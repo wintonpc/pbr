@@ -39,41 +39,6 @@ const fld_t FLD_SINT64 = 18;
 
 const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
 
-struct Model;
-struct Msg;
-struct Fld;
-
-typedef void (*add_fld_func)(Msg&, Fld);
-typedef const Fld* (*get_fld_func)(const Msg&, int);
-
-struct Fld {
-  int num;
-  wire_t wire_type;
-  fld_t fld_type;  
-};
-
-struct Msg {
-  std::string name;
-  std::vector<Fld> flds;
-  add_fld_func add_fld;
-  get_fld_func get_fld;
-};
-
-Msg make_msg(std::string name, zz_t max_zz_fld_num);
-
-struct Model {
-  std::vector<Msg> msgs;
-};
-
-#define MODEL(handle) (Model*)NUM2LONG(handle);
-
 zz_t max_zz_field(VALUE fields);
-zz_t zz_enc32(int n);
-int zz_dec32(zz_t zz);
-
-inline VALUE rb_get(VALUE receiver, const char* name) {
-  return rb_funcall(receiver, rb_intern(name), 0);
-}
-
 
 #endif

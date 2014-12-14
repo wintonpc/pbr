@@ -1,5 +1,13 @@
 #include <stdio.h>
 #include "pbr_ext.h"
+#include "model.h"
+#include "encode.h"
+
+#define MODEL(handle) (Model*)NUM2LONG(handle);
+
+inline VALUE rb_get(VALUE receiver, const char* name) {
+  return rb_funcall(receiver, rb_intern(name), 0);
+}
 
 VALUE create_handle(VALUE self) {
   return LONG2NUM((long int)(new Model()));
@@ -9,49 +17,6 @@ VALUE destroy_handle(VALUE self, VALUE handle) {
   delete MODEL(handle);
   return Qnil;
 }
-
-void add_indexing_fld(Msg& msg, Fld fld) {
-  msg.flds[zz_enc32(fld.num)] = fld;
-}
-
-const Fld* get_indexing_fld(const Msg& msg, int fld_num) {
-  zz_t zz_fld_num = zz_enc32(fld_num);
-  if (zz_fld_num >= msg.flds.size())
-    return NULL;
-  else
-    return &msg.flds[zz_fld_num];
-}
-
-void add_scanning_fld(Msg& msg, Fld fld) {
-  msg.flds.push_back(fld);
-}
-
-const Fld* get_scanning_fld(const Msg& msg, int fld_num) {
-  int len = msg.flds.size();
-  for (int i=0; i<len; i++)
-    if (msg.flds[i].num == fld_num)
-      return &msg.flds[i];
-  return NULL;
-}
-
-Msg make_msg(std::string name, zz_t max_zz_fld_num) {
-  Msg msg;
-  msg.name = name;
-  
-  if (max_zz_fld_num <= ZZ_FLD_LOOKUP_CUTOFF) {
-    msg.flds.reserve(max_zz_fld_num);
-    msg.add_fld = add_scanning_fld;
-    msg.get_fld = get_scanning_fld;
-  }
-  else {
-    msg.add_fld = add_indexing_fld;
-    msg.get_fld = get_indexing_fld;
-  }
-
-  return msg;
-}
-
-
 
 VALUE register_types(VALUE self, VALUE handle, VALUE types) {
 
@@ -82,14 +47,6 @@ zz_t max_zz_field(VALUE flds) {
       max = zzfn;
   }
   return max;
-}
-
-zz_t zz_enc32(int n) {
-  return (n << 1) ^ (n >> 31);
-}
-
-int zz_dec32(zz_t zz) {
-  return (zz >> 1) ^ (-(zz & 1));
 }
 
 extern "C" void Init_pbr_ext() {
