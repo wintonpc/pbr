@@ -17,15 +17,16 @@ class Pbr
   end
 
   # def self.finalize(handle)
-  #   proc { C::destroy_handle(handle) }
+  #   proc { Ext::destroy_handle(handle) }
   # end
 
   def write(obj, type)
     ensure_type_registered(type)
+    Ext::write(@handle, obj, type.name)
   end
 
-  def read(buf, type)
-
+  def read(buf, obj, type)
+    obj
   end
 
   def ensure_type_registered(type)

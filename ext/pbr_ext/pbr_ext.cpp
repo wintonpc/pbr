@@ -34,8 +34,6 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types) {
     model->msgs.push_back(msg);
   }
 
-  cout << "done pushing msgs" << endl;
-
   // fill in fields
   for (int i=0; i<num_types; i++) {
     VALUE type = rb_ary_entry(types, i);
@@ -50,7 +48,8 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types) {
     for (int f=0; f<(int)msg.flds.size(); f++) {
       Fld fld = msg.flds[f];
       if (fld.name != "")
-        cout << "  " << fld.num << " " << fld.name << endl;
+        cout << "  " << fld.num << " " << fld.name << " (" << (int)fld.fld_type << ") ["
+             << (int)fld.wire_type << "]" << endl;
     }
   }
   cout << "---------------" << endl;
@@ -66,7 +65,41 @@ void register_fields(Msg& msg, VALUE type) {
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
     fld.name = RSTRING_PTR(sym_to_s(rb_get(rFld, "name")));
+    fld.fld_type = NUM2INT(rb_get(rFld, "type"));
+    fld.wire_type = wire_type_for_fld_type(fld.fld_type);
     msg.add_fld(msg, fld);
+  }
+}
+
+VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name) {
+  // Model* model = MODEL(handle);
+  // Msg* msg = get_msg_by_name(model, std::string(RSTRING_PTR(type_name)));
+  // int num_flds = msg->flds.size();
+  // buf_t buf;
+  // for (int i=0; i<num_flds; i++) {
+  //   Fld* fld = &msg->flds[i];
+    
+  // }
+  return Qnil;
+}
+
+Msg* get_msg_by_name(Model* model, std::string name) {
+  int len = model->msgs.size();
+  for (int i=0; i<len; i++) {
+    Msg* msg = &model->msgs[i];
+    if (msg->name == name)
+      return msg;
+  }
+  return NULL;
+}
+
+wire_t wire_type_for_fld_type(fld_t fld_type) {
+  switch (fld_type) {
+  case FLD_STRING:
+    return WIRE_LENGTH_DELIMITED;
+  default:
+    cout << "WARNING: unexpected field type " << (int)fld_type << endl;
+    return WIRE_VARINT;
   }
 }
 
@@ -96,5 +129,6 @@ extern "C" void Init_pbr_ext() {
   rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 0);
   rb_define_singleton_method(ext, "destroy_handle", (VALUE(*)(ANYARGS))destroy_handle, 1);
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 2);
+  rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
 
 }

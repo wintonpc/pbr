@@ -1,10 +1,13 @@
 #ifndef common_h__
 #define common_h__
 
+#include <vector>
+
 typedef unsigned char wire_t;
 typedef unsigned char fld_t;
 typedef unsigned int zz_t;
 typedef long unsigned int zz64_t;
+typedef std::vector<unsigned char> buf_t;
 
 const wire_t WIRE_VARINT = 0;
 const wire_t WIRE_64BIT = 1;
