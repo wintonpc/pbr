@@ -31,8 +31,8 @@ class Pbr
      ## Uses ZigZag encoding.
   end
 
-  TField = Struct.new(:name, :type)
+  TField = Struct.new(:name, :num, :type)
 
-  TMessage = Struct.new(:fields)
+  TMessage = Struct.new(:name, :fields)
 
 end

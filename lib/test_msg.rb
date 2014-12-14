@@ -1,5 +1,5 @@
 require 'pbr'
 
-TestMsg = Pbr::TMessage.new([
-    Pbr::TField.new(:greeting, Pbr::TFieldType::STRING)
+TestMsg = Pbr::TMessage.new('TestMsg', [
+    Pbr::TField.new(:greeting, 1, Pbr::TFieldType::STRING)
 ])
