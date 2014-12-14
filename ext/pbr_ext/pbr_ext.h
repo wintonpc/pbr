@@ -37,19 +37,39 @@ const fld_t FLD_SFIXED64 = 16;
 const fld_t FLD_SINT32 = 17;
 const fld_t FLD_SINT64 = 18;
 
+const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
+
 class Fld {
  public:
+  int num;
   wire_t wire_type;
   fld_t fld_type;
 };
 
 class Msg {
  public:
-  Msg(std::string name, zz_t zz_max_field_num);
-  ~Msg();
-
   std::string name;
-  Fld* flds;
+  virtual void add_fld(Fld fld) = 0;
+  virtual Fld *get_fld(int fld_num) = 0;
+  
+ private:
+  std::vector<Fld> flds;
+};
+
+const Msg create_msg(std::string name, zz_t max_zz_fld_num);
+
+class ScanningMsg : public Msg {
+ public:
+  ScanningMsg(std::string name);
+  void add_fld(Fld fld);
+  Fld *get_fld(int fld_num);
+};
+
+class IndexingMsg : public Msg {
+ public:
+  IndexingMsg(std::string name, zz_t max_zz_fld_num);
+  void add_fld(Fld fld);
+  Fld *get_fld(int fld_num);
 };
 
 class Model {
