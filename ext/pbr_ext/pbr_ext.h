@@ -39,42 +39,29 @@ const fld_t FLD_SINT64 = 18;
 
 const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
 
-class Fld {
- public:
+struct Model;
+struct Msg;
+struct Fld;
+
+typedef void (*add_fld_func)(Msg&, Fld);
+typedef const Fld* (*get_fld_func)(const Msg&, int);
+
+struct Fld {
   int num;
   wire_t wire_type;
-  fld_t fld_type;
+  fld_t fld_type;  
 };
 
-class Msg {
- public:
+struct Msg {
   std::string name;
-  virtual void add_fld(Fld fld) = 0;
-  virtual Fld *get_fld(int fld_num) = 0;
-  
- private:
   std::vector<Fld> flds;
+  add_fld_func add_fld;
+  get_fld_func get_fld;
 };
 
-const Msg create_msg(std::string name, zz_t max_zz_fld_num);
+Msg make_msg(std::string name, zz_t max_zz_fld_num);
 
-class ScanningMsg : public Msg {
- public:
-  ScanningMsg(std::string name);
-  void add_fld(Fld fld);
-  Fld *get_fld(int fld_num);
-};
-
-class IndexingMsg : public Msg {
- public:
-  IndexingMsg(std::string name, zz_t max_zz_fld_num);
-  void add_fld(Fld fld);
-  Fld *get_fld(int fld_num);
-};
-
-class Model {
- public:
-
+struct Model {
   std::vector<Msg> msgs;
 };
 
@@ -82,6 +69,7 @@ class Model {
 
 zz_t max_zz_field(VALUE fields);
 zz_t zz_enc32(int n);
+int zz_dec32(zz_t zz);
 
 inline VALUE rb_get(VALUE receiver, const char* name) {
   return rb_funcall(receiver, rb_intern(name), 0);
