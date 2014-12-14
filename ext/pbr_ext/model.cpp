@@ -1,6 +1,9 @@
+#include <iostream>
+
 #include "model.h"
 #include "encode.h"
 
+using namespace std;
 
 void add_indexing_fld(Msg& msg, Fld fld) {
   msg.flds[zz_enc32(fld.num)] = fld;
@@ -31,14 +34,14 @@ Msg make_msg(std::string name, zz_t max_zz_fld_num) {
   msg.name = name;
   
   if (max_zz_fld_num <= ZZ_FLD_LOOKUP_CUTOFF) {
-    msg.flds.reserve(max_zz_fld_num);
-    msg.add_fld = add_scanning_fld;
-    msg.get_fld = get_scanning_fld;
-  }
-  else {
+    msg.flds.resize(max_zz_fld_num + 1);
     msg.add_fld = add_indexing_fld;
     msg.get_fld = get_indexing_fld;
   }
-
+  else {
+    msg.add_fld = add_scanning_fld;
+    msg.get_fld = get_scanning_fld;
+  }
+  
   return msg;
 }

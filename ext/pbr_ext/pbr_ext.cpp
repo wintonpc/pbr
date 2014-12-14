@@ -2,6 +2,9 @@
 #include "pbr_ext.h"
 #include "model.h"
 #include "encode.h"
+#include <iostream>
+
+using namespace std;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
@@ -27,14 +30,51 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types) {
   for (int i=0; i<num_types; i++) {
     VALUE type = rb_ary_entry(types, i);
     std::string name(RSTRING_PTR(rb_get(type, "name")));
-    printf("saw type %s\n", name.c_str());
     Msg msg = make_msg(name, max_zz_field(rb_get(type, "fields")));
     model->msgs.push_back(msg);
   }
 
+  cout << "done pushing msgs" << endl;
+
   // fill in fields
+  for (int i=0; i<num_types; i++) {
+    VALUE type = rb_ary_entry(types, i);
+    register_fields(model->msgs[i], type);
+  }
+
+  cout << endl;
+  cout << "REGISTERED:" << endl;
+  for (int m=0; m<(int)model->msgs.size(); m++) {
+    Msg msg = model->msgs[m];
+    cout << msg.name << endl;
+    for (int f=0; f<(int)msg.flds.size(); f++) {
+      Fld fld = msg.flds[f];
+      if (fld.name != "")
+        cout << "  " << fld.num << " " << fld.name << endl;
+    }
+  }
+  cout << "---------------" << endl;
 
   return Qnil;
+}
+
+void register_fields(Msg& msg, VALUE type) {
+  VALUE rFields = rb_get(type, "fields");
+  int num_fields = RARRAY_LEN(rFields);
+  for (int i=0; i<num_fields; i++) {
+    VALUE rFld = rb_ary_entry(rFields, i);
+    Fld fld;
+    fld.num = NUM2INT(rb_get(rFld, "num"));
+    fld.name = RSTRING_PTR(sym_to_s(rb_get(rFld, "name")));
+    msg.add_fld(msg, fld);
+  }
+}
+
+VALUE sym_to_s(VALUE x) {
+  if (TYPE(x) == T_SYMBOL)
+    return rb_sym_to_s(x);
+  else
+    return x;
 }
 
 zz_t max_zz_field(VALUE flds) {

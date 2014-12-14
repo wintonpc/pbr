@@ -1,7 +1,9 @@
 #ifndef model_h__
 #define model_h__
 
-#include "pbr_ext.h"
+#include <vector>
+#include <string>
+#include "common.h"
 
 struct Model;
 struct Msg;
@@ -23,6 +25,7 @@ struct Msg {
 
 struct Fld {
   int num;
+  std::string name;
   wire_t wire_type;
   fld_t fld_type;  
 };
