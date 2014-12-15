@@ -27,8 +27,8 @@ class Pbr
     Ext::write(@handle, obj, type.name)
   end
 
-  def read(buf, obj, type)
-    obj
+  def read(buf, type)
+    nil
   end
 
   def ensure_type_registered(type)

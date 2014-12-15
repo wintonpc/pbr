@@ -14,7 +14,7 @@ describe Pbr do
       obj = OpenStruct.new
       obj.greeting = 'hello, world!'
       bytes = Pbr.new.write(obj, TestMsg)
-      obj2 = Pbr.new.read(bytes, OpenStruct.new, TestMsg)
+      obj2 = Pbr.new.read(bytes, TestMsg)
       expect(obj2.greeting).to eql obj.greeting
     end
   end
