@@ -8,7 +8,7 @@ require 'ostruct'
 class Pbr
 
   def initialize(rule=PbrRule.default)
-    @rule = rule
+    @rule = wrap_rule(rule)
     @handle = Ext::create_handle
     @registered_types = Set.new
   end

@@ -13,7 +13,7 @@ VALUE create_handle(VALUE self);
 VALUE destroy_handle(VALUE self, VALUE handle);
 VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule);
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name);
-void register_fields(Msg *msg, VALUE type);
+void register_fields(Msg *msg, VALUE type, VALUE rule);
 zz_t max_zz_field(VALUE fields);
 VALUE sym_to_s(VALUE x);
 wire_t wire_type_for_fld_type(fld_t fld_type);

@@ -13,7 +13,7 @@ VALUE rb_get(VALUE receiver, const char* name) {
 }
 
 VALUE rb_call1(VALUE proc, VALUE arg) {
-  return rb_funcall(proc, rb_intern("call"), 1);
+  return rb_funcall(proc, rb_intern("call"), 1, arg);
 }
 
 VALUE create_handle(VALUE self) {
@@ -46,17 +46,20 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
 
   // fill in fields
   for (VALUE type : new_types)
-    register_fields(get_msg_for_type(model, type), type);
+    register_fields(get_msg_for_type(model, type), type, rule);
 
   // print debugging info
   cout << endl;
   cout << "REGISTERED:" << endl;
   for (Msg& msg : model->msgs) {
-    cout << msg.name << endl;
+    cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds) {
       if (fld.name != "")
-        cout << "  " << fld.num << " " << fld.name << " (" << (int)fld.fld_type << ") ["
-             << (int)fld.wire_type << "]" << endl;
+        cout << "  " << fld.num << " " << fld.name
+             << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+             << " (" << (int)fld.fld_type << ") "
+             << "[" << (int)fld.wire_type << "]"
+             << endl;
     }
   }
   cout << "---------------" << endl;
@@ -64,13 +67,17 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   return Qnil;
 }
 
-void register_fields(Msg *msg, VALUE type) {
+void register_fields(Msg *msg, VALUE type, VALUE rule) {
   for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
+    VALUE rFldName = sym_to_s(rb_get(rFld, "name"));
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
-    fld.name = RSTRING_PTR(sym_to_s(rb_get(rFld, "name")));
+    fld.name = RSTRING_PTR(rFldName);
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
+    VALUE proc = rb_get(rule, "get_target_field");
+    VALUE name = rb_call1(proc, rFldName);
+    fld.target_field = rb_intern(RSTRING_PTR(name));
     msg->add_fld(msg, fld);
   }
 }
@@ -80,7 +87,7 @@ Msg* get_msg_for_type(Model* model, VALUE type) {
 }
 
 string type_name(VALUE type) {
-  return string(RSTRING_PTR(rb_get(type, "name")));
+  return RSTRING_PTR(rb_get(type, "name"));
 }
 
 vector<VALUE> arr2vec(VALUE array) {
@@ -93,7 +100,7 @@ vector<VALUE> arr2vec(VALUE array) {
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name) {
   // Model* model = MODEL(handle);
-  // Msg* msg = get_msg_by_name(model, std::string(RSTRING_PTR(type_name)));
+  // Msg* msg = get_msg_by_name(model, RSTRING_PTR(type_name));
   // int num_flds = msg->flds.size();
   // buf_t buf;
   // for (int i=0; i<num_flds; i++) {

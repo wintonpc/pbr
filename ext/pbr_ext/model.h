@@ -28,6 +28,8 @@ struct Msg {
 struct Fld {
   int num;
   std::string name;
+  ID target_field;
+  VALUE target_key;
   wire_t wire_type;
   fld_t fld_type;  
 };
