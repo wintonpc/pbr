@@ -3,10 +3,12 @@ Dir.glob(File.join(File.dirname(__FILE__), 'pbr/**/*.rb')).each{|path| require_r
 
 require 'set'
 require 'pbr_ext'
+require 'ostruct'
 
 class Pbr
 
-  def initialize
+  def initialize(rule=PbrRule.default)
+    @rule = rule
     @handle = Ext::create_handle
     @registered_types = Set.new
   end
@@ -32,12 +34,20 @@ class Pbr
   def ensure_type_registered(type)
     unless @registered_types.include?(type)
       types = collect_type_dependencies(type)
-      Ext::register_types(@handle, types)
+      Ext::register_types(@handle, types, @rule)
       @registered_types += types
     end
   end
 
   def collect_type_dependencies(type)
     [type] # TODO
+  end
+
+  def wrap_rule(rule)
+    w = PbrRule.new
+    w.get_target_type = rule.get_target_type
+    w.get_target_field = ->f{rule.get_target_field.call(f).to_s}
+    w.get_target_key = rule.get_target_field
+    w
   end
 end

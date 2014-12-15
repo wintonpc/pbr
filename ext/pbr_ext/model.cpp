@@ -5,27 +5,36 @@
 
 using namespace std;
 
-void add_indexing_fld(Msg& msg, Fld fld) {
-  msg.flds[zz_enc32(fld.num)] = fld;
+void add_indexing_fld(Msg* msg, Fld fld) {
+  msg->flds[zz_enc32(fld.num)] = fld;
 }
 
-const Fld* get_indexing_fld(const Msg& msg, int fld_num) {
+Fld* get_indexing_fld(Msg* msg, int fld_num) {
   zz_t zz_fld_num = zz_enc32(fld_num);
-  if (zz_fld_num >= msg.flds.size())
+  if (zz_fld_num >= msg->flds.size())
     return NULL;
   else
-    return &msg.flds[zz_fld_num];
+    return &msg->flds[zz_fld_num];
 }
 
-void add_scanning_fld(Msg& msg, Fld fld) {
-  msg.flds.push_back(fld);
+void add_scanning_fld(Msg* msg, Fld fld) {
+  msg->flds.push_back(fld);
 }
 
-const Fld* get_scanning_fld(const Msg& msg, int fld_num) {
-  int len = msg.flds.size();
-  for (int i=0; i<len; i++)
-    if (msg.flds[i].num == fld_num)
-      return &msg.flds[i];
+Fld* get_scanning_fld(Msg* msg, int fld_num) {
+  for (Fld& fld : msg->flds)
+    if (fld.num == fld_num)
+      return &fld;
+  return NULL;
+}
+
+Msg* get_msg_by_name(Model* model, std::string name) {
+  int len = model->msgs.size();
+  for (int i=0; i<len; i++) {
+    Msg* msg = &model->msgs[i];
+    if (msg->name == name)
+      return msg;
+  }
   return NULL;
 }
 

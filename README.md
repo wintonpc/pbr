@@ -44,3 +44,6 @@ A `pbr_type` is a beefcake ruby class and another ruby class;
 - per-pbr_type settings
   - field name inflection options
     - allow arbitrary mappings with lambdas
+
+- optimization
+  - change enc/decode-time functions to use references

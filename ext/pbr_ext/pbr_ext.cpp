@@ -8,8 +8,12 @@ using namespace std;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
-inline VALUE rb_get(VALUE receiver, const char* name) {
+VALUE rb_get(VALUE receiver, const char* name) {
   return rb_funcall(receiver, rb_intern(name), 0);
+}
+
+VALUE rb_call1(VALUE proc, VALUE arg) {
+  return rb_funcall(proc, rb_intern("call"), 1);
 }
 
 VALUE create_handle(VALUE self) {
@@ -21,54 +25,70 @@ VALUE destroy_handle(VALUE self, VALUE handle) {
   return Qnil;
 }
 
-VALUE register_types(VALUE self, VALUE handle, VALUE types) {
+VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
 
   Model* model = MODEL(handle);
 
+  // filter out already registered
+  vector<VALUE> new_types;
+  for (VALUE type : arr2vec(types)) {
+    Msg *existing = get_msg_for_type(model, type);
+    if (existing == NULL)
+      new_types.push_back(type);
+  }
+  
   // push msgs
-  int num_types = RARRAY_LEN(types);
-  for (int i=0; i<num_types; i++) {
-    VALUE type = rb_ary_entry(types, i);
-    std::string name(RSTRING_PTR(rb_get(type, "name")));
-    Msg msg = make_msg(name, max_zz_field(rb_get(type, "fields")));
+  for (VALUE type : new_types) {
+    Msg msg = make_msg(type_name(type), max_zz_field(rb_get(type, "fields")));
+    msg.target = rb_call1(rb_get(rule, "get_target_type"), type);
     model->msgs.push_back(msg);
   }
 
   // fill in fields
-  for (int i=0; i<num_types; i++) {
-    VALUE type = rb_ary_entry(types, i);
-    register_fields(model->msgs[i], type);
-  }
+  for (VALUE type : new_types)
+    register_fields(get_msg_for_type(model, type), type);
 
+  // print debugging info
   cout << endl;
   cout << "REGISTERED:" << endl;
-  for (int m=0; m<(int)model->msgs.size(); m++) {
-    Msg msg = model->msgs[m];
+  for (Msg& msg : model->msgs) {
     cout << msg.name << endl;
-    for (int f=0; f<(int)msg.flds.size(); f++) {
-      Fld fld = msg.flds[f];
+    for (Fld& fld : msg.flds) {
       if (fld.name != "")
         cout << "  " << fld.num << " " << fld.name << " (" << (int)fld.fld_type << ") ["
              << (int)fld.wire_type << "]" << endl;
     }
   }
   cout << "---------------" << endl;
-
+  
   return Qnil;
 }
 
-void register_fields(Msg& msg, VALUE type) {
-  VALUE rFields = rb_get(type, "fields");
-  int num_fields = RARRAY_LEN(rFields);
-  for (int i=0; i<num_fields; i++) {
-    VALUE rFld = rb_ary_entry(rFields, i);
+void register_fields(Msg *msg, VALUE type) {
+  for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
     fld.name = RSTRING_PTR(sym_to_s(rb_get(rFld, "name")));
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
-    msg.add_fld(msg, fld);
+    msg->add_fld(msg, fld);
   }
+}
+
+Msg* get_msg_for_type(Model* model, VALUE type) {
+  return get_msg_by_name(model, type_name(type));
+}
+
+string type_name(VALUE type) {
+  return string(RSTRING_PTR(rb_get(type, "name")));
+}
+
+vector<VALUE> arr2vec(VALUE array) {
+  vector<VALUE> v;
+  int len = RARRAY_LEN(array);
+  for (int i=0; i<len; i++)
+    v.push_back(rb_ary_entry(array, i));
+  return v;
 }
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name) {
@@ -81,16 +101,6 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name) {
     
   // }
   return Qnil;
-}
-
-Msg* get_msg_by_name(Model* model, std::string name) {
-  int len = model->msgs.size();
-  for (int i=0; i<len; i++) {
-    Msg* msg = &model->msgs[i];
-    if (msg->name == name)
-      return msg;
-  }
-  return NULL;
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {
@@ -128,7 +138,7 @@ extern "C" void Init_pbr_ext() {
 
   rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 0);
   rb_define_singleton_method(ext, "destroy_handle", (VALUE(*)(ANYARGS))destroy_handle, 1);
-  rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 2);
+  rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
 
 }

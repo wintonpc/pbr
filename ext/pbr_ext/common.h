@@ -3,8 +3,8 @@
 
 #include <vector>
 
-typedef unsigned char wire_t;
-typedef unsigned char fld_t;
+typedef int wire_t;
+typedef int fld_t;
 typedef unsigned int zz_t;
 typedef long unsigned int zz64_t;
 typedef std::vector<unsigned char> buf_t;
