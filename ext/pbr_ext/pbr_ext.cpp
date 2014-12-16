@@ -62,7 +62,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
            << "[" << (int)fld.wire_type << "]"
            << endl;
     }
-  }
+ }
   cout << "---------------" << endl;
   
   return Qnil;
@@ -129,7 +129,6 @@ VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
 
 void w_var_uint32(buf_t& buf, uint32_t n) {
   cout << "w_var_uint32 " << n << endl;
-  // consider unrolling
   while (n > 127) {
     buf.push_back((uint8_t)((n & 127) | 128));
     n >>= 7;
@@ -145,6 +144,11 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
 
 void wf_string(buf_t& buf, VALUE obj, ID target_field) {
   cout << "wf_string" << endl;
+  VALUE v = rb_funcall(obj, target_field, 0);
+  const char *s = RSTRING_PTR(v);
+  int len = RSTRING_LEN(v);
+  w_var_uint32(buf, len);
+  buf.insert(buf.end(), s, s + len);
 }
 
 write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {

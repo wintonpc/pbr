@@ -15,6 +15,7 @@ describe Pbr do
       obj.greeting = 'hello, world!'
       bytes = Pbr.new.write(obj, TestMsg)
       puts "bytes = #{bytes.unpack('C*').inspect}"
+      puts "string = #{bytes}"
       obj2 = Pbr.new.read(bytes, TestMsg)
       expect(obj2.greeting).to eql obj.greeting
     end
