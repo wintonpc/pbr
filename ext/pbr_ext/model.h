@@ -12,6 +12,9 @@ struct Fld;
 
 typedef void (*add_fld_func)(Msg*, Fld);
 typedef Fld* (*get_fld_func)(Msg*, int);
+typedef VALUE (*write_obj_func)(Msg* msg, int num_flds, buf_t& buf, VALUE obj);
+typedef void (*write_fld_func)(buf_t& buf, VALUE obj, ID target_field);
+typedef void (*write_key_func)(buf_t& buf, VALUE obj, VALUE target_key);
 
 struct Model {
   std::vector<Msg> msgs;
@@ -20,18 +23,23 @@ struct Model {
 struct Msg {
   std::string name;
   VALUE target;
-  std::vector<Fld> flds;
+  bool target_is_hash;
+  std::vector<Fld> flds_to_lookup;
+  std::vector<Fld> flds_to_enumerate;
   add_fld_func add_fld;
   get_fld_func get_fld;
+  write_obj_func write;
 };
 
 struct Fld {
-  int num;
+  fld_num_t num;
   std::string name;
   ID target_field;
   VALUE target_key;
   wire_t wire_type;
-  fld_t fld_type;  
+  fld_t fld_type;
+  write_fld_func write_fld;
+  write_key_func write_key;
 };
 
 Msg make_msg(std::string name, zz_t max_zz_fld_num);

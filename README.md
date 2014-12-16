@@ -19,6 +19,8 @@ A `pbr_type` is a beefcake ruby class and another ruby class:
 - hash support
   - consider being more flexible with determining if a target type should be treated as a hash
 
+- consider ObjectId -> string problem
+
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
 

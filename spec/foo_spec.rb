@@ -14,6 +14,7 @@ describe Pbr do
       obj = OpenStruct.new
       obj.greeting = 'hello, world!'
       bytes = Pbr.new.write(obj, TestMsg)
+      puts "bytes = #{bytes.unpack('C*').inspect}"
       obj2 = Pbr.new.read(bytes, TestMsg)
       expect(obj2.greeting).to eql obj.greeting
     end

@@ -6,23 +6,25 @@
 using namespace std;
 
 void add_indexing_fld(Msg* msg, Fld fld) {
-  msg->flds[zz_enc32(fld.num)] = fld;
+  msg->flds_to_enumerate.push_back(fld);
+  msg->flds_to_lookup[zz_enc32(fld.num)] = fld;
 }
 
 Fld* get_indexing_fld(Msg* msg, int fld_num) {
   zz_t zz_fld_num = zz_enc32(fld_num);
-  if (zz_fld_num >= msg->flds.size())
+  if (zz_fld_num >= msg->flds_to_lookup.size())
     return NULL;
   else
-    return &msg->flds[zz_fld_num];
+    return &msg->flds_to_lookup[zz_fld_num];
 }
 
 void add_scanning_fld(Msg* msg, Fld fld) {
-  msg->flds.push_back(fld);
+  msg->flds_to_enumerate.push_back(fld);
+  msg->flds_to_lookup.push_back(fld);
 }
 
 Fld* get_scanning_fld(Msg* msg, int fld_num) {
-  for (Fld& fld : msg->flds)
+  for (Fld& fld : msg->flds_to_lookup)
     if (fld.num == fld_num)
       return &fld;
   return NULL;
@@ -43,7 +45,7 @@ Msg make_msg(std::string name, zz_t max_zz_fld_num) {
   msg.name = name;
   
   if (max_zz_fld_num <= ZZ_FLD_LOOKUP_CUTOFF) {
-    msg.flds.resize(max_zz_fld_num + 1);
+    msg.flds_to_lookup.resize(max_zz_fld_num + 1);
     msg.add_fld = add_indexing_fld;
     msg.get_fld = get_indexing_fld;
   }

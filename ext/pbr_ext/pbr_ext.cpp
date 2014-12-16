@@ -41,6 +41,8 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   for (VALUE type : new_types) {
     Msg msg = make_msg(type_name(type), max_zz_field(rb_get(type, "fields")));
     msg.target = rb_call1(rb_get(rule, "get_target_type"), type);
+    msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
+    msg.write = msg.target_is_hash ? write_hash : write_obj;
     model->msgs.push_back(msg);
   }
 
@@ -53,13 +55,12 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   cout << "REGISTERED:" << endl;
   for (Msg& msg : model->msgs) {
     cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
-    for (Fld& fld : msg.flds) {
-      if (fld.name != "")
-        cout << "  " << fld.num << " " << fld.name
-             << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
-             << " (" << (int)fld.fld_type << ") "
-             << "[" << (int)fld.wire_type << "]"
-             << endl;
+    for (Fld& fld : msg.flds_to_enumerate) {
+      cout << "  " << fld.num << " " << fld.name
+           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+           << " (" << (int)fld.fld_type << ") "
+           << "[" << (int)fld.wire_type << "]"
+           << endl;
     }
   }
   cout << "---------------" << endl;
@@ -75,9 +76,13 @@ void register_fields(Msg *msg, VALUE type, VALUE rule) {
     fld.name = RSTRING_PTR(rFldName);
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
-    VALUE proc = rb_get(rule, "get_target_field");
-    VALUE name = rb_call1(proc, rFldName);
-    fld.target_field = rb_intern(RSTRING_PTR(name));
+    if (msg->target_is_hash) {
+      fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
+      fld.write_key = get_key_writer(fld.wire_type, fld.fld_type);
+    } else {
+      fld.target_field = rb_intern(RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName)));
+      fld.write_fld = get_fld_writer(fld.wire_type, fld.fld_type);
+    }
     msg->add_fld(msg, fld);
   }
 }
@@ -98,16 +103,59 @@ vector<VALUE> arr2vec(VALUE array) {
   return v;
 }
 
-VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type_name) {
-  // Model* model = MODEL(handle);
-  // Msg* msg = get_msg_by_name(model, RSTRING_PTR(type_name));
-  // int num_flds = msg->flds.size();
-  // buf_t buf;
-  // for (int i=0; i<num_flds; i++) {
-  //   Fld* fld = &msg->flds[i];
-    
-  // }
+VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
+  Model* model = MODEL(handle);
+  Msg* msg = get_msg_for_type(model, type);
+  buf_t buf;
+  int num_flds = msg->flds_to_enumerate.size();
+  write_obj_func write = msg->target_is_hash ? write_hash : write_obj;
+  return write(msg, num_flds, buf, obj);
+}
+
+VALUE write_obj(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
+  for (int i=0; i<num_flds; i++) {
+    Fld* fld = &msg->flds_to_enumerate[i];
+    write_header(buf, fld->wire_type, fld->num);
+    fld->write_fld(buf, obj, fld->target_field);
+  }
+  cout << "buf size " << buf.size() << endl;
+  cout << "buf[0] " << (int)buf[0] << endl;
+  return rb_str_new((const char*)buf.data(), buf.size());
+}
+
+VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
   return Qnil;
+}
+
+void w_var_uint32(buf_t& buf, uint32_t n) {
+  cout << "w_var_uint32 " << n << endl;
+  // consider unrolling
+  while (n > 127) {
+    buf.push_back((uint8_t)((n & 127) | 128));
+    n >>= 7;
+  }
+  buf.push_back((uint8_t)(n & 127));
+}
+
+void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
+  cout << "write_header " << wire_type << " " << fld_num << endl;
+  uint32_t h = (fld_num << 3) | wire_type;
+  w_var_uint32(buf, h);
+}
+
+void wf_string(buf_t& buf, VALUE obj, ID target_field) {
+  cout << "wf_string" << endl;
+}
+
+write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
+  switch (fld_type) {
+  case FLD_STRING: return wf_string;
+  default: return NULL;
+  }
+}
+
+write_key_func get_key_writer(wire_t wire_type, fld_t fld_type) {
+  return NULL;
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {
