@@ -28,7 +28,8 @@ class Pbr
   end
 
   def read(buf, type)
-    nil
+    ensure_type_registered(type)
+    Ext::read(@handle, buf, type)
   end
 
   def ensure_type_registered(type)

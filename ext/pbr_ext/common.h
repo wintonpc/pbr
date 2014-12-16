@@ -1,6 +1,7 @@
 #ifndef common_h__
 #define common_h__
 
+#include <cstdint>
 #include <vector>
 
 typedef int wire_t;
@@ -37,5 +38,16 @@ const fld_t FLD_SINT32 = 17;
 const fld_t FLD_SINT64 = 18;
 
 const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
+
+typedef struct StringStream {
+  uint8_t* buf;
+  int pos;
+  int len;
+} ss_t;
+
+
+ss_t ss_make(const char* s, int len);
+uint8_t ss_read_byte(ss_t& ss);
+#define ss_more(ss)  (ss).pos <= (ss).len
 
 #endif

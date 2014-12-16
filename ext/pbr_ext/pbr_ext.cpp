@@ -2,6 +2,7 @@
 #include "pbr_ext.h"
 #include "model.h"
 #include "encode.h"
+#include <cstdint>
 #include <iostream>
 
 using namespace std;
@@ -112,6 +113,26 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   return write(msg, num_flds, buf, obj);
 }
 
+VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
+  Model* model = MODEL(handle);
+  Msg* msg = get_msg_for_type(model, type);
+  ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
+  read_obj_func read = msg->target_is_hash ? read_hash : read_obj;
+  return read(msg, ss);
+}
+
+VALUE read_obj(Msg* msg, ss_t& ss) {
+  while (ss_more(ss)) {
+    uint8_t b = ss_read_byte(ss);
+    cout << "read " << b << endl;
+  }
+  return Qnil;
+}
+
+VALUE read_hash(Msg* msg, ss_t& ss) {
+  return Qnil;
+}
+
 VALUE write_obj(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
@@ -130,10 +151,10 @@ VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
 void w_var_uint32(buf_t& buf, uint32_t n) {
   cout << "w_var_uint32 " << n << endl;
   while (n > 127) {
-    buf.push_back((uint8_t)((n & 127) | 128));
+    buf.push_back((uint32_t)((n & 127) | 128));
     n >>= 7;
   }
-  buf.push_back((uint8_t)(n & 127));
+  buf.push_back((uint32_t)(n & 127));
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
@@ -199,5 +220,6 @@ extern "C" void Init_pbr_ext() {
   rb_define_singleton_method(ext, "destroy_handle", (VALUE(*)(ANYARGS))destroy_handle, 1);
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
+  rb_define_singleton_method(ext, "read", (VALUE(*)(ANYARGS))read, 3);
 
 }
