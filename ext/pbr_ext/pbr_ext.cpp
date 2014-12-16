@@ -63,7 +63,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
            << "[" << (int)fld.wire_type << "]"
            << endl;
     }
- }
+  }
   cout << "---------------" << endl;
   
   return Qnil;
@@ -124,11 +124,11 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
 VALUE read_obj(Msg* msg, ss_t& ss) {
   while (ss_more(ss)) {
     uint8_t b = ss_read_byte(ss);
-    cout << "read " << b << endl;
+    cout << "read " << (int)b << endl;
   }
   return Qnil;
 }
-
+ 
 VALUE read_hash(Msg* msg, ss_t& ss) {
   return Qnil;
 }
@@ -155,6 +155,20 @@ void w_var_uint32(buf_t& buf, uint32_t n) {
     n >>= 7;
   }
   buf.push_back((uint32_t)(n & 127));
+}
+ 
+void r_var_uint32(ss_t& ss) {
+  uint32_t val;
+  int sh_amt = 0;
+  while (ss_more(ss) && ((b = ss_read_byte(ss) & 128 != 0))) {
+    uint8_t b = ss_read_byte(ss);
+    val |= (((uint32_t)b) & 127) << sh_amt;
+
+    if ((b & 128) == 0)
+      return val;
+    else
+      sh_amt += 7;
+  }
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
