@@ -10,7 +10,9 @@ read_key_func get_key_reader(wire_t wire_type, fld_t fld_type);
 void rf_string(ss_t& ss, VALUE obj, ID target_field_setter);
 void rf_int32(ss_t& ss, VALUE obj, ID target_field_setter);
 void rf_uint32(ss_t& ss, VALUE obj, ID target_field_setter);
+void rf_int64(ss_t& ss, VALUE obj, ID target_field_setter);
 
 uint32_t r_var_uint32(ss_t& ss);
+uint64_t r_var_uint64(ss_t& ss);
 
 #endif

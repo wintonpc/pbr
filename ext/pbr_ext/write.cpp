@@ -9,6 +9,7 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   case FLD_STRING: return wf_string;
   case FLD_INT32: return wf_int32;
   case FLD_UINT32: return wf_uint32;
+  case FLD_INT64: return wf_int64;
   default: return NULL;
   }
 }
@@ -35,6 +36,10 @@ void wf_uint32(buf_t& buf, VALUE obj, ID target_field) {
   w_var_uint32(buf, NUM2UINT(FVAL()));
 }
 
+void wf_int64(buf_t& buf, VALUE obj, ID target_field) {
+  w_var_uint64(buf, NUM2LL(FVAL()));
+}
+
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   //cout << "write_header " << wire_type << " " << fld_num << endl;
   uint32_t h = (fld_num << 3) | wire_type;
@@ -42,10 +47,17 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
 }
 
 void w_var_uint32(buf_t& buf, uint32_t n) {
-  //cout << "w_var_uint32 " << n << endl;
   while (n > 127) {
     buf.push_back((uint32_t)((n & 127) | 128));
     n >>= 7;
   }
   buf.push_back((uint32_t)(n & 127));
+}
+
+void w_var_uint64(buf_t& buf, uint64_t n) {
+  while (n > 127) {
+    buf.push_back((uint64_t)((n & 127) | 128));
+    n >>= 7;
+  }
+  buf.push_back((uint64_t)(n & 127));
 }

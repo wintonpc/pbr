@@ -31,6 +31,7 @@ describe Pbr do
       roundtrip(:int32, 0)
       roundtrip(:int32, 1)
       roundtrip(:int32, -1)
+      roundtrip(:int32, 1234)
       roundtrip(:int32, 2**31 - 1)
       roundtrip(:int32, -2**31)
     end
@@ -40,6 +41,15 @@ describe Pbr do
       roundtrip(:uint32, 1)
       roundtrip(:uint32, 1234)
       roundtrip(:uint32, 2**32 - 1)
+    end
+
+    it 'int64' do
+      roundtrip(:int64, 0)
+      roundtrip(:int64, 1)
+      roundtrip(:int64, -1)
+      roundtrip(:int64, 1234)
+      roundtrip(:int64, 2**63 - 1)
+      roundtrip(:int64, -2**63)
     end
 
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
