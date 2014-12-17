@@ -7,13 +7,6 @@ require 'active_support/inflector'
 describe Pbr do
 
   context 'roundtrips' do
-    it 'strings' do
-      roundtrip(:string, '')
-      roundtrip(:string, 'hello, world!')
-      roundtrip(:string, "hello\0world")
-      roundtrip(:string, 'z' * 1024 * 1024)
-    end
-
     it 'field names' do
       roundtrip(:string, 'sss', :foo)
       roundtrip(:string, 'sss', 'foo')
@@ -25,6 +18,21 @@ describe Pbr do
       roundtrip(:string, 'sss', :foo, min_field_num)
       roundtrip(:string, 'sss', :foo, 1234)
       roundtrip(:string, 'sss', :foo, max_field_num)
+    end
+
+    it 'string' do
+      roundtrip(:string, '')
+      roundtrip(:string, 'hello, world!')
+      roundtrip(:string, "hello\0world")
+      roundtrip(:string, 'z' * 1024 * 1024)
+    end
+
+    it 'int32' do
+      roundtrip(:int32, 0)
+      roundtrip(:int32, 1)
+      roundtrip(:int32, -1)
+      roundtrip(:int32, 2**31 - 1)
+      roundtrip(:int32, -2**31)
     end
 
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
