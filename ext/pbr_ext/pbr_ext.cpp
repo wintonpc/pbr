@@ -1,25 +1,19 @@
 #include <stdio.h>
+#include <cstdint>
+#include <iostream>
+
 #include "pbr_ext.h"
 #include "model.h"
 #include "encode.h"
-#include <cstdint>
-#include <iostream>
+#include "common.h"
+#include "ss.h"
+#include "types.h"
+#include "read.h"
+#include "write.h"
 
 using namespace std;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
-
-const char* inspect(VALUE x) {
-  return RSTRING_PTR(rb_inspect(x));
-}
-
-VALUE rb_get(VALUE receiver, const char* name) {
-  return rb_funcall(receiver, rb_intern(name), 0);
-}
-
-VALUE rb_call1(VALUE proc, VALUE arg) {
-  return rb_funcall(proc, rb_intern("call"), 1, arg);
-}
 
 VALUE create_handle(VALUE self) {
   return LONG2NUM((long int)(new Model()));
@@ -106,10 +100,6 @@ Msg* get_msg_for_type(Model* model, VALUE type) {
   return get_msg_by_name(model, type_name(type));
 }
 
-string type_name(VALUE type) {
-  return RSTRING_PTR(rb_get(type, "name"));
-}
-
 vector<VALUE> arr2vec(VALUE array) {
   vector<VALUE> v;
   int len = RARRAY_LEN(array);
@@ -131,21 +121,6 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
   Msg* msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
   return msg->read(msg, ss);
-}
-
-uint32_t r_var_uint32(ss_t& ss) {
-  uint32_t val = 0;
-  int sh_amt = 0;
-  while (ss_more(ss)) {
-    uint8_t b = ss_read_byte(ss);
-    val |= (((uint32_t)b) & 127) << sh_amt;
-
-    if ((b & 128) == 0)
-      break;
-    else
-      sh_amt += 7;
-  }
-  return val;
 }
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
@@ -183,63 +158,6 @@ VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
   return Qnil;
 }
 
-void w_var_uint32(buf_t& buf, uint32_t n) {
-  cout << "w_var_uint32 " << n << endl;
-  while (n > 127) {
-    buf.push_back((uint32_t)((n & 127) | 128));
-    n >>= 7;
-  }
-  buf.push_back((uint32_t)(n & 127));
-}
- 
-void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
-  cout << "write_header " << wire_type << " " << fld_num << endl;
-  uint32_t h = (fld_num << 3) | wire_type;
-  w_var_uint32(buf, h);
-}
-
-void wf_string(buf_t& buf, VALUE obj, ID target_field) {
-  cout << "wf_string" << endl;
-  VALUE v = rb_funcall(obj, target_field, 0);
-  const char *s = RSTRING_PTR(v);
-  int len = RSTRING_LEN(v);
-  w_var_uint32(buf, len);
-  buf.insert(buf.end(), s, s + len);
-}
-
-void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
-  cout << "rf_string" << endl;
-  int32_t len = r_var_uint32(ss);
-  cout << "len = " << len << endl;
-  VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
-  cout << inspect(rstr) << endl;
-  cout << inspect(obj) << "." << inspect(ID2SYM(target_field_setter)) << " " << inspect(rstr) << endl;
-  rb_funcall(obj, target_field_setter, 1, rstr);
-  cout << "set it" << endl;
-}
-
-write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
-  switch (fld_type) {
-  case FLD_STRING: return wf_string;
-  default: return NULL;
-  }
-}
-
-read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
-  switch (fld_type) {
-  case FLD_STRING: return rf_string;
-  default: return NULL;
-  }
-}
-
-write_key_func get_key_writer(wire_t wire_type, fld_t fld_type) {
-  return NULL;
-}
-
-read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
-  return NULL;
-}
-
 wire_t wire_type_for_fld_type(fld_t fld_type) {
   switch (fld_type) {
   case FLD_STRING:
@@ -248,13 +166,6 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
     cout << "WARNING: unexpected field type " << (int)fld_type << endl;
     return WIRE_VARINT;
   }
-}
-
-VALUE sym_to_s(VALUE x) {
-  if (TYPE(x) == T_SYMBOL)
-    return rb_sym_to_s(x);
-  else
-    return x;
 }
 
 zz_t max_zz_field(VALUE flds) {

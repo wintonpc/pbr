@@ -3,52 +3,35 @@
 
 #include <cstdint>
 #include <vector>
+#include <ruby.h>
 
-typedef int wire_t;
-typedef int fld_t;
-typedef int fld_num_t;
-typedef unsigned int zz_t;
-typedef long unsigned int zz64_t;
-typedef std::vector<unsigned char> buf_t;
-
-const wire_t WIRE_VARINT = 0;
-const wire_t WIRE_64BIT = 1;
-const wire_t WIRE_LENGTH_DELIMITED = 2;
-//const wire_t WIRE_START_GROUP = 3;
-//const wire_t WIRE_END_GROUP = 4;
-const wire_t WIRE_32BIT = 5;
-
-const fld_t FLD_DOUBLE = 1;
-const fld_t FLD_FLOAT = 2;
-const fld_t FLD_INT64 = 3;
-const fld_t FLD_UINT64 = 4;
-const fld_t FLD_INT32 = 5;
-const fld_t FLD_FIXED64 = 6;
-const fld_t FLD_FIXED32 = 7;
-const fld_t FLD_BOOL = 8;
-const fld_t FLD_STRING = 9;
-const fld_t FLD_GROUP = 10;
-const fld_t FLD_MESSAGE = 11;
-const fld_t FLD_BYTES = 12;
-const fld_t FLD_UINT32 = 13;
-const fld_t FLD_ENUM = 14;
-const fld_t FLD_SFIXED32 = 15;
-const fld_t FLD_SFIXED64 = 16;
-const fld_t FLD_SINT32 = 17;
-const fld_t FLD_SINT64 = 18;
+#include "types.h"
 
 const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
 
-typedef struct StringStream {
-  uint8_t* buf;
-  int pos;
-  int len;
-} ss_t;
+inline const char* inspect(VALUE x) {
+  return RSTRING_PTR(rb_inspect(x));
+}
+
+inline VALUE rb_get(VALUE receiver, const char* name) {
+  return rb_funcall(receiver, rb_intern(name), 0);
+}
+
+inline VALUE rb_call1(VALUE proc, VALUE arg) {
+  return rb_funcall(proc, rb_intern("call"), 1, arg);
+}
+
+inline VALUE sym_to_s(VALUE x) {
+  if (TYPE(x) == T_SYMBOL)
+    return rb_sym_to_s(x);
+  else
+    return x;
+}
+
+inline std::string type_name(VALUE type) {
+  return RSTRING_PTR(rb_get(type, "name"));
+}
 
 
-ss_t ss_make(char* s, int len);
-uint8_t ss_read_byte(ss_t& ss);
-char* ss_read_chars(ss_t& ss, int32_t len);
-#define ss_more(ss)  (ss).pos < (ss).len
 
 #endif

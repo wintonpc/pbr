@@ -1,4 +1,4 @@
-#include "common.h"
+#include "ss.h"
 
 ss_t ss_make(char* s, int len) {
   ss_t ss;

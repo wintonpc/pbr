@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include "common.h"
+#include "types.h"
+#include "ss.h"
 
 struct Model;
 struct Msg;
@@ -50,6 +52,7 @@ struct Fld {
   read_fld_func read_fld;
   read_key_func read_key;
 };
+
 
 Msg make_msg(std::string name, zz_t max_zz_fld_num);
 Msg* get_msg_by_name(Model* model, std::string name);
