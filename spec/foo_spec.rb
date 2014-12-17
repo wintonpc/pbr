@@ -7,6 +7,45 @@ require 'active_support/inflector'
 describe Pbr do
 
   context 'roundtrips' do
+
+    def self.it_roundtrips_int(bits, type)
+      it "#{type}" do
+        roundtrip(type, 0)
+        roundtrip(type, 1)
+        roundtrip(type, -1)
+        roundtrip(type, 1234)
+        roundtrip(type, 2**(bits-1) - 1)
+        roundtrip(type, -2**(bits-1))
+      end
+    end
+
+    def self.it_roundtrips_uint(bits, type)
+      it "#{type}" do
+        roundtrip(type, 0)
+        roundtrip(type, 1)
+        roundtrip(type, 1234)
+        roundtrip(type, 2**bits - 1)
+      end
+    end
+
+    def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
+      message_type = msg_type(short_message_type, field_name, field_num)
+      obj = OpenStruct.new
+      obj.send("#{field_name}=", str)
+      bytes = Pbr.new.write(obj, message_type)
+      obj2  = Pbr.new.read(bytes, message_type)
+      v2    = obj2.send(field_name)
+      v1    = obj.send(field_name)
+      shown = "#{v1.inspect} -> #{v2.inspect}"
+      puts shown.size > 120 ? shown[0..100] + '...' : shown
+      expect(v2).to eql v1
+    end
+
+    def msg_type(field_type, field_name=:foo, field_num=1)
+      field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
+      Pbr::TMessage.new('TestMsg', [Pbr::TField.new(field_name, field_num, field_type_class)])
+    end
+
     it 'field names' do
       roundtrip(:string, 'sss', :foo)
       roundtrip(:string, 'sss', 'foo')
@@ -27,88 +66,16 @@ describe Pbr do
       roundtrip(:string, 'z' * 1024 * 1024)
     end
 
-    it 'int32' do
-      roundtrip(:int32, 0)
-      roundtrip(:int32, 1)
-      roundtrip(:int32, -1)
-      roundtrip(:int32, 1234)
-      roundtrip(:int32, 2**31 - 1)
-      roundtrip(:int32, -2**31)
-    end
-
-    it 'uint32' do
-      roundtrip(:uint32, 0)
-      roundtrip(:uint32, 1)
-      roundtrip(:uint32, 1234)
-      roundtrip(:uint32, 2**32 - 1)
-    end
-
-    it 'int64' do
-      roundtrip(:int64, 0)
-      roundtrip(:int64, 1)
-      roundtrip(:int64, -1)
-      roundtrip(:int64, 1234)
-      roundtrip(:int64, 2**63 - 1)
-      roundtrip(:int64, -2**63)
-    end
-
-    it 'uint64' do
-      roundtrip(:uint64, 0)
-      roundtrip(:uint64, 1)
-      roundtrip(:uint64, 1234)
-      roundtrip(:uint64, 2**64 - 1)
-    end
-
-    it 'sint32' do
-      roundtrip(:sint32, 0)
-      roundtrip(:sint32, 1)
-      roundtrip(:sint32, -1)
-      roundtrip(:sint32, 1234)
-      roundtrip(:sint32, 2**31 - 1)
-      roundtrip(:sint32, -2**31)
-    end
-
-    it 'sint64' do
-      roundtrip(:sint64, 0)
-      roundtrip(:sint64, 1)
-      roundtrip(:sint64, -1)
-      roundtrip(:sint64, 1234)
-      roundtrip(:sint64, 2**63 - 1)
-      roundtrip(:sint64, -2**63)
-    end
-
-    it 'sfixed32' do
-      roundtrip(:sfixed32, 0)
-      roundtrip(:sfixed32, 1)
-      roundtrip(:sfixed32, -1)
-      roundtrip(:sfixed32, 1234)
-      roundtrip(:sfixed32, 2**31 - 1)
-      roundtrip(:sfixed32, -2**31)
-    end
-
-    it 'fixed32' do
-      roundtrip(:fixed32, 0)
-      roundtrip(:fixed32, 1)
-      roundtrip(:fixed32, 1234)
-      roundtrip(:fixed32, 2**32 - 1)
-    end
-
-    def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
-      message_type = msg_type(short_message_type, field_name, field_num)
-      obj = OpenStruct.new
-      obj.send("#{field_name}=", str)
-      bytes = Pbr.new.write(obj, message_type)
-      obj2  = Pbr.new.read(bytes, message_type)
-      v2    = obj2.send(field_name)
-      v1    = obj.send(field_name)
-      shown = "#{v1.inspect} -> #{v2.inspect}"
-      puts shown.size > 120 ? shown[0..100] + '...' : shown
-      expect(v2).to eql v1
-    end
-    def msg_type(field_type, field_name=:foo, field_num=1)
-      field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
-      Pbr::TMessage.new('TestMsg', [Pbr::TField.new(field_name, field_num, field_type_class)])
-    end
+    it_roundtrips_int( 32, :int32)
+    it_roundtrips_uint(32, :uint32)
+    it_roundtrips_int( 64, :int64)
+    it_roundtrips_uint(64, :uint64)
+    it_roundtrips_int( 32, :sint32)
+    it_roundtrips_int( 64, :sint64)
+    it_roundtrips_int( 32, :sfixed32)
+    it_roundtrips_uint(32, :fixed32)
+    it_roundtrips_int( 64, :sfixed64)
+    it_roundtrips_uint(64, :fixed64)
   end
 
   C = Struct.new(:foo)

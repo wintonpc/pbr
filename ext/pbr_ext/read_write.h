@@ -13,5 +13,7 @@
   MAP_TYPE(prefix, SINT64)                            \
   MAP_TYPE(prefix, SFIXED32)                          \
   MAP_TYPE(prefix, FIXED32)                           \
+  MAP_TYPE(prefix, SFIXED64)                          \
+  MAP_TYPE(prefix, FIXED64)                           \
 
 #endif

@@ -25,6 +25,8 @@ DEF_WF(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT( FVAL()))); }
 DEF_WF(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL(  FVAL()))); }
 DEF_WF(SFIXED32) { w_int32(   buf,          NUM2INT( FVAL()));  }
 DEF_WF(FIXED32)  { w_int32(   buf,          NUM2UINT(FVAL()));  }
+DEF_WF(SFIXED64) { w_int64(   buf,          NUM2LL(  FVAL()));  }
+DEF_WF(FIXED64)  { w_int64(   buf,          NUM2ULL( FVAL()));  }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   uint32_t h = (fld_num << 3) | wire_type;

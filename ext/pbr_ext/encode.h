@@ -46,12 +46,36 @@ inline void w_int32(buf_t& buf, uint32_t n) {
   buf.push_back((n >> 24) & 0xff);
 }
 
+inline void w_int64(buf_t& buf, uint64_t n) {
+  buf.push_back(n & 0xff);
+  buf.push_back((n >>  8) & 0xff);
+  buf.push_back((n >> 16) & 0xff);
+  buf.push_back((n >> 24) & 0xff);
+  buf.push_back((n >> 32) & 0xff);
+  buf.push_back((n >> 40) & 0xff);
+  buf.push_back((n >> 48) & 0xff);
+  buf.push_back((n >> 56) & 0xff);
+}
+
 inline uint32_t r_int32(ss_t& ss) {
   // TODO: dangerous if buffer is truncated
   uint32_t n = ss_read_byte(ss);
   n |= ((uint32_t)ss_read_byte(ss)) <<  8;
   n |= ((uint32_t)ss_read_byte(ss)) << 16;
   n |= ((uint32_t)ss_read_byte(ss)) << 24;
+  return n;
+}
+
+inline uint64_t r_int64(ss_t& ss) {
+  // TODO: dangerous if buffer is truncated
+  uint64_t n = ss_read_byte(ss);
+  n |= ((uint64_t)ss_read_byte(ss)) <<  8;
+  n |= ((uint64_t)ss_read_byte(ss)) << 16;
+  n |= ((uint64_t)ss_read_byte(ss)) << 24;
+  n |= ((uint64_t)ss_read_byte(ss)) << 32;
+  n |= ((uint64_t)ss_read_byte(ss)) << 40;
+  n |= ((uint64_t)ss_read_byte(ss)) << 48;
+  n |= ((uint64_t)ss_read_byte(ss)) << 56;
   return n;
 }
 
