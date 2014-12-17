@@ -10,6 +10,7 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   case FLD_INT32: return wf_int32;
   case FLD_UINT32: return wf_uint32;
   case FLD_INT64: return wf_int64;
+  case FLD_UINT64: return wf_uint64;
   default: return NULL;
   }
 }
@@ -37,6 +38,7 @@ DEF_WF(string) {
 DEF_WF(int32) { w_var_uint32(buf, NUM2INT(FVAL())); }
 DEF_WF(uint32) { w_var_uint32(buf, NUM2UINT(FVAL())); }
 DEF_WF(int64) { w_var_uint64(buf, NUM2LL(FVAL())); }
+DEF_WF(uint64) { w_var_uint64(buf, NUM2ULL(FVAL())); }
 
 #define DEF_W_VARINT(bits)                                \
   void w_var_uint##bits(buf_t& buf, uint##bits##_t n) {   \

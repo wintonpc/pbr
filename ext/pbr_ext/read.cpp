@@ -10,6 +10,7 @@ read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   case FLD_INT32: return rf_int32;
   case FLD_UINT32: return rf_uint32;
   case FLD_INT64: return rf_int64;
+  case FLD_UINT64: return rf_uint64;
   default: return NULL;
   }
 }
@@ -29,6 +30,7 @@ DEF_RF(string) {
 DEF_RF(int32) { FSET(INT2NUM(r_var_uint32(ss))); }
 DEF_RF(uint32) { FSET(UINT2NUM(r_var_uint32(ss))); }
 DEF_RF(int64) { FSET(LL2NUM(r_var_uint64(ss))); }
+DEF_RF(uint64) { FSET(ULL2NUM(r_var_uint64(ss))); }
 
 #define DEF_R_VARINT(bits)                                  \
   uint##bits##_t r_var_uint##bits(ss_t& ss) {               \
