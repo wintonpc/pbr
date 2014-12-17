@@ -127,7 +127,7 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
   VALUE obj = rb_funcall(msg->target, ctor_id, 0);
   //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
-    uint32_t h = r_var_uint32(ss);
+    uint32_t h = r_varint32(ss);
     //int32_t wire_type = h & 7;
     fld_num_t fld_num = h >> 3;
     //cout << "wire_type " << wire_type << endl;

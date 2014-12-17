@@ -13,20 +13,20 @@ DEF_WF(STRING) {
   VALUE v = FVAL();
   const char *s = RSTRING_PTR(v);
   int len = RSTRING_LEN(v);
-  w_var_uint32(buf, len);
+  w_varint32(buf, len);
   buf.insert(buf.end(), s, s + len);
 }
 
-DEF_WF(INT32) { w_var_uint32(buf, NUM2INT(FVAL())); }
-DEF_WF(UINT32) { w_var_uint32(buf, NUM2UINT(FVAL())); }
-DEF_WF(INT64) { w_var_uint64(buf, NUM2LL(FVAL())); }
-DEF_WF(UINT64) { w_var_uint64(buf, NUM2ULL(FVAL())); }
-DEF_WF(SINT32) { w_var_uint32(buf, zz_enc32(NUM2INT(FVAL()))); }
-DEF_WF(SINT64) { w_var_uint64(buf, zz_enc64(NUM2LL(FVAL()))); }
+DEF_WF(INT32) { w_varint32(buf, NUM2INT(FVAL())); }
+DEF_WF(UINT32) { w_varint32(buf, NUM2UINT(FVAL())); }
+DEF_WF(INT64) { w_varint64(buf, NUM2LL(FVAL())); }
+DEF_WF(UINT64) { w_varint64(buf, NUM2ULL(FVAL())); }
+DEF_WF(SINT32) { w_varint32(buf, zz_enc32(NUM2INT(FVAL()))); }
+DEF_WF(SINT64) { w_varint64(buf, zz_enc64(NUM2LL(FVAL()))); }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   uint32_t h = (fld_num << 3) | wire_type;
-  w_var_uint32(buf, h);
+  w_varint32(buf, h);
 }
 
 write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
