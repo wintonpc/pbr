@@ -19,52 +19,31 @@ read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
 }
 
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
+#define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
 
-void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
+DEF_RF(string) {
   int32_t len = r_var_uint32(ss);
   FSET(rb_str_new(ss_read_chars(ss, len), len));
 }
 
-void rf_int32(ss_t& ss, VALUE obj, ID target_field_setter) {
-  FSET(INT2NUM(r_var_uint32(ss)));
-}
+DEF_RF(int32) { FSET(INT2NUM(r_var_uint32(ss))); }
+DEF_RF(uint32) { FSET(UINT2NUM(r_var_uint32(ss))); }
+DEF_RF(int64) { FSET(LL2NUM(r_var_uint64(ss))); }
 
-void rf_uint32(ss_t& ss, VALUE obj, ID target_field_setter) {
-  FSET(UINT2NUM(r_var_uint32(ss)));
-}
-
-void rf_int64(ss_t& ss, VALUE obj, ID target_field_setter) {
-  FSET(LL2NUM(r_var_uint64(ss)));
-}
-
-uint32_t r_var_uint32(ss_t& ss) {
-  uint32_t val = 0;
-  int sh_amt = 0;
-
-  while (ss_more(ss)) {
-    uint8_t b = ss_read_byte(ss);
-    val |= (((uint32_t)b) & 127) << sh_amt;
-
-    if ((b & 128) == 0)
-      break;
-    else
-      sh_amt += 7;
+#define DEF_R_VARINT(bits)                                  \
+  uint##bits##_t r_var_uint##bits(ss_t& ss) {               \
+    uint##bits##_t val = 0;                                 \
+      int sh_amt = 0;                                       \
+      while (ss_more(ss)) {                                 \
+        uint8_t b = ss_read_byte(ss);                       \
+        val |= (((uint##bits##_t)b) & 127) << sh_amt;       \
+        if ((b & 128) == 0)                                 \
+          break;                                            \
+        else                                                \
+          sh_amt += 7;                                      \
+      }                                                     \
+      return val;                                           \
   }
-  return val;
-}
 
-uint64_t r_var_uint64(ss_t& ss) {
-  uint64_t val = 0;
-  int sh_amt = 0;
-
-  while (ss_more(ss)) {
-    uint8_t b = ss_read_byte(ss);
-    val |= (((uint64_t)b) & 127) << sh_amt;
-
-    if ((b & 128) == 0)
-      break;
-    else
-      sh_amt += 7;
-  }
-  return val;
-}
+DEF_R_VARINT(32)
+DEF_R_VARINT(64)
