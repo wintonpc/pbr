@@ -1,6 +1,7 @@
 #ifndef encode_h__
 #define encode_h__
 
+#include <cstdint>
 #include "pbr_ext.h"
 
 #define DEF_W_VARINT(bits)                                       \
@@ -33,7 +34,9 @@ DEF_W_VARINT(64)
 DEF_R_VARINT(32)
 DEF_R_VARINT(64)
 
-zz_t zz_enc32(int n);
-int zz_dec32(zz_t zz);
+zz_t zz_enc32(int32_t n);
+int32_t zz_dec32(zz_t zz);
+zz64_t zz_enc64(int64_t n);
+int64_t zz_dec64(zz64_t zz);
 
 #endif

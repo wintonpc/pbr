@@ -19,6 +19,7 @@ DEF_RF(UINT32) { FSET(UINT2NUM(r_var_uint32(ss))); }
 DEF_RF(INT64) { FSET(LL2NUM(r_var_uint64(ss))); }
 DEF_RF(UINT64) { FSET(ULL2NUM(r_var_uint64(ss))); }
 DEF_RF(SINT32) { FSET(INT2NUM(zz_dec32(r_var_uint32(ss)))); }
+DEF_RF(SINT64) { FSET(LL2NUM(zz_dec64(r_var_uint64(ss)))); }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(rf); default: return NULL; }

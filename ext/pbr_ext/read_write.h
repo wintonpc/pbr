@@ -9,6 +9,7 @@
   MAP_TYPE(prefix, UINT32)                          \
   MAP_TYPE(prefix, INT64)                           \
   MAP_TYPE(prefix, UINT64)                          \
-  MAP_TYPE(prefix, SINT32)
+  MAP_TYPE(prefix, SINT32)                          \
+  MAP_TYPE(prefix, SINT64)                          \
 
 #endif
