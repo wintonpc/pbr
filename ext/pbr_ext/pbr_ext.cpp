@@ -55,20 +55,20 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
     register_fields(get_msg_for_type(model, type), type, rule);
 
   // print debugging info
-  cout << endl;
-  cout << "REGISTERED:" << endl;
+  //cout << endl;
+  //cout << "REGISTERED:" << endl;
   for (Msg& msg : model->msgs) {
-    cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
+    //cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds_to_enumerate) {
-      cout << "  " << fld.num << " " << fld.name
-           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
-           << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
-           << " (" << (int)fld.fld_type << ") "
-           << "[" << (int)fld.wire_type << "]"
-           << endl;
+      // //cout << "  " << fld.num << " " << fld.name
+      //      << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+      //      << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
+      //      << " (" << (int)fld.fld_type << ") "
+      //      << "[" << (int)fld.wire_type << "]"
+      //      << endl;
     }
   }
-  cout << "---------------" << endl;
+  //cout << "---------------" << endl;
   
   return Qnil;
 }
@@ -125,15 +125,15 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
   VALUE obj = rb_funcall(msg->target, ctor_id, 0);
-  cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
+  //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
     int32_t h = r_var_uint32(ss);
-    int32_t wire_type = h & 7;
+    //int32_t wire_type = h & 7;
     int32_t fld_num = h >> 3;
-    cout << "wire_type " << wire_type << endl;
-    cout << "fld_num " << fld_num << endl;
+    //cout << "wire_type " << wire_type << endl;
+    //cout << "fld_num " << fld_num << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
-    cout << "reading " << fld->name << endl;
+    //cout << "reading " << fld->name << endl;
     fld->read_fld(ss, obj, fld->target_field_setter);
   }
   return obj;
@@ -149,8 +149,8 @@ VALUE write_obj(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
     write_header(buf, fld->wire_type, fld->num);
     fld->write_fld(buf, obj, fld->target_field);
   }
-  cout << "buf size " << buf.size() << endl;
-  cout << "buf[0] " << (int)buf[0] << endl;
+  //cout << "buf size " << buf.size() << endl;
+  //cout << "buf[0] " << (int)buf[0] << endl;
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
@@ -163,7 +163,7 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
   case FLD_STRING:
     return WIRE_LENGTH_DELIMITED;
   default:
-    cout << "WARNING: unexpected field type " << (int)fld_type << endl;
+    //cout << "WARNING: unexpected field type " << (int)fld_type << endl;
     return WIRE_VARINT;
   }
 }

@@ -16,14 +16,14 @@ read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
 }
 
 void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
-  cout << "rf_string" << endl;
+  //cout << "rf_string" << endl;
   int32_t len = r_var_uint32(ss);
-  cout << "len = " << len << endl;
+  //cout << "len = " << len << endl;
   VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
-  cout << inspect(rstr) << endl;
-  cout << inspect(obj) << "." << inspect(ID2SYM(target_field_setter)) << " " << inspect(rstr) << endl;
+  //cout << inspect(rstr) << endl;
+  //cout << inspect(obj) << "." << inspect(ID2SYM(target_field_setter)) << " " << inspect(rstr) << endl;
   rb_funcall(obj, target_field_setter, 1, rstr);
-  cout << "set it" << endl;
+  //cout << "set it" << endl;
 }
 
 uint32_t r_var_uint32(ss_t& ss) {

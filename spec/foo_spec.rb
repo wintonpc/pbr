@@ -2,13 +2,52 @@ require 'rspec'
 require 'ostruct'
 require 'pbr'
 require 'test_msg'
+require 'active_support/inflector'
 
 describe Pbr do
+
+  context 'roundtrips' do
+    it 'strings' do
+      roundtrip(:string, '')
+      roundtrip(:string, 'hello, world!')
+      roundtrip(:string, "hello\0world")
+      roundtrip(:string, 'z' * 1024 * 1024)
+    end
+
+    it 'field names' do
+      roundtrip(:string, 'sss', :foo)
+      roundtrip(:string, 'sss', 'foo')
+    end
+
+    it 'field numbers' do
+      roundtrip(:string, 'sss', :foo, 0)
+      roundtrip(:string, 'sss', :foo, 1)
+      roundtrip(:string, 'sss', :foo, -1)
+      roundtrip(:string, 'sss', :foo, 2 ** 29 - 1)
+    end
+
+    def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
+      message_type = msg_type(short_message_type, field_name, field_num)
+      obj = OpenStruct.new
+      obj.send("#{field_name}=", str)
+      bytes = Pbr.new.write(obj, message_type)
+      obj2  = Pbr.new.read(bytes, message_type)
+      v2    = obj2.send(field_name)
+      v1    = obj.send(field_name)
+      shown = "#{v1.inspect} -> #{v2.inspect}"
+      puts shown.size > 120 ? shown[0..100] + '...' : shown
+      expect(v2).to eql v1
+    end
+    def msg_type(field_type, field_name=:foo, field_num=1)
+      field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
+      Pbr::TMessage.new('TestMsg', [Pbr::TField.new(field_name, field_num, field_type_class)])
+    end
+  end
 
   describe 'roundtrips' do
     let!(:pbr) { Pbr.new }
     after(:each) do
-
+      pbr.close
     end
     it 'roundtrips' do
       obj = OpenStruct.new
