@@ -1,36 +1,12 @@
 #include <iostream>
 
 #include "read.h"
+#include "encode.h"
 
 using namespace std;
 
-read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
-  switch (fld_type) {
-  case FLD_STRING: return rf_string;
-  case FLD_INT32: return rf_int32;
-  case FLD_UINT32: return rf_uint32;
-  case FLD_INT64: return rf_int64;
-  case FLD_UINT64: return rf_uint64;
-  default: return NULL;
-  }
-}
-
-read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
-  return NULL;
-}
-
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
 #define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
-
-DEF_RF(string) {
-  int32_t len = r_var_uint32(ss);
-  FSET(rb_str_new(ss_read_chars(ss, len), len));
-}
-
-DEF_RF(int32) { FSET(INT2NUM(r_var_uint32(ss))); }
-DEF_RF(uint32) { FSET(UINT2NUM(r_var_uint32(ss))); }
-DEF_RF(int64) { FSET(LL2NUM(r_var_uint64(ss))); }
-DEF_RF(uint64) { FSET(ULL2NUM(r_var_uint64(ss))); }
 
 #define DEF_R_VARINT(bits)                                  \
   uint##bits##_t r_var_uint##bits(ss_t& ss) {               \
@@ -49,3 +25,31 @@ DEF_RF(uint64) { FSET(ULL2NUM(r_var_uint64(ss))); }
 
 DEF_R_VARINT(32)
 DEF_R_VARINT(64)
+
+DEF_RF(string) {
+  int32_t len = r_var_uint32(ss);
+  FSET(rb_str_new(ss_read_chars(ss, len), len));
+}
+
+DEF_RF(int32) { FSET(INT2NUM(r_var_uint32(ss))); }
+DEF_RF(uint32) { FSET(UINT2NUM(r_var_uint32(ss))); }
+DEF_RF(int64) { FSET(LL2NUM(r_var_uint64(ss))); }
+DEF_RF(uint64) { FSET(ULL2NUM(r_var_uint64(ss))); }
+DEF_RF(sint32) { FSET(INT2NUM(zz_dec32(r_var_uint32(ss)))); }
+
+read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
+  switch (fld_type) {
+  case FLD_STRING: return rf_string;
+  case FLD_INT32: return rf_int32;
+  case FLD_UINT32: return rf_uint32;
+  case FLD_INT64: return rf_int64;
+  case FLD_UINT64: return rf_uint64;
+  case FLD_SINT32: return rf_sint32;
+  default: return NULL;
+  }
+}
+
+read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
+  return NULL;
+}
+

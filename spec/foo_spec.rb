@@ -60,12 +60,12 @@ describe Pbr do
     end
 
     it 'sint32' do
-      # roundtrip(:sint32, 0)
-      # roundtrip(:int32, 1)
-      # roundtrip(:int32, -1)
-      # roundtrip(:int32, 1234)
-      # roundtrip(:int32, 2**31 - 1)
-      # roundtrip(:int32, -2**31)
+      roundtrip(:sint32, 0)
+      # roundtrip(:sint32, 1)
+      # roundtrip(:sint32, -1)
+      # roundtrip(:sint32, 1234)
+      # roundtrip(:sint32, 2**31 - 1)
+      # roundtrip(:sint32, -2**31)
     end
 
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
