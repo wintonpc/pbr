@@ -29,6 +29,27 @@ describe Pbr do
     end
 
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
+      v1, v2 = do_roundtrip(short_message_type, str, field_name=:foo, field_num=1)
+      expect(v2).to eql v1
+    end
+
+    def roundtrip_float(short_message_type, str, field_name=:foo, field_num=1)
+      v1, v2 = do_roundtrip(short_message_type, str, field_name=:foo, field_num=1)
+      if v1 == 0
+        expect(v2).to eql v1
+      else
+        mag1 = [Math.log10(v1.abs).floor, 1].max
+        mag2 = [Math.log10(v2.abs).floor, 1].max
+        puts "   (mag: #{mag1} -> #{mag2})"
+        expect(mag2).to eql mag1
+        sig1 = v1 / 10**mag1
+        sig2 = v2 / 10**mag2
+        puts "   (sig: #{sig1} -> #{sig2})"
+        expect(sig2).to be_within(0.0000001).of(sig1)
+      end
+    end
+
+    def do_roundtrip(short_message_type, str, field_name=:foo, field_num=1)
       message_type = msg_type(short_message_type, field_name, field_num)
       obj = OpenStruct.new
       obj.send("#{field_name}=", str)
@@ -38,7 +59,7 @@ describe Pbr do
       v1    = obj.send(field_name)
       shown = "#{v1.inspect} -> #{v2.inspect}"
       puts shown.size > 120 ? shown[0..100] + '...' : shown
-      expect(v2).to eql v1
+      [v1, v2]
     end
 
     def msg_type(field_type, field_name=:foo, field_num=1)
@@ -64,6 +85,14 @@ describe Pbr do
       roundtrip(:string, 'hello, world!')
       roundtrip(:string, "hello\0world")
       roundtrip(:string, 'z' * 1024 * 1024)
+    end
+
+    it 'float' do
+      roundtrip_float(:float, 0.0)
+      roundtrip_float(:float, 3.14)
+      roundtrip_float(:float, -3.14)
+      roundtrip_float(:float, 3.402823e38)
+      roundtrip_float(:float, -3.402823e38)
     end
 
     it_roundtrips_int( 32, :int32)

@@ -28,6 +28,11 @@ DEF_WF(FIXED32)  { w_int32(   buf,          NUM2UINT(FVAL()));  }
 DEF_WF(SFIXED64) { w_int64(   buf,          NUM2LL(  FVAL()));  }
 DEF_WF(FIXED64)  { w_int64(   buf,          NUM2ULL( FVAL()));  }
 
+DEF_WF(FLOAT) {
+  float v = (float)NUM2DBL(FVAL());
+  w_int32(buf, *((uint32_t*)&v));
+}
+
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   uint32_t h = (fld_num << 3) | wire_type;
   w_varint32(buf, h);
@@ -38,6 +43,6 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
 }
 
 write_key_func get_key_writer(wire_t wire_type, fld_t fld_type) {
-//switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
-return NULL;
+  //switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
+  return NULL;
 }

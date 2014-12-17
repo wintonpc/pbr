@@ -81,6 +81,8 @@ void register_fields(Msg *msg, VALUE type, VALUE rule) {
     fld.name = RSTRING_PTR(rFldName);
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
+    if (fld.wire_type == -1)
+      continue;
     if (msg->target_is_hash) {
       fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
       fld.write_key = get_key_writer(fld.wire_type, fld.fld_type);
@@ -146,6 +148,7 @@ VALUE read_hash(Msg* msg, ss_t& ss) {
 VALUE write_obj(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
+    //cout << "write_header " << (int)fld->wire_type << " " << endl;
     write_header(buf, fld->wire_type, fld->num);
     fld->write_fld(buf, obj, fld->target_field);
   }
@@ -160,11 +163,26 @@ VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {
   switch (fld_type) {
-  case FLD_STRING:
-    return WIRE_LENGTH_DELIMITED;
+  case FLD_DOUBLE:   return WIRE_64BIT;
+  case FLD_FLOAT:    return WIRE_32BIT;
+  case FLD_INT64:    return WIRE_VARINT;
+  case FLD_UINT64:   return WIRE_VARINT;
+  case FLD_INT32:    return WIRE_VARINT;
+  case FLD_FIXED64:  return WIRE_64BIT;
+  case FLD_FIXED32:  return WIRE_32BIT;
+  case FLD_BOOL:     return WIRE_VARINT;
+  case FLD_STRING:   return WIRE_LENGTH_DELIMITED;
+  case FLD_MESSAGE:  return WIRE_LENGTH_DELIMITED;
+  case FLD_BYTES:    return WIRE_LENGTH_DELIMITED;
+  case FLD_UINT32:   return WIRE_VARINT;
+  case FLD_ENUM:     return WIRE_VARINT;
+  case FLD_SFIXED32: return WIRE_32BIT;
+  case FLD_SFIXED64: return WIRE_64BIT;
+  case FLD_SINT32:   return WIRE_VARINT;
+  case FLD_SINT64:   return WIRE_VARINT;
   default:
-    //cout << "WARNING: unexpected field type " << (int)fld_type << endl;
-    return WIRE_VARINT;
+    cout << "WARNING: unexpected field type " << (int)fld_type << endl;
+    return -1;
   }
 }
 
