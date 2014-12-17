@@ -34,9 +34,9 @@ DEF_W_VARINT(64)
 DEF_R_VARINT(32)
 DEF_R_VARINT(64)
 
-zz_t zz_enc32(int32_t n);
-int32_t zz_dec32(zz_t zz);
-zz64_t zz_enc64(int64_t n);
-int64_t zz_dec64(zz64_t zz);
+inline zz_t zz_enc32(int32_t n) { return (n << 1) ^ (n >> 31); }
+inline int32_t zz_dec32(zz_t zz) { return (zz >> 1) ^ (-(zz & 1)); }
+inline zz64_t zz_enc64(int64_t n) { return (n << 1) ^ (n >> 63); }
+inline int64_t zz_dec64(zz64_t zz) { return (zz >> 1) ^ (-(zz & 1)); }
 
 #endif
