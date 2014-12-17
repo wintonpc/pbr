@@ -6,7 +6,7 @@
 
 typedef int wire_t;
 typedef int fld_t;
-typedef int fld_num_t;
+typedef uint32_t fld_num_t;
 typedef unsigned int zz_t;
 typedef long unsigned int zz64_t;
 typedef std::vector<unsigned char> buf_t;

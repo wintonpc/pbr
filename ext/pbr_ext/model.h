@@ -13,7 +13,7 @@ struct Msg;
 struct Fld;
 
 typedef void (*add_fld_func)(Msg*, Fld);
-typedef Fld* (*get_fld_func)(Msg*, int);
+typedef Fld* (*get_fld_func)(Msg*, fld_num_t);
 
 typedef VALUE (*write_obj_func)(Msg* msg, int num_flds, buf_t& buf, VALUE obj);
 typedef void (*write_fld_func)(buf_t& buf, VALUE obj, ID target_field);
@@ -54,7 +54,7 @@ struct Fld {
 };
 
 
-Msg make_msg(std::string name, zz_t max_zz_fld_num);
+Msg make_msg(std::string name, fld_num_t max_fld_num);
 Msg* get_msg_by_name(Model* model, std::string name);
 
 #endif

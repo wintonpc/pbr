@@ -7,7 +7,7 @@
 
 #include "types.h"
 
-const zz_t ZZ_FLD_LOOKUP_CUTOFF = 1024;
+const int32_t FLD_LOOKUP_CUTOFF = 1024;
 
 inline const char* inspect(VALUE x) {
   return RSTRING_PTR(rb_inspect(x));

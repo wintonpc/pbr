@@ -7,15 +7,14 @@ using namespace std;
 
 void add_indexing_fld(Msg* msg, Fld fld) {
   msg->flds_to_enumerate.push_back(fld);
-  msg->flds_to_lookup[zz_enc32(fld.num)] = fld;
+  msg->flds_to_lookup[fld.num] = fld;
 }
 
-Fld* get_indexing_fld(Msg* msg, int fld_num) {
-  zz_t zz_fld_num = zz_enc32(fld_num);
-  if (zz_fld_num >= msg->flds_to_lookup.size())
+Fld* get_indexing_fld(Msg* msg, fld_num_t fld_num) {
+  if (fld_num >= msg->flds_to_lookup.size())
     return NULL;
   else
-    return &msg->flds_to_lookup[zz_fld_num];
+    return &msg->flds_to_lookup[fld_num];
 }
 
 void add_scanning_fld(Msg* msg, Fld fld) {
@@ -23,7 +22,7 @@ void add_scanning_fld(Msg* msg, Fld fld) {
   msg->flds_to_lookup.push_back(fld);
 }
 
-Fld* get_scanning_fld(Msg* msg, int fld_num) {
+Fld* get_scanning_fld(Msg* msg, fld_num_t fld_num) {
   for (Fld& fld : msg->flds_to_lookup)
     if (fld.num == fld_num)
       return &fld;
@@ -40,12 +39,12 @@ Msg* get_msg_by_name(Model* model, std::string name) {
   return NULL;
 }
 
-Msg make_msg(std::string name, zz_t max_zz_fld_num) {
+Msg make_msg(std::string name, fld_num_t max_fld_num) {
   Msg msg;
   msg.name = name;
   
-  if (max_zz_fld_num <= ZZ_FLD_LOOKUP_CUTOFF) {
-    msg.flds_to_lookup.resize(max_zz_fld_num + 1);
+  if (max_fld_num <= FLD_LOOKUP_CUTOFF) {
+    msg.flds_to_lookup.resize(max_fld_num + 1);
     msg.add_fld = add_indexing_fld;
     msg.get_fld = get_indexing_fld;
   }

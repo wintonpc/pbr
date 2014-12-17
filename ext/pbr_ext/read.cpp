@@ -29,14 +29,19 @@ void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
 uint32_t r_var_uint32(ss_t& ss) {
   uint32_t val = 0;
   int sh_amt = 0;
+
+  int iter = 0;
+
   while (ss_more(ss)) {
     uint8_t b = ss_read_byte(ss);
+    cout << "r_var_uint32(" << iter << ") b = " << (int)b << endl;
     val |= (((uint32_t)b) & 127) << sh_amt;
 
     if ((b & 128) == 0)
       break;
     else
       sh_amt += 7;
+    iter++;
   }
   return val;
 }

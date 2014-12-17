@@ -20,7 +20,7 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type);
 VALUE read_obj(Msg* msg, ss_t& ss);
 VALUE read_hash(Msg* msg, ss_t& ss);
 void register_fields(Msg *msg, VALUE type, VALUE rule);
-zz_t max_zz_field(VALUE fields);
+int32_t max_field_num(VALUE fields);
 VALUE sym_to_s(VALUE x);
 wire_t wire_type_for_fld_type(fld_t fld_type);
 std::string type_name(VALUE type);

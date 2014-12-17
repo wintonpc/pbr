@@ -42,7 +42,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   
   // push msgs
   for (VALUE type : new_types) {
-    Msg msg = make_msg(type_name(type), max_zz_field(rb_get(type, "fields")));
+    Msg msg = make_msg(type_name(type), max_field_num(rb_get(type, "fields")));
     msg.target = rb_call1(rb_get(rule, "get_target_type"), type);
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
     msg.write = msg.target_is_hash ? write_hash : write_obj;
@@ -127,9 +127,9 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
   VALUE obj = rb_funcall(msg->target, ctor_id, 0);
   //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
-    int32_t h = r_var_uint32(ss);
+    uint32_t h = r_var_uint32(ss);
     //int32_t wire_type = h & 7;
-    int32_t fld_num = h >> 3;
+    fld_num_t fld_num = h >> 3;
     //cout << "wire_type " << wire_type << endl;
     //cout << "fld_num " << fld_num << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
@@ -168,14 +168,14 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
   }
 }
 
-zz_t max_zz_field(VALUE flds) {
-  zz_t max = 0;
+int32_t max_field_num(VALUE flds) {
+  int32_t max = 0;
   int len = RARRAY_LEN(flds);
   for (int i=0; i<len; i++) {
     VALUE fld = rb_ary_entry(flds, i);
-    zz_t zzfn = zz_enc32(NUM2INT(rb_get(fld, "num")));
-    if (zzfn > max)
-      max = zzfn;
+    int32_t fn = NUM2INT(rb_get(fld, "num"));
+    if (fn > max)
+      max = fn;
   }
   return max;
 }
