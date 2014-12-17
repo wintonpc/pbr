@@ -9,6 +9,10 @@ using namespace std;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
+const char* inspect(VALUE x) {
+  return RSTRING_PTR(rb_inspect(x));
+}
+
 VALUE rb_get(VALUE receiver, const char* name) {
   return rb_funcall(receiver, rb_intern(name), 0);
 }
@@ -26,7 +30,11 @@ VALUE destroy_handle(VALUE self, VALUE handle) {
   return Qnil;
 }
 
+ID ctor_id;
+
 VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
+
+  ctor_id = rb_intern("new");
 
   Model* model = MODEL(handle);
 
@@ -44,6 +52,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
     msg.target = rb_call1(rb_get(rule, "get_target_type"), type);
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
     msg.write = msg.target_is_hash ? write_hash : write_obj;
+    msg.read = msg.target_is_hash ? read_hash : read_obj;
     model->msgs.push_back(msg);
   }
 
@@ -59,6 +68,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
     for (Fld& fld : msg.flds_to_enumerate) {
       cout << "  " << fld.num << " " << fld.name
            << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+           << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
            << " (" << (int)fld.fld_type << ") "
            << "[" << (int)fld.wire_type << "]"
            << endl;
@@ -80,9 +90,13 @@ void register_fields(Msg *msg, VALUE type, VALUE rule) {
     if (msg->target_is_hash) {
       fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
       fld.write_key = get_key_writer(fld.wire_type, fld.fld_type);
+      fld.read_key = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
-      fld.target_field = rb_intern(RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName)));
+      string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
+      fld.target_field = rb_intern(target_field_name.c_str());
+      fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
       fld.write_fld = get_fld_writer(fld.wire_type, fld.fld_type);
+      fld.read_fld = get_fld_reader(fld.wire_type, fld.fld_type);
     }
     msg->add_fld(msg, fld);
   }
@@ -109,24 +123,45 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
   int num_flds = msg->flds_to_enumerate.size();
-  write_obj_func write = msg->target_is_hash ? write_hash : write_obj;
-  return write(msg, num_flds, buf, obj);
+  return msg->write(msg, num_flds, buf, obj);
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
-  read_obj_func read = msg->target_is_hash ? read_hash : read_obj;
-  return read(msg, ss);
+  return msg->read(msg, ss);
+}
+
+uint32_t r_var_uint32(ss_t& ss) {
+  uint32_t val = 0;
+  int sh_amt = 0;
+  while (ss_more(ss)) {
+    uint8_t b = ss_read_byte(ss);
+    val |= (((uint32_t)b) & 127) << sh_amt;
+
+    if ((b & 128) == 0)
+      break;
+    else
+      sh_amt += 7;
+  }
+  return val;
 }
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
+  VALUE obj = rb_funcall(msg->target, ctor_id, 0);
+  cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
-    uint8_t b = ss_read_byte(ss);
-    cout << "read " << (int)b << endl;
+    int32_t h = r_var_uint32(ss);
+    int32_t wire_type = h & 7;
+    int32_t fld_num = h >> 3;
+    cout << "wire_type " << wire_type << endl;
+    cout << "fld_num " << fld_num << endl;
+    Fld* fld = msg->get_fld(msg, fld_num);
+    cout << "reading " << fld->name << endl;
+    fld->read_fld(ss, obj, fld->target_field_setter);
   }
-  return Qnil;
+  return obj;
 }
  
 VALUE read_hash(Msg* msg, ss_t& ss) {
@@ -157,20 +192,6 @@ void w_var_uint32(buf_t& buf, uint32_t n) {
   buf.push_back((uint32_t)(n & 127));
 }
  
-void r_var_uint32(ss_t& ss) {
-  uint32_t val;
-  int sh_amt = 0;
-  while (ss_more(ss) && ((b = ss_read_byte(ss) & 128 != 0))) {
-    uint8_t b = ss_read_byte(ss);
-    val |= (((uint32_t)b) & 127) << sh_amt;
-
-    if ((b & 128) == 0)
-      return val;
-    else
-      sh_amt += 7;
-  }
-}
-
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   cout << "write_header " << wire_type << " " << fld_num << endl;
   uint32_t h = (fld_num << 3) | wire_type;
@@ -186,6 +207,17 @@ void wf_string(buf_t& buf, VALUE obj, ID target_field) {
   buf.insert(buf.end(), s, s + len);
 }
 
+void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
+  cout << "rf_string" << endl;
+  int32_t len = r_var_uint32(ss);
+  cout << "len = " << len << endl;
+  VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
+  cout << inspect(rstr) << endl;
+  cout << inspect(obj) << "." << inspect(ID2SYM(target_field_setter)) << " " << inspect(rstr) << endl;
+  rb_funcall(obj, target_field_setter, 1, rstr);
+  cout << "set it" << endl;
+}
+
 write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) {
   case FLD_STRING: return wf_string;
@@ -193,7 +225,18 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   }
 }
 
+read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
+  switch (fld_type) {
+  case FLD_STRING: return rf_string;
+  default: return NULL;
+  }
+}
+
 write_key_func get_key_writer(wire_t wire_type, fld_t fld_type) {
+  return NULL;
+}
+
+read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
   return NULL;
 }
 

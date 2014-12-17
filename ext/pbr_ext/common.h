@@ -48,6 +48,7 @@ typedef struct StringStream {
 
 ss_t ss_make(char* s, int len);
 uint8_t ss_read_byte(ss_t& ss);
+char* ss_read_chars(ss_t& ss, int32_t len);
 #define ss_more(ss)  (ss).pos < (ss).len
 
 #endif
