@@ -35,6 +35,13 @@ describe Pbr do
       roundtrip(:int32, -2**31)
     end
 
+    it 'uint32' do
+      roundtrip(:uint32, 0)
+      roundtrip(:uint32, 1)
+      roundtrip(:uint32, 1234)
+      roundtrip(:uint32, 2**32 - 1)
+    end
+
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)
       message_type = msg_type(short_message_type, field_name, field_num)
       obj = OpenStruct.new

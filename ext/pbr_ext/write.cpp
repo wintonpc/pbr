@@ -8,6 +8,7 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) {
   case FLD_STRING: return wf_string;
   case FLD_INT32: return wf_int32;
+  case FLD_UINT32: return wf_uint32;
   default: return NULL;
   }
 }
@@ -28,6 +29,10 @@ void wf_string(buf_t& buf, VALUE obj, ID target_field) {
 
 void wf_int32(buf_t& buf, VALUE obj, ID target_field) {
   w_var_uint32(buf, NUM2INT(FVAL()));
+}
+
+void wf_uint32(buf_t& buf, VALUE obj, ID target_field) {
+  w_var_uint32(buf, NUM2UINT(FVAL()));
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {

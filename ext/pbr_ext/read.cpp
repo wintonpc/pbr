@@ -8,6 +8,7 @@ read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) {
   case FLD_STRING: return rf_string;
   case FLD_INT32: return rf_int32;
+  case FLD_UINT32: return rf_uint32;
   default: return NULL;
   }
 }
@@ -16,15 +17,19 @@ read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
   return NULL;
 }
 
+#define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
+
 void rf_string(ss_t& ss, VALUE obj, ID target_field_setter) {
   int32_t len = r_var_uint32(ss);
-  VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
-  rb_funcall(obj, target_field_setter, 1, rstr);
+  FSET(rb_str_new(ss_read_chars(ss, len), len));
 }
 
 void rf_int32(ss_t& ss, VALUE obj, ID target_field_setter) {
-  VALUE rval = INT2NUM(r_var_uint32(ss));
-  rb_funcall(obj, target_field_setter, 1, rval);
+  FSET(INT2NUM(r_var_uint32(ss)));
+}
+
+void rf_uint32(ss_t& ss, VALUE obj, ID target_field_setter) {
+  FSET(UINT2NUM(r_var_uint32(ss)));
 }
 
 uint32_t r_var_uint32(ss_t& ss) {
