@@ -17,12 +17,13 @@ DEF_WF(STRING) {
   buf.insert(buf.end(), s, s + len);
 }
 
-DEF_WF(INT32) { w_varint32(buf, NUM2INT(FVAL())); }
-DEF_WF(UINT32) { w_varint32(buf, NUM2UINT(FVAL())); }
-DEF_WF(INT64) { w_varint64(buf, NUM2LL(FVAL())); }
-DEF_WF(UINT64) { w_varint64(buf, NUM2ULL(FVAL())); }
-DEF_WF(SINT32) { w_varint32(buf, zz_enc32(NUM2INT(FVAL()))); }
-DEF_WF(SINT64) { w_varint64(buf, zz_enc64(NUM2LL(FVAL()))); }
+DEF_WF(INT32)    { w_varint32(buf,          NUM2INT( FVAL()));  }
+DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(FVAL()));  }
+DEF_WF(INT64)    { w_varint64(buf,          NUM2LL(  FVAL()));  }
+DEF_WF(UINT64)   { w_varint64(buf,          NUM2ULL( FVAL()));  }
+DEF_WF(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT( FVAL()))); }
+DEF_WF(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL(  FVAL()))); }
+DEF_WF(SFIXED32) { w_int32(   buf,          NUM2INT( FVAL()));  }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   uint32_t h = (fld_num << 3) | wire_type;

@@ -78,12 +78,12 @@ describe Pbr do
     end
 
     it 'sfixed32' do
-      # roundtrip(:sfixed32, 0)
-      # roundtrip(:sfixed32, 1)
-      # roundtrip(:sfixed32, -1)
-      # roundtrip(:sfixed32, 1234)
-      # roundtrip(:sfixed32, 2**31 - 1)
-      # roundtrip(:sfixed32, -2**31)
+      roundtrip(:sfixed32, 0)
+      roundtrip(:sfixed32, 1)
+      roundtrip(:sfixed32, -1)
+      roundtrip(:sfixed32, 1234)
+      roundtrip(:sfixed32, 2**31 - 1)
+      roundtrip(:sfixed32, -2**31)
     end
 
     def roundtrip(short_message_type, str, field_name=:foo, field_num=1)

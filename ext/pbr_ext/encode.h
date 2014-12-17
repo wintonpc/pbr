@@ -39,4 +39,20 @@ inline int32_t zz_dec32(zz32_t zz) { return (zz >> 1) ^ (-(zz & 1)); }
 inline zz64_t zz_enc64(int64_t n) { return (n << 1) ^ (n >> 63); }
 inline int64_t zz_dec64(zz64_t zz) { return (zz >> 1) ^ (-(zz & 1)); }
 
+inline void w_int32(buf_t& buf, uint32_t n) {
+  buf.push_back(n & 0xff);
+  buf.push_back((n >>  8) & 0xff);
+  buf.push_back((n >> 16) & 0xff);
+  buf.push_back((n >> 24) & 0xff);
+}
+
+inline uint32_t r_int32(ss_t& ss) {
+  // TODO: dangerous if buffer is truncated
+  uint32_t n = ss_read_byte(ss);
+  n |= ((uint32_t)ss_read_byte(ss)) <<  8;
+  n |= ((uint32_t)ss_read_byte(ss)) << 16;
+  n |= ((uint32_t)ss_read_byte(ss)) << 24;
+  return n;
+}
+
 #endif
