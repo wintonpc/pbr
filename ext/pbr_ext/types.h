@@ -37,7 +37,4 @@ const fld_t FLD_SFIXED64 = 16;
 const fld_t FLD_SINT32 = 17;
 const fld_t FLD_SINT64 = 18;
 
-
-
-
 #endif

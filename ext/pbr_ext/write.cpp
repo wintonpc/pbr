@@ -15,16 +15,16 @@ extern VALUE UTF_8_ENCODING;
 #define FVAL()  rb_funcall(obj, target_field, 0)
 #define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, ID target_field)
 
-DEF_WF(INT32)    { w_varint32(buf,          NUM2INT( FVAL()));  }
+DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (FVAL()));  }
 DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(FVAL()));  }
-DEF_WF(INT64)    { w_varint64(buf,          NUM2LL(  FVAL()));  }
-DEF_WF(UINT64)   { w_varint64(buf,          NUM2ULL( FVAL()));  }
-DEF_WF(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT( FVAL()))); }
-DEF_WF(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL(  FVAL()))); }
-DEF_WF(SFIXED32) { w_int32(   buf,          NUM2INT( FVAL()));  }
-DEF_WF(FIXED32)  { w_int32(   buf,          NUM2UINT(FVAL()));  }
-DEF_WF(SFIXED64) { w_int64(   buf,          NUM2LL(  FVAL()));  }
-DEF_WF(FIXED64)  { w_int64(   buf,          NUM2ULL( FVAL()));  }
+DEF_WF(INT64)    { w_varint64(buf,          NUM2LL  (FVAL()));  }
+DEF_WF(UINT64)   { w_varint64(buf,          NUM2ULL (FVAL()));  }
+DEF_WF(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT (FVAL()))); }
+DEF_WF(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL  (FVAL()))); }
+DEF_WF(SFIXED32) { w_int32   (buf,          NUM2INT (FVAL()));  }
+DEF_WF(FIXED32)  { w_int32   (buf,          NUM2UINT(FVAL()));  }
+DEF_WF(SFIXED64) { w_int64   (buf,          NUM2LL  (FVAL()));  }
+DEF_WF(FIXED64)  { w_int64   (buf,          NUM2ULL (FVAL()));  }
 
 DEF_WF(FLOAT) {
   float v = (float)NUM2DBL(FVAL());

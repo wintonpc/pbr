@@ -5,7 +5,7 @@
 #include "pbr_ext.h"
 
 #define DEF_W_VARINT(bits)                                       \
-  inline void w_varint##bits(buf_t& buf, uint##bits##_t n) {   \
+  inline void w_varint##bits(buf_t& buf, uint##bits##_t n) {     \
     while (n > 127) {                                            \
       buf.push_back((uint##bits##_t)((n & 127) | 128));          \
       n >>= 7;                                                   \
@@ -15,7 +15,7 @@
 
 
 #define DEF_R_VARINT(bits)                                         \
-  inline uint##bits##_t r_varint##bits(ss_t& ss) {               \
+  inline uint##bits##_t r_varint##bits(ss_t& ss) {                 \
     uint##bits##_t val = 0;                                        \
       int sh_amt = 0;                                              \
       while (ss_more(ss)) {                                        \

@@ -23,5 +23,4 @@
   MAP_TYPE(prefix, DOUBLE)                            \
   MAP_TYPE(prefix, BOOL)                              \
 
-
 #endif
