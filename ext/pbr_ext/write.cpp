@@ -30,7 +30,12 @@ DEF_WF(FIXED64)  { w_int64(   buf,          NUM2ULL( FVAL()));  }
 
 DEF_WF(FLOAT) {
   float v = (float)NUM2DBL(FVAL());
-  w_int32(buf, *((uint32_t*)&v));
+  w_int32(buf, REINTERPRET(uint32_t, v));
+}
+
+DEF_WF(DOUBLE) {
+  double v = NUM2DBL(FVAL());
+  w_int64(buf, REINTERPRET(uint64_t, v));
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {

@@ -27,7 +27,12 @@ DEF_RF(FIXED64)  { FSET(ULL2NUM(          r_int64(   ss)));  }
 
 DEF_RF(FLOAT) {
   uint32_t v = r_int32(ss);
-  FSET(DBL2NUM((double)*((float*)&v)));
+  FSET(DBL2NUM((double)REINTERPRET(float, v)));
+}
+
+DEF_RF(DOUBLE) {
+  uint64_t v = r_int64(ss);
+  FSET(DBL2NUM(REINTERPRET(double, v)));
 }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {

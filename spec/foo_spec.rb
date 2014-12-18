@@ -33,7 +33,7 @@ describe Pbr do
       expect(v2).to eql v1
     end
 
-    def roundtrip_float(short_message_type, str, field_name=:foo, field_num=1)
+    def roundtrip_float(precision, short_message_type, str, field_name=:foo, field_num=1)
       v1, v2 = do_roundtrip(short_message_type, str, field_name=:foo, field_num=1)
       if v1 == 0
         expect(v2).to eql v1
@@ -45,7 +45,7 @@ describe Pbr do
         sig1 = v1 / 10**mag1
         sig2 = v2 / 10**mag2
         puts "   (sig: #{sig1} -> #{sig2})"
-        expect(sig2).to be_within(0.0000001).of(sig1)
+        expect(sig2).to be_within(10 ** (-precision)).of(sig1)
       end
     end
 
@@ -88,11 +88,20 @@ describe Pbr do
     end
 
     it 'float' do
-      roundtrip_float(:float, 0.0)
-      roundtrip_float(:float, 3.14)
-      roundtrip_float(:float, -3.14)
-      roundtrip_float(:float, 3.402823e38)
-      roundtrip_float(:float, -3.402823e38)
+      roundtrip_float(7, :float, 0.0)
+      roundtrip_float(7, :float, 3.14)
+      roundtrip_float(7, :float, -3.14)
+      roundtrip_float(7, :float, 3.402823e38)
+      roundtrip_float(7, :float, -3.402823e38)
+    end
+
+    it 'double' do
+      roundtrip(:double, 0.0)
+      roundtrip(:double, 3.14)
+      roundtrip(:double, -3.14)
+      roundtrip(:double, 3.402823e38)
+      roundtrip(:double, -3.402823e38)
+      roundtrip(:double, 0.030000000000000006)
     end
 
     it_roundtrips_int( 32, :int32)
