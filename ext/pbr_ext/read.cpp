@@ -7,7 +7,7 @@
 using namespace std;
 
 extern VALUE UTF_8_ENCODING;
-extern VALUE FORCE_ENCODING_ID;
+extern VALUE FORCE_ID_ENCODING;
 
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
 #define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
@@ -36,7 +36,7 @@ DEF_RF(DOUBLE) {
 DEF_RF(STRING) {
   int32_t len = r_varint32(ss);
   VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
-  FSET(rb_funcall(rstr, FORCE_ENCODING_ID, 1, UTF_8_ENCODING));
+  FSET(rb_funcall(rstr, FORCE_ID_ENCODING, 1, UTF_8_ENCODING));
 }
 
 DEF_RF(BYTES) {

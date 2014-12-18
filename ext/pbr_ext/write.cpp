@@ -6,8 +6,8 @@
 
 using namespace std;
 
-extern ID ENCODING_ID;
-extern ID ENCODE_ID;
+extern ID ID_ENCODING;
+extern ID ID_ENCODE;
 extern VALUE UTF_8_ENCODING;
 
 #define FVAL()  rb_funcall(obj, target_field, 0) 
@@ -47,12 +47,12 @@ DEF_WF(STRING) {
   VALUE v_in = FVAL();
   VALUE v;
 
-  if (rb_funcall(v_in, ENCODING_ID, 0) == UTF_8_ENCODING) {
+  if (rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING) {
     //cout << "string to write is UTF-8" << endl;
     v = v_in;
   } else {
     //cout << "string to write is NOT UTF-8" << endl;
-    v = rb_funcall(v_in, ENCODE_ID, 1, UTF_8_ENCODING);
+    v = rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
   }
 
   write_bytes(buf, v);

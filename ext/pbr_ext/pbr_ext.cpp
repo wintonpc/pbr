@@ -15,11 +15,11 @@ using namespace std;
 
 // "constants" we don't want to compute repeatedly.
 // set in Init_pbr_ext.
-ID CTOR_ID; 
+ID ID_CTOR; 
 VALUE UTF_8_ENCODING;
-ID ENCODE_ID;
-ID ENCODING_ID;
-ID FORCE_ENCODING_ID;
+ID ID_ENCODE;
+ID ID_ENCODING;
+ID FORCE_ID_ENCODING;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
@@ -130,7 +130,7 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
 }
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
-  VALUE obj = rb_funcall(msg->target, CTOR_ID, 0);
+  VALUE obj = rb_funcall(msg->target, ID_CTOR, 0);
   //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
@@ -203,10 +203,10 @@ int32_t max_field_num(VALUE flds) {
 }
 
 extern "C" void Init_pbr_ext() {
-  CTOR_ID = rb_intern("new");
-  ENCODE_ID = rb_intern("encode");
-  ENCODING_ID = rb_intern("encoding");
-  FORCE_ENCODING_ID = rb_intern("force_encoding");
+  ID_CTOR = rb_intern("new");
+  ID_ENCODE = rb_intern("encode");
+  ID_ENCODING = rb_intern("encoding");
+  FORCE_ID_ENCODING = rb_intern("force_encoding");
   VALUE encoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   UTF_8_ENCODING = rb_const_get(encoding, rb_intern("UTF_8"));
 
