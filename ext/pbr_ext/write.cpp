@@ -6,24 +6,12 @@
 
 using namespace std;
 
+extern ID ENCODING_ID;
+extern ID ENCODE_ID;
+extern VALUE UTF_8_ENCODING;
+
 #define FVAL()  rb_funcall(obj, target_field, 0) 
 #define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, ID target_field)
-
-DEF_WF(BYTES) {
-  VALUE v = FVAL();
-  const char *s = RSTRING_PTR(v);
-  int len = RSTRING_LEN(v);
-  w_varint32(buf, len);
-  buf.insert(buf.end(), s, s + len);
-}
-
-DEF_WF(STRING) {
-  VALUE v = FVAL();
-  const char *s = RSTRING_PTR(v);
-  int len = RSTRING_LEN(v);
-  w_varint32(buf, len);
-  buf.insert(buf.end(), s, s + len);
-}
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT( FVAL()));  }
 DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(FVAL()));  }
@@ -44,6 +32,30 @@ DEF_WF(FLOAT) {
 DEF_WF(DOUBLE) {
   double v = NUM2DBL(FVAL());
   w_int64(buf, REINTERPRET(uint64_t, v));
+}
+
+void write_bytes(buf_t& buf, VALUE rstr) {
+  const char *s = RSTRING_PTR(rstr);
+  int len = RSTRING_LEN(rstr);
+  w_varint32(buf, len);
+  buf.insert(buf.end(), s, s + len);
+}
+
+DEF_WF(BYTES) { write_bytes(buf, FVAL()); }
+
+DEF_WF(STRING) {
+  VALUE v_in = FVAL();
+  VALUE v;
+
+  if (rb_funcall(v_in, ENCODING_ID, 0) == UTF_8_ENCODING) {
+    //cout << "string to write is UTF-8" << endl;
+    v = v_in;
+  } else {
+    //cout << "string to write is NOT UTF-8" << endl;
+    v = rb_funcall(v_in, ENCODE_ID, 1, UTF_8_ENCODING);
+  }
+
+  write_bytes(buf, v);
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {

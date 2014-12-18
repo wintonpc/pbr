@@ -15,8 +15,11 @@ using namespace std;
 
 // "constants" we don't want to compute repeatedly.
 // set in Init_pbr_ext.
-ID ctor_id; 
+ID CTOR_ID; 
 VALUE UTF_8_ENCODING;
+ID ENCODE_ID;
+ID ENCODING_ID;
+ID FORCE_ENCODING_ID;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
@@ -127,7 +130,7 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
 }
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
-  VALUE obj = rb_funcall(msg->target, ctor_id, 0);
+  VALUE obj = rb_funcall(msg->target, CTOR_ID, 0);
   //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
@@ -200,10 +203,12 @@ int32_t max_field_num(VALUE flds) {
 }
 
 extern "C" void Init_pbr_ext() {
-  ctor_id = rb_intern("new");
+  CTOR_ID = rb_intern("new");
+  ENCODE_ID = rb_intern("encode");
+  ENCODING_ID = rb_intern("encoding");
+  FORCE_ENCODING_ID = rb_intern("force_encoding");
   VALUE encoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   UTF_8_ENCODING = rb_const_get(encoding, rb_intern("UTF_8"));
-  cout << "initialized encoding " << inspect(UTF_8_ENCODING) << endl;
 
   VALUE pbr = rb_define_class("Pbr", rb_cObject);
   VALUE ext = rb_define_module_under(pbr, "Ext");

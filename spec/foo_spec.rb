@@ -57,7 +57,7 @@ describe Pbr do
       obj2  = Pbr.new.read(bytes, message_type)
       v2    = obj2.send(field_name)
       v1    = obj.send(field_name)
-      shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''}"
+      shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
       puts shown.size > 120 ? shown[0..100] + '...' : shown
       [v1, v2]
     end
@@ -85,6 +85,11 @@ describe Pbr do
       roundtrip(:string, 'hello, world!')
       roundtrip(:string, "hello\0world")
       roundtrip(:string, 'z' * 1024 * 1024)
+
+      v1, v2 = do_roundtrip(:string, 'hello, world!'.encode('utf-16'))
+      expect(v1.encoding).to eql Encoding::UTF_16
+      expect(v2.encoding).to eql Encoding::UTF_8
+      expect(v2).to eql v1.encode('utf-8')
     end
 
     it 'bytes' do

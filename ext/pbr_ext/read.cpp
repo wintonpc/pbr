@@ -6,17 +6,11 @@
 
 using namespace std;
 
+extern VALUE UTF_8_ENCODING;
+extern VALUE FORCE_ENCODING_ID;
+
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
 #define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
-
-#define DEF_RF_STRING(type)                             \
-  DEF_RF(type) {                                        \
-    int32_t len = r_varint32(ss);                       \
-    FSET(rb_str_new(ss_read_chars(ss, len), len));      \
-  }
-
-DEF_RF_STRING(STRING)
-DEF_RF_STRING(BYTES)
 
 DEF_RF(INT32)    { FSET(INT2NUM(          r_varint32(ss)));  }
 DEF_RF(UINT32)   { FSET(UINT2NUM(         r_varint32(ss)));  }
@@ -37,6 +31,17 @@ DEF_RF(FLOAT) {
 DEF_RF(DOUBLE) {
   uint64_t v = r_int64(ss);
   FSET(DBL2NUM(REINTERPRET(double, v)));
+}
+
+DEF_RF(STRING) {
+  int32_t len = r_varint32(ss);
+  VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
+  FSET(rb_funcall(rstr, FORCE_ENCODING_ID, 1, UTF_8_ENCODING));
+}
+
+DEF_RF(BYTES) {
+  int32_t len = r_varint32(ss);
+  FSET(rb_str_new(ss_read_chars(ss, len), len));
 }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
