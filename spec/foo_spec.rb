@@ -61,11 +61,16 @@ describe Pbr do
 
     def msg_type(field_type, field_name=:foo, field_num=1)
       field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
-      Pbr::TMessage.new('TestMsg', [Pbr::TField.new(field_name, field_num, field_type_class)])
+      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class)])
+      test_msg = Pbr::TMessage.new('TestMsg', [
+                                      Pbr::TField.new(field_name, field_num, field_type_class),
+                                      Pbr::TField.new('sub', field_num + 1, sub_msg)
+                                 ])
+      test_msg
     end
 
     def self.it_roundtrips_int(tripper, bits, type)
-      it "#{type}" do
+      it "#{type} with #{tripper.name}" do
         roundtrip(tripper, type, 0)
         roundtrip(tripper, type, 1)
         roundtrip(tripper, type, -1)
@@ -76,7 +81,7 @@ describe Pbr do
     end
 
     def self.it_roundtrips_uint(tripper, bits, type)
-      it "#{type}" do
+      it "#{type} with #{tripper.name}" do
         roundtrip(tripper, type, 0)
         roundtrip(tripper, type, 1)
         roundtrip(tripper, type, 1234)
@@ -86,12 +91,12 @@ describe Pbr do
 
     [method(:do_obj_roundtrip)].each do |t|
 
-      it 'field names' do
+      it "field names with #{t.name}" do
         roundtrip(t, :string, 'sss', :foo)
         roundtrip(t, :string, 'sss', 'foo')
       end
 
-      it 'field numbers' do
+      it "field numbers with #{t.name}" do
         min_field_num = 1
         max_field_num = 2 ** 29 - 1
         roundtrip(t, :string, 'sss', :foo, min_field_num)
@@ -99,7 +104,7 @@ describe Pbr do
         roundtrip(t, :string, 'sss', :foo, max_field_num)
       end
 
-      it 'string' do
+      it "string with #{t.name}" do
         roundtrip(t, :string, '')
         roundtrip(t, :string, 'hello, world!')
         roundtrip(t, :string, "hello\0world")
@@ -111,12 +116,12 @@ describe Pbr do
         expect(v2).to eql v1.encode('utf-8')
       end
 
-      it 'bytes' do
+      it "bytes with #{t.name}" do
         roundtrip(t, :bytes, 'hello')
         roundtrip(t, :bytes, [0, 1, 2, 3, 255].pack('c*'))
       end
 
-      it 'float' do
+      it "float with #{t.name}" do
         roundtrip_float(t, 7, :float, 0.0)
         roundtrip_float(t, 7, :float, 3.14)
         roundtrip_float(t, 7, :float, -3.14)
@@ -124,7 +129,7 @@ describe Pbr do
         roundtrip_float(t, 7, :float, -3.402823e38)
       end
 
-      it 'double' do
+      it "double with #{t.name}" do
         roundtrip(t, :double, 0.0)
         roundtrip(t, :double, 3.14)
         roundtrip(t, :double, -3.14)
@@ -133,7 +138,7 @@ describe Pbr do
         roundtrip(t, :double, 0.030000000000000006)
       end
 
-      it 'bool' do
+      it "bool with #{t.name}" do
         roundtrip(t, :bool, true)
         roundtrip(t, :bool, false)
       end
@@ -148,6 +153,10 @@ describe Pbr do
       it_roundtrips_uint(t, 32, :fixed32)
       it_roundtrips_int(t, 64, :sfixed64)
       it_roundtrips_uint(t, 64, :fixed64)
+
+      it "embedded messages with #{t.name}" do
+
+      end
     end
   end
 
