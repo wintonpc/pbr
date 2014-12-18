@@ -21,6 +21,7 @@
   MAP_TYPE(prefix, FIXED64)                           \
   MAP_TYPE(prefix, FLOAT)                             \
   MAP_TYPE(prefix, DOUBLE)                            \
+  MAP_TYPE(prefix, BOOL)                              \
 
 
 #endif

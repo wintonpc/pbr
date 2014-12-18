@@ -9,6 +9,8 @@ using namespace std;
 extern VALUE UTF_8_ENCODING;
 extern VALUE FORCE_ID_ENCODING;
 
+// these macros are unhygienic, but that's ok since they are
+// local to this file.
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
 #define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
 
@@ -31,6 +33,11 @@ DEF_RF(FLOAT) {
 DEF_RF(DOUBLE) {
   uint64_t v = r_int64(ss);
   FSET(DBL2NUM(REINTERPRET(double, v)));
+}
+
+DEF_RF(BOOL) {
+  uint32_t v = r_varint32(ss);
+  FSET(v == 0 ? Qfalse : Qtrue);
 }
 
 DEF_RF(STRING) {

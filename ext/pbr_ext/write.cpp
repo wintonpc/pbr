@@ -10,7 +10,9 @@ extern ID ID_ENCODING;
 extern ID ID_ENCODE;
 extern VALUE UTF_8_ENCODING;
 
-#define FVAL()  rb_funcall(obj, target_field, 0) 
+// these macros are unhygienic, but that's ok since they are
+// local to this file.
+#define FVAL()  rb_funcall(obj, target_field, 0)
 #define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, ID target_field)
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT( FVAL()));  }
@@ -32,6 +34,18 @@ DEF_WF(FLOAT) {
 DEF_WF(DOUBLE) {
   double v = NUM2DBL(FVAL());
   w_int64(buf, REINTERPRET(uint64_t, v));
+}
+
+DEF_WF(BOOL) {
+  VALUE v = FVAL();
+  if (v == Qtrue)
+    w_varint32(buf, 1);
+  else if (v == Qfalse)
+    w_varint32(buf, 0);
+  else {
+    w_varint32(buf, 0);
+    cout << "bad boolean " << inspect(v) << ". wrote false." << endl;
+  }
 }
 
 void write_bytes(buf_t& buf, VALUE rstr) {

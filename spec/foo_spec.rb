@@ -114,6 +114,11 @@ describe Pbr do
       roundtrip(:double, 0.030000000000000006)
     end
 
+    it 'bool' do
+      roundtrip(:bool, true)
+      roundtrip(:bool, false)
+    end
+
     it_roundtrips_int( 32, :int32)
     it_roundtrips_uint(32, :uint32)
     it_roundtrips_int( 64, :int64)
