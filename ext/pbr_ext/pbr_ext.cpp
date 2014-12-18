@@ -13,6 +13,11 @@
 
 using namespace std;
 
+// "constants" we don't want to compute repeatedly.
+// set in Init_pbr_ext.
+ID ctor_id; 
+VALUE UTF_8_ENCODING;
+
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
 VALUE create_handle(VALUE self) {
@@ -24,11 +29,7 @@ VALUE destroy_handle(VALUE self, VALUE handle) {
   return Qnil;
 }
 
-ID ctor_id;
-
 VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
-
-  ctor_id = rb_intern("new");
 
   Model* model = MODEL(handle);
 
@@ -199,6 +200,11 @@ int32_t max_field_num(VALUE flds) {
 }
 
 extern "C" void Init_pbr_ext() {
+  ctor_id = rb_intern("new");
+  VALUE encoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
+  UTF_8_ENCODING = rb_const_get(encoding, rb_intern("UTF_8"));
+  cout << "initialized encoding " << inspect(UTF_8_ENCODING) << endl;
+
   VALUE pbr = rb_define_class("Pbr", rb_cObject);
   VALUE ext = rb_define_module_under(pbr, "Ext");
 
@@ -207,5 +213,4 @@ extern "C" void Init_pbr_ext() {
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
   rb_define_singleton_method(ext, "read", (VALUE(*)(ANYARGS))read, 3);
-
 }

@@ -9,6 +9,14 @@ using namespace std;
 #define FVAL()  rb_funcall(obj, target_field, 0) 
 #define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, ID target_field)
 
+DEF_WF(BYTES) {
+  VALUE v = FVAL();
+  const char *s = RSTRING_PTR(v);
+  int len = RSTRING_LEN(v);
+  w_varint32(buf, len);
+  buf.insert(buf.end(), s, s + len);
+}
+
 DEF_WF(STRING) {
   VALUE v = FVAL();
   const char *s = RSTRING_PTR(v);

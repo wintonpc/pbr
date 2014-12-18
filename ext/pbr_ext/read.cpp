@@ -9,10 +9,14 @@ using namespace std;
 #define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
 #define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
 
-DEF_RF(STRING) {
-  int32_t len = r_varint32(ss);
-  FSET(rb_str_new(ss_read_chars(ss, len), len));
-}
+#define DEF_RF_STRING(type)                             \
+  DEF_RF(type) {                                        \
+    int32_t len = r_varint32(ss);                       \
+    FSET(rb_str_new(ss_read_chars(ss, len), len));      \
+  }
+
+DEF_RF_STRING(STRING)
+DEF_RF_STRING(BYTES)
 
 DEF_RF(INT32)    { FSET(INT2NUM(          r_varint32(ss)));  }
 DEF_RF(UINT32)   { FSET(UINT2NUM(         r_varint32(ss)));  }

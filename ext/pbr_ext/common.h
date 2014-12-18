@@ -32,6 +32,4 @@ inline std::string type_name(VALUE type) {
   return RSTRING_PTR(rb_get(type, "name"));
 }
 
-
-
 #endif

@@ -8,6 +8,7 @@
 
 #define TYPE_MAP(prefix)                              \
   MAP_TYPE(prefix, STRING)                            \
+  MAP_TYPE(prefix, BYTES)                             \
   MAP_TYPE(prefix, INT32)                             \
   MAP_TYPE(prefix, UINT32)                            \
   MAP_TYPE(prefix, INT64)                             \
