@@ -13,7 +13,7 @@ extern VALUE UTF_8_ENCODING;
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
 #define FVAL()  rb_funcall(obj, fld->target_field, 0)
-#define DEF_WF(type)  void wf_##type(Model* model, buf_t& buf, VALUE obj, Fld* fld)
+#define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, Fld* fld)
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (FVAL()));  }
 DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(FVAL()));  }
@@ -75,11 +75,11 @@ DEF_WF(STRING) {
 DEF_WF(MESSAGE) {
   cout << "writing msg field" << endl;
   buf_t tmp_buf;
-  Msg* embedded_msg = &model->msgs[fld->msg_field_index];
+  Msg* embedded_msg = fld->embedded_msg;
   cout << "embedded type: " << embedded_msg->name << endl;
   VALUE v = FVAL();
   cout << "embedded value: " << inspect(v) << endl;
-  embedded_msg->write(model, embedded_msg, tmp_buf, v);
+  embedded_msg->write(embedded_msg, tmp_buf, v);
   w_varint32(buf, tmp_buf.size());
   buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
   cout << "wrote embedded message without throwing" << endl;

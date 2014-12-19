@@ -52,7 +52,7 @@ DEF_RF(BYTES) {
 }
 
 DEF_RF(MESSAGE) {
-  
+  //ss_t tmp_ss = ss
 }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {

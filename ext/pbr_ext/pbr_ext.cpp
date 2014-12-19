@@ -86,7 +86,7 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
     fld.name = RSTRING_PTR(rFldName);
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     if (fld.fld_type == FLD_MESSAGE)
-      fld.msg_field_index = get_msg_for_type(model, rb_get(rFld, "msg_class"))->index;
+      fld.embedded_msg = get_msg_for_type(model, rb_get(rFld, "msg_class"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
     if (fld.wire_type == -1)
       continue;
@@ -122,7 +122,7 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
-  return msg->write(model, msg, buf, obj);
+  return msg->write(msg, buf, obj);
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
@@ -153,21 +153,21 @@ VALUE read_hash(Msg* msg, ss_t& ss) {
   return Qnil;
 }
 
-VALUE write_obj(Model* model, Msg* msg, buf_t& buf, VALUE obj) {
+VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
     //cout << "write_header " << (int)fld->wire_type << " " << endl;
     cout << "writing field " << msg->name << "." << fld->name << endl;
     write_header(buf, fld->wire_type, fld->num);
-    fld->write_fld(model, buf, obj, fld);
+    fld->write_fld(buf, obj, fld);
   }
   //cout << "buf size " << buf.size() << endl;
   //cout << "buf[0] " << (int)buf[0] << endl;
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
-VALUE write_hash(Model* model, Msg* msg, buf_t& buf, VALUE obj) {
+VALUE write_hash(Msg* msg, buf_t& buf, VALUE obj) {
   return Qnil;
 }
 
