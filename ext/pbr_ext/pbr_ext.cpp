@@ -93,7 +93,7 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
     if (msg->target_is_hash) {
       fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
       fld.write_fld = get_key_writer(fld.wire_type, fld.fld_type);
-      fld.read_key = get_key_reader(fld.wire_type, fld.fld_type);
+      fld.read_fld = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
       string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
       fld.target_field = rb_intern(target_field_name.c_str());
@@ -144,7 +144,7 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
     //cout << "fld_num " << fld_num << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
     //cout << "reading " << fld->name << endl;
-    fld->read_fld(ss, obj, fld->target_field_setter);
+    fld->read_fld(ss, obj, fld);
   }
   return obj;
 }

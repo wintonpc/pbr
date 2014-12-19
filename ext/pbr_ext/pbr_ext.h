@@ -28,8 +28,9 @@ Msg* get_msg_for_type(Model* model, VALUE type);
 std::vector<VALUE> arr2vec(VALUE array);
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num);
 write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type);
+write_fld_func get_key_writer(wire_t wire_type, fld_t fld_type);
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type);
-read_key_func get_key_reader(wire_t wire_type, fld_t fld_type);
+read_fld_func get_key_reader(wire_t wire_type, fld_t fld_type);
 
 #endif
 

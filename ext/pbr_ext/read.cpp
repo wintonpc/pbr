@@ -11,8 +11,8 @@ extern VALUE FORCE_ID_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define FSET(val)  rb_funcall(obj, target_field_setter, 1, (val))
-#define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, ID target_field_setter)
+#define FSET(val)  rb_funcall(obj, fld->target_field_setter, 1, (val))
+#define DEF_RF(type)  void rf_##type(ss_t& ss, VALUE obj, Fld* fld)
 
 DEF_RF(INT32)    { FSET(INT2NUM          (r_varint32(ss)));  }
 DEF_RF(UINT32)   { FSET(UINT2NUM         (r_varint32(ss)));  }
@@ -52,14 +52,17 @@ DEF_RF(BYTES) {
 }
 
 DEF_RF(MESSAGE) {
-  //ss_t tmp_ss = ss
+  int32_t len = r_varint32(ss);
+  ss_t tmp_ss = ss_make(ss, len);
+  Msg* embedded_msg = fld->embedded_msg;
+  embedded_msg->read(embedded_msg, tmp_ss);
 }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(rf); default: return NULL; }
 }
 
-read_key_func get_key_reader(wire_t wire_type, fld_t fld_type) {
+read_fld_func get_key_reader(wire_t wire_type, fld_t fld_type) {
   //switch (fld_type) { TYPE_MAP(rk); default: return NULL; }
   return NULL;
 }

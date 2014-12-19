@@ -19,8 +19,7 @@ typedef VALUE (*write_obj_func)(Msg* msg, buf_t& buf, VALUE obj);
 typedef void (*write_fld_func)(buf_t& buf, VALUE obj, Fld* fld);
 
 typedef VALUE (*read_obj_func)(Msg* msg, ss_t& ss);
-typedef void (*read_fld_func)(ss_t& ss, VALUE obj, ID target_field_setter);
-typedef void (*read_key_func)(ss_t& ss, VALUE obj, VALUE target_key);
+typedef void (*read_fld_func)(ss_t& ss, VALUE obj, Fld* fld);
 
 struct Model {
   std::vector<Msg> msgs;
@@ -50,7 +49,6 @@ struct Fld {
   Msg* embedded_msg;
   write_fld_func write_fld;
   read_fld_func read_fld;
-  read_key_func read_key;
 };
 
 

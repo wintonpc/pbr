@@ -78,7 +78,7 @@ DEF_WF(MESSAGE) {
   Msg* embedded_msg = fld->embedded_msg;
   cout << "embedded type: " << embedded_msg->name << endl;
   VALUE v = FVAL();
-  cout << "embedded value: " << inspect(v) << endl;
+  //cout << "embedded value: " << inspect(v) << endl;
   embedded_msg->write(embedded_msg, tmp_buf, v);
   w_varint32(buf, tmp_buf.size());
   buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
