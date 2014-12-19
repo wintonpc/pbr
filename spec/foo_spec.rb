@@ -31,10 +31,12 @@ describe Pbr do
 
     def do_roundtrip(tripper, short_message_type, str, field_name=:foo, field_num=1)
       message_type = msg_type(short_message_type, field_name, field_num)
-      v1, v2 = tripper.call(message_type, str, field_name)
-      shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
-      puts shown.size > 120 ? shown[0..100] + '...' : shown
-      [v1, v2]
+      v1, v2, v3, v4 = tripper.call(message_type, str, field_name)
+      [[v1, v2], [v3, v4]].each do |(v1, v2)|
+        shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
+        puts shown.size > 120 ? shown[0..100] + '...' : shown
+      end
+      [v1, v2, v3, v4]
     end
 
     def self.do_obj_roundtrip(message_type, field_val, field_name=:foo)
@@ -44,32 +46,33 @@ describe Pbr do
       obj.sub.bar = field_val
       bytes = Pbr.new.write(obj, message_type)
       obj2  = Pbr.new.read(bytes, message_type)
-      # expect(obj2).to be_a OpenStruct
-      v2    = obj2.send(field_name)
       v1    = obj.send(field_name)
-      [v1, v2]
+      v2    = obj2.send(field_name)
+      v3    = obj.sub.bar
+      v4    = obj2.sub.bar
+      [v1, v2, v3, v4]
     end
 
-    def self.do_hash_roundtrip(message_type, field_val, key_name=:foo)
-      obj = {}
-      obj['sub'] = {}
-      obj[key_name] = field_val
-      obj['sub']['bar'] = field_val
-      bytes = Pbr.new.write(obj, message_type)
-      obj2  = Pbr.new.read(bytes, message_type)
-      # expect(obj2).to be_a Hash
-      v2    = obj2[key_name]
-      v1    = obj2[key_name]
-      [v1, v2]
-    end
+    # def self.do_hash_roundtrip(message_type, field_val, key_name=:foo)
+    #   obj = {}
+    #   obj['sub'] = {}
+    #   obj[key_name] = field_val
+    #   obj['sub']['bar'] = field_val
+    #   bytes = Pbr.new.write(obj, message_type)
+    #   obj2  = Pbr.new.read(bytes, message_type)
+    #   # expect(obj2).to be_a Hash
+    #   v2    = obj2[key_name]
+    #   v1    = obj2[key_name]
+    #   [v1, v2]
+    # end
 
     def msg_type(field_type, field_name=:foo, field_num=1)
       field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
       sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class, nil)])
       test_msg = Pbr::TMessage.new('TestMsg', [
-                                      Pbr::TField.new(field_name, field_num, field_type_class, nil),
-                                      Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
-                                 ])
+                                                Pbr::TField.new(field_name, field_num, field_type_class, nil),
+                                                Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
+                                            ])
     end
 
     def self.it_roundtrips_int(tripper, bits, type)

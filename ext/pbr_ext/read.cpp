@@ -55,7 +55,7 @@ DEF_RF(MESSAGE) {
   int32_t len = r_varint32(ss);
   ss_t tmp_ss = ss_make(ss, len);
   Msg* embedded_msg = fld->embedded_msg;
-  embedded_msg->read(embedded_msg, tmp_ss);
+  FSET(embedded_msg->read(embedded_msg, tmp_ss));
 }
 
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
