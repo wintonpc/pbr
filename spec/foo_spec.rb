@@ -39,7 +39,9 @@ describe Pbr do
 
     def self.do_obj_roundtrip(message_type, field_val, field_name=:foo)
       obj = OpenStruct.new
+      obj.sub = OpenStruct.new
       obj.send("#{field_name}=", field_val)
+      obj.sub.bar = field_val
       bytes = Pbr.new.write(obj, message_type)
       obj2  = Pbr.new.read(bytes, message_type)
       # expect(obj2).to be_a OpenStruct
@@ -50,7 +52,9 @@ describe Pbr do
 
     def self.do_hash_roundtrip(message_type, field_val, key_name=:foo)
       obj = {}
+      obj['sub'] = {}
       obj[key_name] = field_val
+      obj['sub']['bar'] = field_val
       bytes = Pbr.new.write(obj, message_type)
       obj2  = Pbr.new.read(bytes, message_type)
       # expect(obj2).to be_a Hash
@@ -61,12 +65,11 @@ describe Pbr do
 
     def msg_type(field_type, field_name=:foo, field_num=1)
       field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
-      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class)])
+      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class, nil)])
       test_msg = Pbr::TMessage.new('TestMsg', [
-                                      Pbr::TField.new(field_name, field_num, field_type_class),
-                                      Pbr::TField.new('sub', field_num + 1, sub_msg)
+                                      Pbr::TField.new(field_name, field_num, field_type_class, nil),
+                                      Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
                                  ])
-      test_msg
     end
 
     def self.it_roundtrips_int(tripper, bits, type)

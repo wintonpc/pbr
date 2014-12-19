@@ -51,6 +51,10 @@ DEF_RF(BYTES) {
   FSET(rb_str_new(ss_read_chars(ss, len), len));
 }
 
+DEF_RF(MESSAGE) {
+  
+}
+
 read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(rf); default: return NULL; }
 }

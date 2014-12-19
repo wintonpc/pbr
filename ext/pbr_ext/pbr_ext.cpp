@@ -51,45 +51,48 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
     msg.write = msg.target_is_hash ? write_hash : write_obj;
     msg.read = msg.target_is_hash ? read_hash : read_obj;
+    msg.index = model->msgs.size();
     model->msgs.push_back(msg);
   }
 
   // fill in fields
   for (VALUE type : new_types)
-    register_fields(get_msg_for_type(model, type), type, rule);
+    register_fields(model, get_msg_for_type(model, type), type, rule);
 
   // print debugging info
-  //cout << endl;
-  //cout << "REGISTERED:" << endl;
+  cout << endl;
+  cout << "REGISTERED:" << endl;
   for (Msg& msg : model->msgs) {
-    //cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
+    cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds_to_enumerate) {
-      // //cout << "  " << fld.num << " " << fld.name
-      //      << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
-      //      << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
-      //      << " (" << (int)fld.fld_type << ") "
-      //      << "[" << (int)fld.wire_type << "]"
-      //      << endl;
+      cout << "  " << fld.num << " " << fld.name
+           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+           << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
+           << " (" << (int)fld.fld_type << ") "
+           << "[" << (int)fld.wire_type << "]"
+           << endl;
     }
   }
-  //cout << "---------------" << endl;
+  cout << "---------------" << endl;
   
   return Qnil;
 }
 
-void register_fields(Msg *msg, VALUE type, VALUE rule) {
+void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
   for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
     VALUE rFldName = sym_to_s(rb_get(rFld, "name"));
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
     fld.name = RSTRING_PTR(rFldName);
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
+    if (fld.fld_type == FLD_MESSAGE)
+      fld.msg_field_index = get_msg_for_type(model, rb_get(rFld, "msg_class"))->index;
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
     if (fld.wire_type == -1)
       continue;
     if (msg->target_is_hash) {
       fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
-      fld.write_key = get_key_writer(fld.wire_type, fld.fld_type);
+      fld.write_fld = get_key_writer(fld.wire_type, fld.fld_type);
       fld.read_key = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
       string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
@@ -115,14 +118,15 @@ vector<VALUE> arr2vec(VALUE array) {
 }
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
+  cout << "writing" << endl;
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
-  int num_flds = msg->flds_to_enumerate.size();
-  return msg->write(msg, num_flds, buf, obj);
+  return msg->write(model, msg, buf, obj);
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
+  cout << "reading" << endl;
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
@@ -149,19 +153,21 @@ VALUE read_hash(Msg* msg, ss_t& ss) {
   return Qnil;
 }
 
-VALUE write_obj(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
+VALUE write_obj(Model* model, Msg* msg, buf_t& buf, VALUE obj) {
+  int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
     //cout << "write_header " << (int)fld->wire_type << " " << endl;
+    cout << "writing field " << msg->name << "." << fld->name << endl;
     write_header(buf, fld->wire_type, fld->num);
-    fld->write_fld(buf, obj, fld->target_field);
+    fld->write_fld(model, buf, obj, fld);
   }
   //cout << "buf size " << buf.size() << endl;
   //cout << "buf[0] " << (int)buf[0] << endl;
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
-VALUE write_hash(Msg* msg, int num_flds, buf_t& buf, VALUE obj) {
+VALUE write_hash(Model* model, Msg* msg, buf_t& buf, VALUE obj) {
   return Qnil;
 }
 

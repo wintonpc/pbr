@@ -18,19 +18,23 @@ to inflect field names (or hash keys).
 - test against another PB implementation
 
 - performance testing
+  - test function pointers vs big `switch`
 
 - hash support
   - consider being more flexible with determining if a target type should be treated as a hash
     (for things that act like a hashes but are not)
 
 - validation
-  - count actual required fields vs expected. only compute details if actual != expected.
+  - when writing, verify value type
+  - when reading, count actual required fields vs expected. only compute details if actual != expected.
   - raise error
 
 - make type declarations friendlier
   - implement `protoc` plugin
 
-- consider ObjectId -> string problem
+- consider field mapping
+  - ObjectId -> string
+  - Time -> string
 
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
@@ -55,5 +59,5 @@ to inflect field names (or hash keys).
           - if this proves to be more than actually needed, pad with zero bits
           - if not enough, insert the appropriate number of additional bytes.
             (std::vector.insert() is likely performant enough for this)
-
+  - reuse the same vector for temporary embedded message writing
 

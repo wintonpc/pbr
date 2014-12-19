@@ -12,8 +12,8 @@ extern VALUE UTF_8_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define FVAL()  rb_funcall(obj, target_field, 0)
-#define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE obj, ID target_field)
+#define FVAL()  rb_funcall(obj, fld->target_field, 0)
+#define DEF_WF(type)  void wf_##type(Model* model, buf_t& buf, VALUE obj, Fld* fld)
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (FVAL()));  }
 DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(FVAL()));  }
@@ -72,6 +72,19 @@ DEF_WF(STRING) {
   write_bytes(buf, v);
 }
 
+DEF_WF(MESSAGE) {
+  cout << "writing msg field" << endl;
+  buf_t tmp_buf;
+  Msg* embedded_msg = &model->msgs[fld->msg_field_index];
+  cout << "embedded type: " << embedded_msg->name << endl;
+  VALUE v = FVAL();
+  cout << "embedded value: " << inspect(v) << endl;
+  embedded_msg->write(model, embedded_msg, tmp_buf, v);
+  w_varint32(buf, tmp_buf.size());
+  buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
+  cout << "wrote embedded message without throwing" << endl;
+}
+
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   uint32_t h = (fld_num << 3) | wire_type;
   w_varint32(buf, h);
@@ -81,7 +94,7 @@ write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(wf); default: return NULL; }
 }
 
-write_key_func get_key_writer(wire_t wire_type, fld_t fld_type) {
+write_fld_func get_key_writer(wire_t wire_type, fld_t fld_type) {
   //switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
   return NULL;
 }

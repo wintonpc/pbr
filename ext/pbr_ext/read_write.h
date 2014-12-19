@@ -22,5 +22,6 @@
   MAP_TYPE(prefix, FLOAT)                             \
   MAP_TYPE(prefix, DOUBLE)                            \
   MAP_TYPE(prefix, BOOL)                              \
+  MAP_TYPE(prefix, MESSAGE)                           \
 
 #endif

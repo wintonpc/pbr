@@ -34,14 +34,20 @@ class Pbr
 
   def ensure_type_registered(type)
     unless @registered_types.include?(type)
-      types = collect_type_dependencies(type)
+      types = collect_type_dependencies(type).to_a
       Ext::register_types(@handle, types, @rule)
       @registered_types += types
     end
   end
 
-  def collect_type_dependencies(type)
-    [type] # TODO
+  def collect_type_dependencies(type, seen=Set.new)
+    unless seen.include?(type)
+      seen.add(type)
+      type.fields.
+          select{|f| f.type == Pbr::TFieldType::MESSAGE}.
+          each{|f| collect_type_dependencies(f.msg_class, seen)}
+    end
+    seen
   end
 
   def wrap_rule(rule)

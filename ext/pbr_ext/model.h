@@ -15,9 +15,8 @@ struct Fld;
 typedef void (*add_fld_func)(Msg*, Fld);
 typedef Fld* (*get_fld_func)(Msg*, fld_num_t);
 
-typedef VALUE (*write_obj_func)(Msg* msg, int num_flds, buf_t& buf, VALUE obj);
-typedef void (*write_fld_func)(buf_t& buf, VALUE obj, ID target_field);
-typedef void (*write_key_func)(buf_t& buf, VALUE obj, VALUE target_key);
+typedef VALUE (*write_obj_func)(Model* model, Msg* msg, buf_t& buf, VALUE obj);
+typedef void (*write_fld_func)(Model* model, buf_t& buf, VALUE obj, Fld* fld);
 
 typedef VALUE (*read_obj_func)(Msg* msg, ss_t& ss);
 typedef void (*read_fld_func)(ss_t& ss, VALUE obj, ID target_field_setter);
@@ -28,6 +27,7 @@ struct Model {
 };
 
 struct Msg {
+  int index;
   std::string name;
   VALUE target;
   bool target_is_hash;
@@ -47,8 +47,8 @@ struct Fld {
   VALUE target_key;
   wire_t wire_type;
   fld_t fld_type;
+  int msg_field_index;
   write_fld_func write_fld;
-  write_key_func write_key;
   read_fld_func read_fld;
   read_key_func read_key;
 };
