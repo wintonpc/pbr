@@ -23,7 +23,6 @@ class Pbr
   end
 
   TField = Struct.new(:name, :num, :type, :msg_class)
-
   TMessage = Struct.new(:name, :fields)
 
 end

@@ -26,6 +26,8 @@ DEF_WF(FIXED32)  { w_int32   (buf,          NUM2UINT(FVAL()));  }
 DEF_WF(SFIXED64) { w_int64   (buf,          NUM2LL  (FVAL()));  }
 DEF_WF(FIXED64)  { w_int64   (buf,          NUM2ULL (FVAL()));  }
 
+DEF_WF(ENUM)     { w_varint32(buf,          NUM2INT (FVAL()));  }
+
 DEF_WF(FLOAT) {
   float v = (float)NUM2DBL(FVAL());
   w_int32(buf, REINTERPRET(uint32_t, v));

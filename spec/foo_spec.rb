@@ -39,6 +39,8 @@ describe Pbr do
     it_roundtrips_uint(64, :uint64)
     it_roundtrips_uint(64, :fixed64)
 
+    it_roundtrips_sint(32, :enum)
+
     context 'allows field names to be' do
       it('symbols') { roundtrip(:string, 'sss', :foo) }
       it('string') { roundtrip(:string, 'sss', 'foo') }
@@ -103,7 +105,6 @@ describe Pbr do
         expect(v2.bar).to eql v1.bar
       end
     end
-
 
     def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
       field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize

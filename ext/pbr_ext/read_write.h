@@ -23,5 +23,6 @@
   MAP_TYPE(prefix, DOUBLE)                            \
   MAP_TYPE(prefix, BOOL)                              \
   MAP_TYPE(prefix, MESSAGE)                           \
+  MAP_TYPE(prefix, ENUM)                              \
 
 #endif
