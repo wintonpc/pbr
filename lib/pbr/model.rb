@@ -1,6 +1,13 @@
 class Pbr
 
+  module Enum
+    def values
+      self.constants.map { |sym| self.const_get(sym) }
+    end
+  end
+
   module TFieldType
+    extend Enum
     ## 0 is reserved for errors.
     DOUBLE   = 1
     FLOAT    = 2
@@ -24,5 +31,22 @@ class Pbr
 
   TField = Struct.new(:name, :num, :type, :msg_class)
   TMessage = Struct.new(:name, :fields)
+
+  module Label
+    extend Enum
+    OPTIONAL = 1
+    REQUIRED = 2
+    REPEATED = 3
+  end
+
+  class TField
+    attr_accessor :name, :num, :type, :msg_class, :label
+
+    def initialize(name, num, type, opts={})
+      @name, @num, @type = name, num, type
+      @msg_class = opts[:msg_class]
+      @label = opts[:label] || Label::REQUIRED
+    end
+  end
 
 end

@@ -10,7 +10,6 @@ to inflect field names (or hash keys).
 
 # To do
 
-- embedded messages
 - repeated
   - packed
 - optional

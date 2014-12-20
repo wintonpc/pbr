@@ -6,6 +6,7 @@
 
 typedef int wire_t;
 typedef int fld_t;
+typedef int label_t;
 typedef uint32_t fld_num_t;
 typedef unsigned int zz32_t;
 typedef long unsigned int zz64_t;
@@ -36,5 +37,9 @@ const fld_t FLD_SFIXED32 = 15;
 const fld_t FLD_SFIXED64 = 16;
 const fld_t FLD_SINT32 = 17;
 const fld_t FLD_SINT64 = 18;
+
+const label_t LABEL_OPTIONAL = 1;
+const label_t LABEL_REQUIRED = 2;
+const label_t LABEL_REPEATED = 3;
 
 #endif

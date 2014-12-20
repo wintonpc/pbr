@@ -95,8 +95,8 @@ describe Pbr do
     end
 
     it 'embedded messages' do
-      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', 1, Pbr::TFieldType::STRING, nil)])
-      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::MESSAGE, sub_msg)])
+      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', 1, Pbr::TFieldType::STRING)])
+      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::MESSAGE, msg_class: sub_msg)])
 
       field_val = OpenStruct.new({bar: 'hello'})
 
@@ -106,9 +106,15 @@ describe Pbr do
       end
     end
 
+    it 'repeated fields' do
+      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::STRING, label: Pbr::Label::REPEATED)])
+
+      roundtrip_impl(message_type, ['hello', 'world'], 'foo')
+    end
+
     def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
       field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize
-      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type, nil) ])
+      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type) ])
       roundtrip_impl(message_type, field_val, field_name, &block)
     end
 

@@ -88,6 +88,13 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
     if (fld.fld_type == FLD_MESSAGE)
       fld.embedded_msg = get_msg_for_type(model, rb_get(rFld, "msg_class"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
+    fld.label = NUM2INT(rb_get(rFld, "label"));
+
+    cout << "registering field " << fld.name << endl;
+    cout << "  fld_type: " << fld.fld_type << endl;
+    cout << "  wire_type: " << fld.wire_type << endl;
+    cout << "  label: " << fld.label << endl;
+
     if (fld.wire_type == -1)
       continue;
     if (msg->target_is_hash) {
@@ -95,11 +102,14 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
       fld.write_fld = get_key_writer(fld.wire_type, fld.fld_type);
       fld.read_fld = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
+      cout << "  it is an object type" << endl;
       string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
       fld.target_field = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
       fld.write_fld = get_fld_writer(fld.wire_type, fld.fld_type);
       fld.read_fld = get_fld_reader(fld.wire_type, fld.fld_type);
+      cout << "  set read_fld" << endl;
+      cout << "  to " << (uint64_t)fld.read_fld << endl;
     }
     msg->add_fld(msg, fld);
   }
@@ -135,16 +145,26 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
   VALUE obj = rb_funcall(msg->target, ID_CTOR, 0);
-  //cout << "read_obj " << RSTRING_PTR(rb_inspect(obj)) << " which is a " << RSTRING_PTR(rb_inspect(msg->target)) << endl;
+  
+  for (Fld& fld : msg->flds_to_enumerate)
+    if (fld.label == LABEL_REPEATED)
+      rb_funcall(obj, fld.target_field_setter, 1, rb_ary_new());
+
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
-    //int32_t wire_type = h & 7;
     fld_num_t fld_num = h >> 3;
-    //cout << "wire_type " << wire_type << endl;
-    //cout << "fld_num " << fld_num << endl;
+    cout << "getting field number " << fld_num << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
-    //cout << "reading " << fld->name << endl;
-    fld->read_fld(ss, obj, fld);
+    if (fld->label != LABEL_REPEATED) {
+      cout << "reading field " << fld->name << " ..." << endl;
+      cout << "read_fld = " << (int64_t)fld->read_fld << endl;
+      VALUE val = fld->read_fld(ss, fld);
+      cout << "setting..." << endl;
+      rb_funcall(obj, fld->target_field_setter, 1, val);
+    } else {
+      VALUE val = fld->read_fld(ss, fld);
+      rb_ary_push(rb_funcall(obj, fld->target_field, 0), val);
+    }
   }
   return obj;
 }
@@ -153,17 +173,26 @@ VALUE read_hash(Msg* msg, ss_t& ss) {
   return Qnil;
 }
 
+void write_value(buf_t& buf, Fld* fld, VALUE obj) {
+  write_header(buf, fld->wire_type, fld->num);
+  fld->write_fld(buf, obj, fld);
+}
+
 VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
-    //cout << "write_header " << (int)fld->wire_type << " " << endl;
-    cout << "writing field " << msg->name << "." << fld->name << endl;
-    write_header(buf, fld->wire_type, fld->num);
-    fld->write_fld(buf, obj, fld);
+    VALUE val = rb_funcall(obj, fld->target_field, 0);
+    if (fld->label != LABEL_REPEATED) {
+      write_value(buf, fld, val);
+    } else {
+      int len = RARRAY_LEN(val);
+      for (int i=0; i<len; i++) {
+        VALUE elem = rb_ary_entry(val, i);
+        write_value(buf, fld, elem);
+      }
+    }
   }
-  //cout << "buf size " << buf.size() << endl;
-  //cout << "buf[0] " << (int)buf[0] << endl;
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
