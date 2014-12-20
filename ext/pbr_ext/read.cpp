@@ -53,7 +53,7 @@ DEF_RF(BYTES) {
 
 DEF_RF(MESSAGE) {
   int32_t len = r_varint32(ss);
-  ss_t tmp_ss = ss_make(ss, len);
+  ss_t tmp_ss = ss_substream(ss, len);
   Msg* embedded_msg = fld->embedded_msg;
   FSET(embedded_msg->read(embedded_msg, tmp_ss));
 }

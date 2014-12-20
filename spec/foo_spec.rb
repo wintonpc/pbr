@@ -4,64 +4,11 @@ require 'pbr'
 require 'test_msg'
 require 'active_support/inflector'
 
-def print_roundtrip(v1, v2)
-  shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
-  puts shown.size > 120 ? shown[0..100] + '...' : shown
-end
-
 describe Pbr do
 
   context 'roundtrips' do
 
-    def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
-      block ||= ->(v1, v2){expect(v2).to eql v1}
-      field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize
-      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type, nil) ])
-
-      pbr = Pbr.new
-      begin
-        obj1 = OpenStruct.new
-        obj1.send("#{field_name}=", field_val)
-
-        bytes = pbr.write(obj1, message_type)
-        obj2 = pbr.read(bytes, message_type)
-
-        v1, v2 = [obj1, obj2].map{|obj| obj.send(field_name)}
-        print_roundtrip(v1, v2)
-        block.call(v1, v2)
-      ensure
-        pbr.close
-      end
-    end
-
-    def roundtrip_float(precision, field_type_as_symbol, field_val)
-      roundtrip(field_type_as_symbol, field_val) do |v1, v2|
-        if v1 == 0
-          expect(v2).to eql v1
-        else
-          mag1 = [Math.log10(v1.abs).floor, 1].max
-          mag2 = [Math.log10(v2.abs).floor, 1].max
-          puts "   (mag: #{mag1} -> #{mag2})"
-          expect(mag2).to eql mag1
-          sig1 = v1 / 10**mag1
-          sig2 = v2 / 10**mag2
-          puts "   (sig: #{sig1} -> #{sig2})"
-          expect(sig2).to be_within(10 ** (-precision)).of(sig1)
-        end
-      end
-    end
-
-    # def msg_type(field_type, field_name=:foo, field_num=1)
-    #   field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
-    #   sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class, nil)])
-    #   test_msg = Pbr::TMessage.new('TestMsg', [
-    #                                             Pbr::TField.new(field_name, field_num, field_type_class, nil),
-    #                                             Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
-    #                                         ])
-    # end
-
-
-    def self.it_roundtrips_int(bits, type)
+    def self.it_roundtrips_sint(bits, type)
       it type do
         roundtrip(type, 0)
         roundtrip(type, 1)
@@ -80,6 +27,17 @@ describe Pbr do
         roundtrip(type, 2**bits - 1)
       end
     end
+
+    it_roundtrips_sint(32, :int32)
+    it_roundtrips_sint(32, :sint32)
+    it_roundtrips_sint(32, :sfixed32)
+    it_roundtrips_uint(32, :uint32)
+    it_roundtrips_uint(32, :fixed32)
+    it_roundtrips_sint(64, :int64)
+    it_roundtrips_sint(64, :sint64)
+    it_roundtrips_sint(64, :sfixed64)
+    it_roundtrips_uint(64, :uint64)
+    it_roundtrips_uint(64, :fixed64)
 
     context 'allows field names to be' do
       it('symbols') { roundtrip(:string, 'sss', :foo) }
@@ -134,15 +92,64 @@ describe Pbr do
       roundtrip(:bool, false)
     end
 
-    it_roundtrips_int(32, :int32)
-    it_roundtrips_uint(32, :uint32)
-    it_roundtrips_int(64, :int64)
-    it_roundtrips_uint(64, :uint64)
-    it_roundtrips_int(32, :sint32)
-    it_roundtrips_int(64, :sint64)
-    it_roundtrips_int(32, :sfixed32)
-    it_roundtrips_uint(32, :fixed32)
-    it_roundtrips_int(64, :sfixed64)
-    it_roundtrips_uint(64, :fixed64)
+    it 'embedded messages' do
+      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', 1, Pbr::TFieldType::STRING, nil)])
+      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::MESSAGE, sub_msg)])
+
+      field_val = OpenStruct.new({bar: 'hello'})
+
+      roundtrip_impl(message_type, field_val, 'foo') do |v1, v2|
+        expect(v2).to be_a OpenStruct
+        expect(v2.bar).to eql v1.bar
+      end
+    end
+
+
+    def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
+      field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize
+      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type, nil) ])
+      roundtrip_impl(message_type, field_val, field_name, &block)
+    end
+
+    def roundtrip_float(precision, field_type_as_symbol, field_val)
+      roundtrip(field_type_as_symbol, field_val) do |v1, v2|
+        if v1 == 0
+          expect(v2).to eql v1
+        else
+          mag1 = [Math.log10(v1.abs).floor, 1].max
+          mag2 = [Math.log10(v2.abs).floor, 1].max
+          puts "   (mag: #{mag1} -> #{mag2})"
+          expect(mag2).to eql mag1
+          sig1 = v1 / 10**mag1
+          sig2 = v2 / 10**mag2
+          puts "   (sig: #{sig1} -> #{sig2})"
+          expect(sig2).to be_within(10 ** (-precision)).of(sig1)
+        end
+      end
+    end
+
+    def roundtrip_impl(message_type, field_val, field_name, &block)
+      block ||= ->(v1, v2){expect(v2).to eql v1}
+
+      pbr = Pbr.new
+      begin
+        obj1 = OpenStruct.new
+        obj1.send("#{field_name}=", field_val)
+
+        bytes = pbr.write(obj1, message_type)
+        obj2 = pbr.read(bytes, message_type)
+
+        v1, v2 = [obj1, obj2].map{|obj| obj.send(field_name)}
+        print_roundtrip(v1, v2)
+        block.call(v1, v2)
+      ensure
+        pbr.close
+      end
+    end
+
+    def print_roundtrip(v1, v2)
+      shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
+      puts shown.size > 120 ? shown[0..100] + '...' : shown
+    end
   end
 end

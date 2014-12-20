@@ -8,11 +8,12 @@ ss_t ss_make(char* s, int len) {
   return ss;
 }
 
-ss_t ss_make(ss_t& other, int len) {
+ss_t ss_substream(ss_t& other, int len) {
   ss_t ss;
   ss.buf = other.buf + other.pos;
   ss.pos = 0;
   ss.len = len;
+  other.pos += len;
   return ss;
 }
 
