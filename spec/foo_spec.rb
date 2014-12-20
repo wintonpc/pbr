@@ -4,225 +4,145 @@ require 'pbr'
 require 'test_msg'
 require 'active_support/inflector'
 
+def print_roundtrip(v1, v2)
+  shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
+  puts shown.size > 120 ? shown[0..100] + '...' : shown
+end
+
 describe Pbr do
 
   context 'roundtrips' do
 
-    def roundtrip(tripper, short_message_type, str, field_name=:foo, field_num=1)
-      v1, v2 = do_roundtrip(tripper, short_message_type, str, field_name=:foo, field_num=1)
-      expect(v2).to eql v1
-    end
+    def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
+      block ||= ->(v1, v2){expect(v2).to eql v1}
+      field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize
+      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type, nil) ])
 
-    def roundtrip_float(tripper, precision, short_message_type, str, field_name=:foo, field_num=1)
-      v1, v2 = do_roundtrip(tripper, short_message_type, str, field_name=:foo, field_num=1)
-      if v1 == 0
-        expect(v2).to eql v1
-      else
-        mag1 = [Math.log10(v1.abs).floor, 1].max
-        mag2 = [Math.log10(v2.abs).floor, 1].max
-        puts "   (mag: #{mag1} -> #{mag2})"
-        expect(mag2).to eql mag1
-        sig1 = v1 / 10**mag1
-        sig2 = v2 / 10**mag2
-        puts "   (sig: #{sig1} -> #{sig2})"
-        expect(sig2).to be_within(10 ** (-precision)).of(sig1)
+      pbr = Pbr.new
+      begin
+        obj1 = OpenStruct.new
+        obj1.send("#{field_name}=", field_val)
+
+        bytes = pbr.write(obj1, message_type)
+        obj2 = pbr.read(bytes, message_type)
+
+        v1, v2 = [obj1, obj2].map{|obj| obj.send(field_name)}
+        print_roundtrip(v1, v2)
+        block.call(v1, v2)
+      ensure
+        pbr.close
       end
     end
 
-    def do_roundtrip(tripper, short_message_type, str, field_name=:foo, field_num=1)
-      message_type = msg_type(short_message_type, field_name, field_num)
-      v1, v2, v3, v4 = tripper.call(message_type, str, field_name)
-      [[v1, v2], [v3, v4]].each do |(v1, v2)|
-        shown = "#{v1.inspect}#{v1.is_a?(String) ? " (#{v1.encoding})" : ''} -> #{v2.inspect}#{v2.is_a?(String) ? " (#{v2.encoding})" : ''}"
-        puts shown.size > 120 ? shown[0..100] + '...' : shown
+    def roundtrip_float(precision, field_type_as_symbol, field_val)
+      roundtrip(field_type_as_symbol, field_val) do |v1, v2|
+        if v1 == 0
+          expect(v2).to eql v1
+        else
+          mag1 = [Math.log10(v1.abs).floor, 1].max
+          mag2 = [Math.log10(v2.abs).floor, 1].max
+          puts "   (mag: #{mag1} -> #{mag2})"
+          expect(mag2).to eql mag1
+          sig1 = v1 / 10**mag1
+          sig2 = v2 / 10**mag2
+          puts "   (sig: #{sig1} -> #{sig2})"
+          expect(sig2).to be_within(10 ** (-precision)).of(sig1)
+        end
       end
-      [v1, v2, v3, v4]
     end
 
-    def self.do_obj_roundtrip(message_type, field_val, field_name=:foo)
-      obj = OpenStruct.new
-      obj.sub = OpenStruct.new
-      obj.send("#{field_name}=", field_val)
-      obj.sub.bar = field_val
-      bytes = Pbr.new.write(obj, message_type)
-      obj2  = Pbr.new.read(bytes, message_type)
-      v1    = obj.send(field_name)
-      v2    = obj2.send(field_name)
-      v3    = obj.sub.bar
-      v4    = obj2.sub.bar
-      [v1, v2, v3, v4]
-    end
-
-    # def self.do_hash_roundtrip(message_type, field_val, key_name=:foo)
-    #   obj = {}
-    #   obj['sub'] = {}
-    #   obj[key_name] = field_val
-    #   obj['sub']['bar'] = field_val
-    #   bytes = Pbr.new.write(obj, message_type)
-    #   obj2  = Pbr.new.read(bytes, message_type)
-    #   # expect(obj2).to be_a Hash
-    #   v2    = obj2[key_name]
-    #   v1    = obj2[key_name]
-    #   [v1, v2]
+    # def msg_type(field_type, field_name=:foo, field_num=1)
+    #   field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
+    #   sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class, nil)])
+    #   test_msg = Pbr::TMessage.new('TestMsg', [
+    #                                             Pbr::TField.new(field_name, field_num, field_type_class, nil),
+    #                                             Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
+    #                                         ])
     # end
 
-    def msg_type(field_type, field_name=:foo, field_num=1)
-      field_type_class = "Pbr::TFieldType::#{field_type.to_s.upcase}".constantize
-      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', field_num, field_type_class, nil)])
-      test_msg = Pbr::TMessage.new('TestMsg', [
-                                                Pbr::TField.new(field_name, field_num, field_type_class, nil),
-                                                Pbr::TField.new('sub', field_num + 1, Pbr::TFieldType::MESSAGE, sub_msg)
-                                            ])
-    end
 
-    def self.it_roundtrips_int(tripper, bits, type)
-      it "#{type} with #{tripper.name}" do
-        roundtrip(tripper, type, 0)
-        roundtrip(tripper, type, 1)
-        roundtrip(tripper, type, -1)
-        roundtrip(tripper, type, 1234)
-        roundtrip(tripper, type, 2**(bits-1) - 1)
-        roundtrip(tripper, type, -2**(bits-1))
+    def self.it_roundtrips_int(bits, type)
+      it type do
+        roundtrip(type, 0)
+        roundtrip(type, 1)
+        roundtrip(type, -1)
+        roundtrip(type, 1234)
+        roundtrip(type, 2**(bits-1) - 1)
+        roundtrip(type, -2**(bits-1))
       end
     end
 
-    def self.it_roundtrips_uint(tripper, bits, type)
-      it "#{type} with #{tripper.name}" do
-        roundtrip(tripper, type, 0)
-        roundtrip(tripper, type, 1)
-        roundtrip(tripper, type, 1234)
-        roundtrip(tripper, type, 2**bits - 1)
+    def self.it_roundtrips_uint(bits, type)
+      it type do
+        roundtrip(type, 0)
+        roundtrip(type, 1)
+        roundtrip(type, 1234)
+        roundtrip(type, 2**bits - 1)
       end
     end
 
-    [method(:do_obj_roundtrip)].each do |t|
+    context 'allows field names to be' do
+      it('symbols') { roundtrip(:string, 'sss', :foo) }
+      it('string') { roundtrip(:string, 'sss', 'foo') }
+    end
 
-      it "field names with #{t.name}" do
-        roundtrip(t, :string, 'sss', :foo)
-        roundtrip(t, :string, 'sss', 'foo')
-      end
+    it 'field numbers' do
+      min_field_num = 1
+      max_field_num = 2 ** 29 - 1
+      roundtrip(:string, 'sss', :foo, min_field_num)
+      roundtrip(:string, 'sss', :foo, 1234)
+      roundtrip(:string, 'sss', :foo, max_field_num)
+    end
 
-      it "field numbers with #{t.name}" do
-        min_field_num = 1
-        max_field_num = 2 ** 29 - 1
-        roundtrip(t, :string, 'sss', :foo, min_field_num)
-        roundtrip(t, :string, 'sss', :foo, 1234)
-        roundtrip(t, :string, 'sss', :foo, max_field_num)
-      end
+    it 'string' do
+      roundtrip(:string, '')
+      roundtrip(:string, 'hello, world!')
+      roundtrip(:string, "hello\0world")
+      roundtrip(:string, 'z' * 1024 * 1024)
 
-      it "string with #{t.name}" do
-        roundtrip(t, :string, '')
-        roundtrip(t, :string, 'hello, world!')
-        roundtrip(t, :string, "hello\0world")
-        roundtrip(t, :string, 'z' * 1024 * 1024)
-
-        v1, v2 = do_roundtrip(t, :string, 'hello, world!'.encode('utf-16'))
+      roundtrip(:string, 'hello, world!'.encode('utf-16')) do |v1, v2|
         expect(v1.encoding).to eql Encoding::UTF_16
         expect(v2.encoding).to eql Encoding::UTF_8
         expect(v2).to eql v1.encode('utf-8')
       end
-
-      it "bytes with #{t.name}" do
-        roundtrip(t, :bytes, 'hello')
-        roundtrip(t, :bytes, [0, 1, 2, 3, 255].pack('c*'))
-      end
-
-      it "float with #{t.name}" do
-        roundtrip_float(t, 7, :float, 0.0)
-        roundtrip_float(t, 7, :float, 3.14)
-        roundtrip_float(t, 7, :float, -3.14)
-        roundtrip_float(t, 7, :float, 3.402823e38)
-        roundtrip_float(t, 7, :float, -3.402823e38)
-      end
-
-      it "double with #{t.name}" do
-        roundtrip(t, :double, 0.0)
-        roundtrip(t, :double, 3.14)
-        roundtrip(t, :double, -3.14)
-        roundtrip(t, :double, 3.402823e38)
-        roundtrip(t, :double, -3.402823e38)
-        roundtrip(t, :double, 0.030000000000000006)
-      end
-
-      it "bool with #{t.name}" do
-        roundtrip(t, :bool, true)
-        roundtrip(t, :bool, false)
-      end
-
-      it_roundtrips_int(t, 32, :int32)
-      it_roundtrips_uint(t, 32, :uint32)
-      it_roundtrips_int(t, 64, :int64)
-      it_roundtrips_uint(t, 64, :uint64)
-      it_roundtrips_int(t, 32, :sint32)
-      it_roundtrips_int(t, 64, :sint64)
-      it_roundtrips_int(t, 32, :sfixed32)
-      it_roundtrips_uint(t, 32, :fixed32)
-      it_roundtrips_int(t, 64, :sfixed64)
-      it_roundtrips_uint(t, 64, :fixed64)
-
-      it "embedded messages with #{t.name}" do
-
-      end
-    end
-  end
-
-  C = Struct.new(:foo)
-
-  it 'performance tests' do
-    GC.disable
-    obj = C.new(nil)
-    hash = {foo: nil, 'foo' => nil}
-
-    trial(:direct) do
-      obj.foo = 5
     end
 
-    obj_set_foo = ->(obj, v){obj.foo = v}
-    trial(:direct_lambda) do
-      obj_set_foo.call(obj, 5)
+    it 'bytes' do
+      roundtrip(:bytes, 'hello')
+      roundtrip(:bytes, [0, 1, 2, 3, 255].pack('c*'))
     end
 
-    get_obj_set_foo = ->{obj_set_foo}
-    trial(:direct_lambda_indirected) do
-      get_obj_set_foo.call.call(obj, 5)
+    it 'float' do
+      roundtrip_float(7, :float, 0.0)
+      roundtrip_float(7, :float, 3.14)
+      roundtrip_float(7, :float, -3.14)
+      roundtrip_float(7, :float, 3.402823e38)
+      roundtrip_float(7, :float, -3.402823e38)
     end
 
-    trial(:send) do
-      obj.send(:foo=, 5)
+    it 'double' do
+      roundtrip(:double, 0.0)
+      roundtrip(:double, 3.14)
+      roundtrip(:double, -3.14)
+      roundtrip(:double, 3.402823e38)
+      roundtrip(:double, -3.402823e38)
+      roundtrip(:double, 0.030000000000000006)
     end
 
-    setter = :foo=
-    trial(:captured_send) do
-      obj.send(setter, 5)
+    it 'bool' do
+      roundtrip(:bool, true)
+      roundtrip(:bool, false)
     end
 
-    trial(:hash_symbol) do
-      hash[:foo] = 5
-    end
-
-    hash_set_foo = ->(h, v){h[:foo] = v}
-    trial(:hash_symbol_lambda) do
-      hash_set_foo.call(hash, 5)
-    end
-
-    trial(:hash_string) do
-      hash['foo'] = 5
-    end
-  end
-
-  def trial(name, &block)
-    time_it(name) do
-      10000000.times(&block)
-    end
-  end
-
-  def time_it(name)
-    start = Time.now
-    begin
-      yield
-    ensure
-      stop = Time.now
-      puts "#{name}: #{stop - start} seconds"
-    end
+    it_roundtrips_int(32, :int32)
+    it_roundtrips_uint(32, :uint32)
+    it_roundtrips_int(64, :int64)
+    it_roundtrips_uint(64, :uint64)
+    it_roundtrips_int(32, :sint32)
+    it_roundtrips_int(64, :sint64)
+    it_roundtrips_int(32, :sfixed32)
+    it_roundtrips_uint(32, :fixed32)
+    it_roundtrips_int(64, :sfixed64)
+    it_roundtrips_uint(64, :fixed64)
   end
 end
