@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'pbr/generator'
+
+# borrowed from beefcake
+
+ns = (ENV['PBR_NAMESPACE'] || '').split('::')
+
+pbr = Pbr.new(PbrRule.vanilla)
+req = pbr.read(STDIN.read, CodeGeneratorRequest)
+res = pbr.write(Pbr::Generator.compile(ns, req), CodeGeneratorResponse)
+STDOUT.print(res.encode)

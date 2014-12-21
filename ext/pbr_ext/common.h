@@ -29,7 +29,7 @@ inline VALUE sym_to_s(VALUE x) {
 }
 
 inline std::string type_name(VALUE type) {
-  return RSTRING_PTR(rb_get(type, "name"));
+  return RSTRING_PTR(rb_get(type, "type_name"));
 }
 
 #endif
