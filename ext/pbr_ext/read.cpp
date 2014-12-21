@@ -12,7 +12,6 @@ extern ID ID_CTOR;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-//#define FSET(val)  rb_funcall(obj, fld->target_field_setter, 1, (val))
 #define DEF_RF(type)  VALUE rf_##type(ss_t& ss, Fld* fld)
 
 DEF_RF(INT32)    { return (INT2NUM          (r_varint32(ss)));  }
@@ -62,11 +61,11 @@ DEF_RF(MESSAGE) {
   return (embedded_msg->read(embedded_msg, tmp_ss));
 }
 
-read_fld_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
+read_val_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(rf); default: cout << "get_fld_reader failed" << endl; return NULL; }
 }
 
-read_fld_func get_key_reader(wire_t wire_type, fld_t fld_type) {
+read_val_func get_key_reader(wire_t wire_type, fld_t fld_type) {
   //switch (fld_type) { TYPE_MAP(rk); default: return NULL; }
   return NULL;
 }
@@ -83,7 +82,7 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
     fld_num_t fld_num = h >> 3;
     Fld* fld = msg->get_fld(msg, fld_num);
     if (fld->label != LABEL_REPEATED) {
-      VALUE val = fld->read_fld(ss, fld);
+      VALUE val = fld->read(ss, fld);
       rb_funcall(obj, fld->target_field_setter, 1, val);
     } else {
       if (fld->is_packed) {
@@ -91,9 +90,9 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
         ss_t tmp_ss = ss_substream(ss, byte_len);
         VALUE rArr = rb_funcall(obj, fld->target_field, 0);
         while (ss_more(tmp_ss))
-          rb_ary_push(rArr, fld->read_fld(tmp_ss, fld));
+          rb_ary_push(rArr, fld->read(tmp_ss, fld));
       } else {
-        VALUE val = fld->read_fld(ss, fld);
+        VALUE val = fld->read(ss, fld);
         rb_ary_push(rb_funcall(obj, fld->target_field, 0), val);
       }
     }

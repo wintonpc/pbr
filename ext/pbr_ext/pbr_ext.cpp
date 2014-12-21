@@ -96,14 +96,14 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
       continue;
     if (msg->target_is_hash) {
       fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
-      fld.write_fld = get_key_writer(fld.wire_type, fld.fld_type);
-      fld.read_fld = get_key_reader(fld.wire_type, fld.fld_type);
+      fld.write = get_key_writer(fld.wire_type, fld.fld_type);
+      fld.read = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
       string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
       fld.target_field = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
-      fld.write_fld = get_fld_writer(fld.wire_type, fld.fld_type);
-      fld.read_fld = get_fld_reader(fld.wire_type, fld.fld_type);
+      fld.write = get_fld_writer(fld.wire_type, fld.fld_type);
+      fld.read = get_fld_reader(fld.wire_type, fld.fld_type);
     }
     msg->add_fld(msg, fld);
   }

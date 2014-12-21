@@ -12,7 +12,6 @@ extern VALUE UTF_8_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-//#define FVAL()  rb_funcall(obj, fld->target_field, 0)
 #define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE val, Fld* fld)
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (val));  }
@@ -91,18 +90,18 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   w_varint32(buf, h);
 }
 
-write_fld_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
+write_val_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(wf); default: return NULL; }
 }
 
-write_fld_func get_key_writer(wire_t wire_type, fld_t fld_type) {
+write_val_func get_key_writer(wire_t wire_type, fld_t fld_type) {
   //switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
   return NULL;
 }
 
 void write_value(buf_t& buf, Fld* fld, VALUE obj) {
   write_header(buf, fld->wire_type, fld->num);
-  fld->write_fld(buf, obj, fld);
+  fld->write(buf, obj, fld);
 }
 
 VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
@@ -120,7 +119,7 @@ VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
           buf_t tmp_buf;
           for (int i=0; i<len; i++) {
             VALUE elem = rb_ary_entry(val, i);
-            fld->write_fld(tmp_buf, elem, fld);
+            fld->write(tmp_buf, elem, fld);
           }
           w_varint32(buf, tmp_buf.size());
           buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
