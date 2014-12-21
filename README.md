@@ -10,10 +10,7 @@ to inflect field names (or hash keys).
 
 # To do
 
-- repeated
-  - packed
-- optional
-
+- create DSL for type descriptors
 - test against another PB implementation
 
 - performance testing
@@ -35,6 +32,8 @@ to inflect field names (or hash keys).
 - consider field mapping
   - ObjectId -> string
   - Time -> string
+  - `deflate(:id) {|oid| oid.to_s}`
+  - `inflate(:id) {|id| BSON::ObjectId.new(id)}`
 
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
