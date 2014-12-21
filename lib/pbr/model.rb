@@ -40,12 +40,13 @@ class Pbr
   end
 
   class TField
-    attr_accessor :name, :num, :type, :msg_class, :label
+    attr_accessor :name, :num, :type, :msg_class, :label, :packed
 
     def initialize(name, num, type, opts={})
       @name, @num, @type = name, num, type
       @msg_class = opts[:msg_class]
       @label = opts[:label] || Label::REQUIRED
+      @packed = opts[:packed]
     end
   end
 

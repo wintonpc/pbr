@@ -47,6 +47,7 @@ struct Fld {
   wire_t wire_type;
   fld_t fld_type;
   label_t label;
+  bool is_packed;
   Msg* embedded_msg;
   write_fld_func write_fld;
   read_fld_func read_fld;

@@ -108,8 +108,12 @@ describe Pbr do
 
     it 'repeated fields' do
       message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::STRING, label: Pbr::Label::REPEATED)])
-
       roundtrip_impl(message_type, ['hello', 'world'], 'foo')
+    end
+
+    it 'packed repeated fields' do
+      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::SINT32, label: Pbr::Label::REPEATED, packed: true)])
+      roundtrip_impl(message_type, (0..8).step(2).map{|n| 10**n}, 'foo') # roundtrip some varints of various encoded sizes
     end
 
     def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)

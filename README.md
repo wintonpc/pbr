@@ -26,6 +26,7 @@ to inflect field names (or hash keys).
 - validation
   - when writing, verify value type
   - when reading, count actual required fields vs expected. only compute details if actual != expected.
+    - must take into account the possibility of required/expected fields being repeated too ?
   - raise error
 
 - make type declarations friendlier
