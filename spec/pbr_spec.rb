@@ -1,7 +1,6 @@
 require 'rspec'
 require 'ostruct'
 require 'pbr'
-require 'test_msg'
 require 'active_support/inflector'
 
 describe Pbr do

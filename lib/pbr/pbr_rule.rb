@@ -11,4 +11,18 @@ class PbrRule
     r.get_target_field = ->f{f}
     r
   end
+
+  def self.always(type)
+    r = PbrRule.new
+    r.get_target_type = ->t{type}
+    r.get_target_field = ->f{f}
+    r
+  end
+
+  def self.vanilla
+    r = PbrRule.new
+    r.get_target_type = ->t{t}
+    r.get_target_field = ->f{f}
+    r
+  end
 end

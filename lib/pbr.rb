@@ -44,7 +44,7 @@ class Pbr
     unless seen.include?(type)
       seen.add(type)
       type.fields.
-          select{|f| f.type == Pbr::TFieldType::MESSAGE}.
+          select{|f| f.type == FieldDescriptorProto::Type::MESSAGE}.
           each{|f| collect_type_dependencies(f.msg_class, seen)}
     end
     seen
