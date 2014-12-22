@@ -26,4 +26,8 @@ message Everything {
   required bytes f_bytes = 13;
   required Something f_embedded = 14;
   repeated int32 f_packed = 15 [packed=true];
+  required fixed32 f_fixed32 = 16;
+  required sfixed32 f_sfixed32 = 17;
+  required float f_float = 18;
+  repeated Something f_things = 19;
 }

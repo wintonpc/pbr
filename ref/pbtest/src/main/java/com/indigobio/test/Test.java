@@ -652,6 +652,61 @@ public final class Test {
      * <code>repeated int32 f_packed = 15 [packed = true];</code>
      */
     int getFPacked(int index);
+
+    // required fixed32 f_fixed32 = 16;
+    /**
+     * <code>required fixed32 f_fixed32 = 16;</code>
+     */
+    boolean hasFFixed32();
+    /**
+     * <code>required fixed32 f_fixed32 = 16;</code>
+     */
+    int getFFixed32();
+
+    // required sfixed32 f_sfixed32 = 17;
+    /**
+     * <code>required sfixed32 f_sfixed32 = 17;</code>
+     */
+    boolean hasFSfixed32();
+    /**
+     * <code>required sfixed32 f_sfixed32 = 17;</code>
+     */
+    int getFSfixed32();
+
+    // required float f_float = 18;
+    /**
+     * <code>required float f_float = 18;</code>
+     */
+    boolean hasFFloat();
+    /**
+     * <code>required float f_float = 18;</code>
+     */
+    float getFFloat();
+
+    // repeated .com.indigobio.test.Something f_things = 19;
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    java.util.List<com.indigobio.test.Test.Something> 
+        getFThingsList();
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    com.indigobio.test.Test.Something getFThings(int index);
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    int getFThingsCount();
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    java.util.List<? extends com.indigobio.test.Test.SomethingOrBuilder> 
+        getFThingsOrBuilderList();
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    com.indigobio.test.Test.SomethingOrBuilder getFThingsOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -809,6 +864,29 @@ public final class Test {
               input.popLimit(limit);
               break;
             }
+            case 133: {
+              bitField0_ |= 0x00004000;
+              fFixed32_ = input.readFixed32();
+              break;
+            }
+            case 141: {
+              bitField0_ |= 0x00008000;
+              fSfixed32_ = input.readSFixed32();
+              break;
+            }
+            case 149: {
+              bitField0_ |= 0x00010000;
+              fFloat_ = input.readFloat();
+              break;
+            }
+            case 154: {
+              if (!((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
+                fThings_ = new java.util.ArrayList<com.indigobio.test.Test.Something>();
+                mutable_bitField0_ |= 0x00040000;
+              }
+              fThings_.add(input.readMessage(com.indigobio.test.Test.Something.PARSER, extensionRegistry));
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -819,6 +897,9 @@ public final class Test {
       } finally {
         if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
           fPacked_ = java.util.Collections.unmodifiableList(fPacked_);
+        }
+        if (((mutable_bitField0_ & 0x00040000) == 0x00040000)) {
+          fThings_ = java.util.Collections.unmodifiableList(fThings_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1215,6 +1296,90 @@ public final class Test {
     }
     private int fPackedMemoizedSerializedSize = -1;
 
+    // required fixed32 f_fixed32 = 16;
+    public static final int F_FIXED32_FIELD_NUMBER = 16;
+    private int fFixed32_;
+    /**
+     * <code>required fixed32 f_fixed32 = 16;</code>
+     */
+    public boolean hasFFixed32() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    /**
+     * <code>required fixed32 f_fixed32 = 16;</code>
+     */
+    public int getFFixed32() {
+      return fFixed32_;
+    }
+
+    // required sfixed32 f_sfixed32 = 17;
+    public static final int F_SFIXED32_FIELD_NUMBER = 17;
+    private int fSfixed32_;
+    /**
+     * <code>required sfixed32 f_sfixed32 = 17;</code>
+     */
+    public boolean hasFSfixed32() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    /**
+     * <code>required sfixed32 f_sfixed32 = 17;</code>
+     */
+    public int getFSfixed32() {
+      return fSfixed32_;
+    }
+
+    // required float f_float = 18;
+    public static final int F_FLOAT_FIELD_NUMBER = 18;
+    private float fFloat_;
+    /**
+     * <code>required float f_float = 18;</code>
+     */
+    public boolean hasFFloat() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    /**
+     * <code>required float f_float = 18;</code>
+     */
+    public float getFFloat() {
+      return fFloat_;
+    }
+
+    // repeated .com.indigobio.test.Something f_things = 19;
+    public static final int F_THINGS_FIELD_NUMBER = 19;
+    private java.util.List<com.indigobio.test.Test.Something> fThings_;
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    public java.util.List<com.indigobio.test.Test.Something> getFThingsList() {
+      return fThings_;
+    }
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    public java.util.List<? extends com.indigobio.test.Test.SomethingOrBuilder> 
+        getFThingsOrBuilderList() {
+      return fThings_;
+    }
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    public int getFThingsCount() {
+      return fThings_.size();
+    }
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    public com.indigobio.test.Test.Something getFThings(int index) {
+      return fThings_.get(index);
+    }
+    /**
+     * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+     */
+    public com.indigobio.test.Test.SomethingOrBuilder getFThingsOrBuilder(
+        int index) {
+      return fThings_.get(index);
+    }
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
@@ -1231,6 +1396,10 @@ public final class Test {
       fBytes_ = com.google.protobuf.ByteString.EMPTY;
       fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
       fPacked_ = java.util.Collections.emptyList();
+      fFixed32_ = 0;
+      fSfixed32_ = 0;
+      fFloat_ = 0F;
+      fThings_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1293,9 +1462,27 @@ public final class Test {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFFixed32()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFSfixed32()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFFloat()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       if (!getFEmbedded().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
+      }
+      for (int i = 0; i < getFThingsCount(); i++) {
+        if (!getFThings(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       memoizedIsInitialized = 1;
       return true;
@@ -1352,6 +1539,18 @@ public final class Test {
       }
       for (int i = 0; i < fPacked_.size(); i++) {
         output.writeInt32NoTag(fPacked_.get(i));
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeFixed32(16, fFixed32_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeSFixed32(17, fSfixed32_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeFloat(18, fFloat_);
+      }
+      for (int i = 0; i < fThings_.size(); i++) {
+        output.writeMessage(19, fThings_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -1431,6 +1630,22 @@ public final class Test {
               .computeInt32SizeNoTag(dataSize);
         }
         fPackedMemoizedSerializedSize = dataSize;
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFixed32Size(16, fFixed32_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSFixed32Size(17, fSfixed32_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(18, fFloat_);
+      }
+      for (int i = 0; i < fThings_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, fThings_.get(i));
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1541,6 +1756,7 @@ public final class Test {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getFEmbeddedFieldBuilder();
+          getFThingsFieldBuilder();
         }
       }
       private static Builder create() {
@@ -1583,6 +1799,18 @@ public final class Test {
         bitField0_ = (bitField0_ & ~0x00002000);
         fPacked_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00004000);
+        fFixed32_ = 0;
+        bitField0_ = (bitField0_ & ~0x00008000);
+        fSfixed32_ = 0;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        fFloat_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00020000);
+        if (fThingsBuilder_ == null) {
+          fThings_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00040000);
+        } else {
+          fThingsBuilder_.clear();
+        }
         return this;
       }
 
@@ -1676,6 +1904,27 @@ public final class Test {
           bitField0_ = (bitField0_ & ~0x00004000);
         }
         result.fPacked_ = fPacked_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.fFixed32_ = fFixed32_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.fSfixed32_ = fSfixed32_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.fFloat_ = fFloat_;
+        if (fThingsBuilder_ == null) {
+          if (((bitField0_ & 0x00040000) == 0x00040000)) {
+            fThings_ = java.util.Collections.unmodifiableList(fThings_);
+            bitField0_ = (bitField0_ & ~0x00040000);
+          }
+          result.fThings_ = fThings_;
+        } else {
+          result.fThings_ = fThingsBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1746,6 +1995,41 @@ public final class Test {
           }
           onChanged();
         }
+        if (other.hasFFixed32()) {
+          setFFixed32(other.getFFixed32());
+        }
+        if (other.hasFSfixed32()) {
+          setFSfixed32(other.getFSfixed32());
+        }
+        if (other.hasFFloat()) {
+          setFFloat(other.getFFloat());
+        }
+        if (fThingsBuilder_ == null) {
+          if (!other.fThings_.isEmpty()) {
+            if (fThings_.isEmpty()) {
+              fThings_ = other.fThings_;
+              bitField0_ = (bitField0_ & ~0x00040000);
+            } else {
+              ensureFThingsIsMutable();
+              fThings_.addAll(other.fThings_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.fThings_.isEmpty()) {
+            if (fThingsBuilder_.isEmpty()) {
+              fThingsBuilder_.dispose();
+              fThingsBuilder_ = null;
+              fThings_ = other.fThings_;
+              bitField0_ = (bitField0_ & ~0x00040000);
+              fThingsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getFThingsFieldBuilder() : null;
+            } else {
+              fThingsBuilder_.addAllMessages(other.fThings_);
+            }
+          }
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -1807,9 +2091,27 @@ public final class Test {
           
           return false;
         }
+        if (!hasFFixed32()) {
+          
+          return false;
+        }
+        if (!hasFSfixed32()) {
+          
+          return false;
+        }
+        if (!hasFFloat()) {
+          
+          return false;
+        }
         if (!getFEmbedded().isInitialized()) {
           
           return false;
+        }
+        for (int i = 0; i < getFThingsCount(); i++) {
+          if (!getFThings(i).isInitialized()) {
+            
+            return false;
+          }
         }
         return true;
       }
@@ -2492,6 +2794,345 @@ public final class Test {
         return this;
       }
 
+      // required fixed32 f_fixed32 = 16;
+      private int fFixed32_ ;
+      /**
+       * <code>required fixed32 f_fixed32 = 16;</code>
+       */
+      public boolean hasFFixed32() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      /**
+       * <code>required fixed32 f_fixed32 = 16;</code>
+       */
+      public int getFFixed32() {
+        return fFixed32_;
+      }
+      /**
+       * <code>required fixed32 f_fixed32 = 16;</code>
+       */
+      public Builder setFFixed32(int value) {
+        bitField0_ |= 0x00008000;
+        fFixed32_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required fixed32 f_fixed32 = 16;</code>
+       */
+      public Builder clearFFixed32() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        fFixed32_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // required sfixed32 f_sfixed32 = 17;
+      private int fSfixed32_ ;
+      /**
+       * <code>required sfixed32 f_sfixed32 = 17;</code>
+       */
+      public boolean hasFSfixed32() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>required sfixed32 f_sfixed32 = 17;</code>
+       */
+      public int getFSfixed32() {
+        return fSfixed32_;
+      }
+      /**
+       * <code>required sfixed32 f_sfixed32 = 17;</code>
+       */
+      public Builder setFSfixed32(int value) {
+        bitField0_ |= 0x00010000;
+        fSfixed32_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required sfixed32 f_sfixed32 = 17;</code>
+       */
+      public Builder clearFSfixed32() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        fSfixed32_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // required float f_float = 18;
+      private float fFloat_ ;
+      /**
+       * <code>required float f_float = 18;</code>
+       */
+      public boolean hasFFloat() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      /**
+       * <code>required float f_float = 18;</code>
+       */
+      public float getFFloat() {
+        return fFloat_;
+      }
+      /**
+       * <code>required float f_float = 18;</code>
+       */
+      public Builder setFFloat(float value) {
+        bitField0_ |= 0x00020000;
+        fFloat_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float f_float = 18;</code>
+       */
+      public Builder clearFFloat() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        fFloat_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      // repeated .com.indigobio.test.Something f_things = 19;
+      private java.util.List<com.indigobio.test.Test.Something> fThings_ =
+        java.util.Collections.emptyList();
+      private void ensureFThingsIsMutable() {
+        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
+          fThings_ = new java.util.ArrayList<com.indigobio.test.Test.Something>(fThings_);
+          bitField0_ |= 0x00040000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder> fThingsBuilder_;
+
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public java.util.List<com.indigobio.test.Test.Something> getFThingsList() {
+        if (fThingsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(fThings_);
+        } else {
+          return fThingsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public int getFThingsCount() {
+        if (fThingsBuilder_ == null) {
+          return fThings_.size();
+        } else {
+          return fThingsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public com.indigobio.test.Test.Something getFThings(int index) {
+        if (fThingsBuilder_ == null) {
+          return fThings_.get(index);
+        } else {
+          return fThingsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder setFThings(
+          int index, com.indigobio.test.Test.Something value) {
+        if (fThingsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFThingsIsMutable();
+          fThings_.set(index, value);
+          onChanged();
+        } else {
+          fThingsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder setFThings(
+          int index, com.indigobio.test.Test.Something.Builder builderForValue) {
+        if (fThingsBuilder_ == null) {
+          ensureFThingsIsMutable();
+          fThings_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          fThingsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder addFThings(com.indigobio.test.Test.Something value) {
+        if (fThingsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFThingsIsMutable();
+          fThings_.add(value);
+          onChanged();
+        } else {
+          fThingsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder addFThings(
+          int index, com.indigobio.test.Test.Something value) {
+        if (fThingsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureFThingsIsMutable();
+          fThings_.add(index, value);
+          onChanged();
+        } else {
+          fThingsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder addFThings(
+          com.indigobio.test.Test.Something.Builder builderForValue) {
+        if (fThingsBuilder_ == null) {
+          ensureFThingsIsMutable();
+          fThings_.add(builderForValue.build());
+          onChanged();
+        } else {
+          fThingsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder addFThings(
+          int index, com.indigobio.test.Test.Something.Builder builderForValue) {
+        if (fThingsBuilder_ == null) {
+          ensureFThingsIsMutable();
+          fThings_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          fThingsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder addAllFThings(
+          java.lang.Iterable<? extends com.indigobio.test.Test.Something> values) {
+        if (fThingsBuilder_ == null) {
+          ensureFThingsIsMutable();
+          super.addAll(values, fThings_);
+          onChanged();
+        } else {
+          fThingsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder clearFThings() {
+        if (fThingsBuilder_ == null) {
+          fThings_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00040000);
+          onChanged();
+        } else {
+          fThingsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public Builder removeFThings(int index) {
+        if (fThingsBuilder_ == null) {
+          ensureFThingsIsMutable();
+          fThings_.remove(index);
+          onChanged();
+        } else {
+          fThingsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public com.indigobio.test.Test.Something.Builder getFThingsBuilder(
+          int index) {
+        return getFThingsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public com.indigobio.test.Test.SomethingOrBuilder getFThingsOrBuilder(
+          int index) {
+        if (fThingsBuilder_ == null) {
+          return fThings_.get(index);  } else {
+          return fThingsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public java.util.List<? extends com.indigobio.test.Test.SomethingOrBuilder> 
+           getFThingsOrBuilderList() {
+        if (fThingsBuilder_ != null) {
+          return fThingsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(fThings_);
+        }
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public com.indigobio.test.Test.Something.Builder addFThingsBuilder() {
+        return getFThingsFieldBuilder().addBuilder(
+            com.indigobio.test.Test.Something.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public com.indigobio.test.Test.Something.Builder addFThingsBuilder(
+          int index) {
+        return getFThingsFieldBuilder().addBuilder(
+            index, com.indigobio.test.Test.Something.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
+       */
+      public java.util.List<com.indigobio.test.Test.Something.Builder> 
+           getFThingsBuilderList() {
+        return getFThingsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder> 
+          getFThingsFieldBuilder() {
+        if (fThingsBuilder_ == null) {
+          fThingsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder>(
+                  fThings_,
+                  ((bitField0_ & 0x00040000) == 0x00040000),
+                  getParentForChildren(),
+                  isClean());
+          fThings_ = null;
+        }
+        return fThingsBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -2523,7 +3164,7 @@ public final class Test {
   static {
     java.lang.String[] descriptorData = {
       "\n\ntest.proto\022\022com.indigobio.test\"\026\n\tSome" +
-      "thing\022\t\n\001a\030\001 \002(\t\"\204\003\n\nEverything\022\017\n\007f_int" +
+      "thing\022\t\n\001a\030\001 \002(\t\"\355\003\n\nEverything\022\017\n\007f_int" +
       "32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(\003\022\020\n\010f_uint32\030\003 " +
       "\002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n\010f_sint32\030\005 \002(\021\022" +
       "\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_bool\030\007 \002(\010\0224\n\006f_e" +
@@ -2532,8 +3173,10 @@ public final class Test {
       "\030\n \002(\020\022\020\n\010f_double\030\013 \002(\001\022\020\n\010f_string\030\014 \002" +
       "(\t\022\017\n\007f_bytes\030\r \002(\014\0221\n\nf_embedded\030\016 \002(\0132" +
       "\035.com.indigobio.test.Something\022\024\n\010f_pack",
-      "ed\030\017 \003(\005B\002\020\001\"!\n\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INA" +
-      "CTIVE\020\002"
+      "ed\030\017 \003(\005B\002\020\001\022\021\n\tf_fixed32\030\020 \002(\007\022\022\n\nf_sfi" +
+      "xed32\030\021 \002(\017\022\017\n\007f_float\030\022 \002(\002\022/\n\010f_things" +
+      "\030\023 \003(\0132\035.com.indigobio.test.Something\"!\n" +
+      "\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2551,7 +3194,7 @@ public final class Test {
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", "FFixed32", "FSfixed32", "FFloat", "FThings", });
           return null;
         }
       };

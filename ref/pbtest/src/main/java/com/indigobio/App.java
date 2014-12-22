@@ -35,6 +35,15 @@ public class App
         verify(msg.getFPacked(1), 1000);
         verify(msg.getFPacked(2), 1000000);
 
+        verify(msg.getFFixed32(), 0xffffffff);
+        verify(msg.getFSfixed32(), 0x7fffffff);
+        //verify(msg.getFFloat(), 3.141592); // don't bother with approximation here
+
+        verify(msg.getFThingsCount(), 3);
+        verify(msg.getFThings(0).getA(), "foo");
+        verify(msg.getFThings(1).getA(), "bar");
+        verify(msg.getFThings(2).getA(), "baz");
+
         System.err.println("pbtest verification passed");
 
         msg.writeTo(System.out);

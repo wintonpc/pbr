@@ -30,4 +30,8 @@ class Everything
   required :f_bytes, :bytes, 13
   required :f_embedded, Something, 14
   repeated :f_packed, :int32, 15, packed: true
+  required :f_fixed32, :fixed32, 16
+  required :f_sfixed32, :sfixed32, 17
+  required :f_float, :float, 18
+  repeated :f_things, Something, 19
 end

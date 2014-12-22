@@ -20,6 +20,10 @@ describe Pbr do
         f_bytes: [0, 1, 2, 3, 255].pack('c*'),
         f_embedded: Something.new(a: 'goodbye'),
         f_packed: [1, 1000, 1000000],
+        f_fixed32: 2**32 - 1,
+        f_sfixed32: 2**31 - 1,
+        f_float: 3.141592,
+        f_things: %w(foo bar baz).map{|s| Something.new(a: s)}
     )
     decoded = roundtrip(msg)
     expect(decoded.f_int32).to eql 2**31 - 1
@@ -38,6 +42,10 @@ describe Pbr do
     expect(decoded.f_embedded).to be_a Something
     expect(decoded.f_embedded.a).to eql 'goodbye'
     expect(decoded.f_packed).to eql [1, 1000, 1000000]
+    expect(decoded.f_fixed32).to eql 2**32 - 1
+    expect(decoded.f_sfixed32).to eql 2**31 - 1
+    # expect(decoded.f_float).to eql 3.141592  # don't bother with approximation here
+    expect(decoded.f_things.map(&:a)).to eql %w(foo bar baz)
   end
 
   def roundtrip(msg)
