@@ -44,7 +44,6 @@ DEF_RF(BOOL) {
 }
 
 DEF_RF(STRING) {
-  cout << "read string field" << endl;
   int32_t len = r_varint32(ss);
   VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
   return (rb_funcall(rstr, FORCE_ID_ENCODING, 1, UTF_8_ENCODING));
@@ -73,7 +72,31 @@ read_val_func get_key_reader(wire_t wire_type, fld_t fld_type) {
 
 #define INFLATE(val)  RTEST(fld->inflate) ? rb_funcall(fld->inflate, ID_CALL, 1, (val)) : (val)
 
+void ss_skip(ss_t& ss, int32_t n) {
+  ss.pos += n;
+}
+
+void skip(ss_t& ss, wire_t wire_type) {
+  uint32_t len;
+  switch (wire_type) {
+  case WIRE_VARINT: 
+    r_varint64(ss);
+    break;
+  case WIRE_64BIT:
+    ss_skip(ss, sizeof(int64_t));
+    break;
+  case WIRE_LENGTH_DELIMITED:
+    len = r_varint32(ss);
+    ss_skip(ss, len);
+    break;
+  case WIRE_32BIT:
+    ss_skip(ss, sizeof(int32_t));
+    break;
+  }
+}
+
 VALUE read_obj(Msg* msg, ss_t& ss) {
+  //cout << "read_obj " << msg->name << endl;
   VALUE obj = rb_funcall(msg->target, ID_CTOR, 0);
   
   for (Fld& fld : msg->flds_to_enumerate)
@@ -83,7 +106,16 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
+    //cout << "# " << fld_num << "  " << ss.pos << "/" << ss.len << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
+
+    if (fld == NULL) {
+      cout << "skipping unrecognized field " << msg->name << "." << fld_num << endl;
+      wire_t wire_type = h & 7;
+      skip(ss, wire_type);
+      continue;
+    }
+
     if (fld->label != LABEL_REPEATED) {
       VALUE val = INFLATE(fld->read(ss, fld));
       rb_funcall(obj, fld->target_field_setter, 1, val);

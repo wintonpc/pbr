@@ -1,4 +1,3 @@
-require 'pbr/version'
 Dir.glob(File.join(File.dirname(__FILE__), 'pbr/**/*.rb')).each{|path| require_relative(path)}
 
 require 'set'

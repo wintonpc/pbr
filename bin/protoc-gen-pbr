@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'pbr/generator'
+$LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
+require 'pbr'
 
 # borrowed from beefcake
+
+File.write('/home/pwinton/pb.dat', STDIN.read)
 
 ns = (ENV['PBR_NAMESPACE'] || '').split('::')
 

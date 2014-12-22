@@ -13,8 +13,12 @@ void add_indexing_fld(Msg* msg, Fld fld) {
 Fld* get_indexing_fld(Msg* msg, fld_num_t fld_num) {
   if (fld_num >= msg->flds_to_lookup.size())
     return NULL;
-  else
-    return &msg->flds_to_lookup[fld_num];
+  else {
+    Fld* fld = &msg->flds_to_lookup[fld_num];
+    if (fld->fld_type == 0) // uninitialized field slot
+      return NULL;
+    return fld;
+  }
 }
 
 void add_scanning_fld(Msg* msg, Fld fld) {

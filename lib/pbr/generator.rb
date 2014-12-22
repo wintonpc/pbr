@@ -22,7 +22,7 @@ class Pbr
 
         g.c.rewind
         CodeGeneratorResponse::File.new(
-          :name => File.basename(file.name, ".proto") + ".pb.rb",
+          :name => File.basename(file.name, '.proto') + '.pb.rb',
           :content => g.c.read
         )
       end
@@ -52,7 +52,7 @@ class Pbr
       puts "class #{mt.name}"
 
       indent do
-        puts "include Beefcake::Message"
+        puts 'include Beefcake::Message'
 
         ## Enum Types
         Array(mt.enum_type).each do |et|
@@ -64,7 +64,7 @@ class Pbr
           define!(nt)
         end
       end
-      puts "end"
+      puts 'end'
     end
 
     def message!(pkg, mt)
@@ -83,7 +83,7 @@ class Pbr
         end
       end
 
-      puts "end"
+      puts 'end'
     end
 
     def enum!(et)
@@ -91,10 +91,10 @@ class Pbr
       puts "module #{et.name}"
       indent do
         et.value.each do |v|
-          puts "%s = %d" % [v.name, v.number]
+          puts '%s = %d' % [v.name, v.number]
         end
       end
-      puts "end"
+      puts 'end'
     end
 
     def field!(pkg, f)
@@ -110,23 +110,23 @@ class Pbr
         # Ruby friendly version
         t = f.type_name
         if pkg
-          t = t.gsub(pkg, "") # Remove the leading package name
+          t = t.gsub(pkg, '') # Remove the leading package name
         end
-        t = t.gsub(/^\.*/, "")       # Remove leading `.`s
+        t = t.gsub(/^\.*/, '')       # Remove leading `.`s
 
-        t.gsub(".", "::")  # Convert to Ruby namespacing syntax
+        t.gsub('.', '::')  # Convert to Ruby namespacing syntax
       else
         ":#{name_for(f, T, f.type)}"
       end
 
       # Finally, generate the declaration
-      out = "%s %s, %s, %d" % [label, name, type, f.number]
+      out = '%s %s, %s, %d' % [label, name, type, f.number]
 
       if f.default_value
         v = case f.type
-        when T::TYPE_ENUM
-          "%s::%s" % [type, f.default_value]
-        when T::TYPE_STRING, T::TYPE_BYTES
+        when T::ENUM
+          '%s::%s' % [type, f.default_value]
+        when T::STRING, T::BYTES
           '"%s"' % [f.default_value.gsub('"', '\"')]
         else
           f.default_value
@@ -140,7 +140,7 @@ class Pbr
 
     # Determines the name for a
     def name_for(b, mod, val)
-      b.name_for(mod, val).to_s.gsub(/.*_/, "").downcase
+      b.name_for(mod, val).to_s.gsub(/.*_/, '').downcase
     end
 
     def compile(ns, file)
@@ -171,13 +171,13 @@ class Pbr
         indent do
           ns!(modules[1..-1], &blk)
         end
-        puts "end"
+        puts 'end'
       end
     end
 
     def puts(msg=nil)
       if msg
-        c.puts(("  " * @n) + msg)
+        c.puts(('  ' * @n) + msg)
       else
         c.puts
       end

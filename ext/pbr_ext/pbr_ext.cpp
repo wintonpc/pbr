@@ -71,10 +71,10 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
            << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
            << " (" << (int)fld.fld_type << ") "
            << "[" << (int)fld.wire_type << "]"
-           << "  packed=" << fld.is_packed << endl
-           << "  inflate: " << inspect(fld.inflate) << endl
-           << "  deflate: " << inspect(fld.deflate) << endl
-           << endl;
+           << "  packed=" << fld.is_packed << endl;
+           // << "  inflate: " << inspect(fld.inflate) << endl
+           // << "  deflate: " << inspect(fld.deflate) << endl
+        
     }
   }
   cout << "---------------" << endl;
