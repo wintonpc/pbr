@@ -51,6 +51,8 @@ struct Fld {
   Msg* embedded_msg;
   write_val_func write;
   read_val_func read;
+  VALUE deflate;
+  VALUE inflate;
 };
 
 

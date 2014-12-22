@@ -10,7 +10,7 @@ to inflect field names (or hash keys).
 
 # To do
 
-- create DSL for type descriptors
+- protoc plugin
 - test against another PB implementation
 
 - performance testing

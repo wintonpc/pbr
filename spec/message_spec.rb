@@ -12,10 +12,14 @@ class TestMsg
   repeated :words, :string, 2
   required :thing, SubMsg, 3
   repeated :children, SubMsg, 4
-  # required :stamp, :string, 5
+  required :stamp, :string, 5
+  required :ranges, :string, 6
 
-  # deflate(:stamp) {|time| time.utc.iso8601(3)}
-  # inflate(:stamp) {|iso_str| Time.parse(iso_str).localtime}
+  deflate(:stamp) {|time| time.utc.iso8601(3)}
+  inflate(:stamp) {|iso_str| Time.parse(iso_str).localtime}
+
+  deflate(:ranges) {|r| r.to_s}
+  inflate(:ranges) {|str| eval(str)}
 end
 
 class SubMsg
@@ -30,8 +34,9 @@ describe 'My behaviour' do
     x = TestMsg.new(foo: 'hello',
                     words: ['ping', 'pong'],
                     thing: {bar: 55},
-                    children: [{bar: 66}, {bar: 77}])
-                    # stamp: Time.now)
+                    children: [{bar: 66}, {bar: 77}],
+                    stamp: Time.now,
+                    ranges: [0..3, 5..9])
 
     bytes = pbr.write(x, TestMsg)
     y = pbr.read(bytes, TestMsg)
@@ -46,8 +51,13 @@ describe 'My behaviour' do
     expect(y.children[0].bar).to eql 66
     expect(y.children[1]).to be_a SubMsg
     expect(y.children[1].bar).to eql 77
-    # expect(y.stamp).to be_a Time
-    # expect(y.stamp.zone).to_not eql 'UTC'
+    expect(y.stamp).to be_a Time
+    expect(y.stamp.zone).to_not eql 'UTC'
+    expect(y.ranges.size).to eql 2
+    expect(y.ranges[0]).to be_a Range
+    expect(y.ranges[0]).to eql (0..3)
+    expect(y.ranges[1]).to be_a Range
+    expect(y.ranges[1]).to eql (5..9)
   end
 
   it 'construct with bad field name' do

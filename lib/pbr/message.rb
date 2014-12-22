@@ -74,6 +74,22 @@ class Pbr
         @fields_by_name ||= {}
       end
 
+      def deflators
+        @deflators ||= {}
+      end
+
+      def inflators
+        @inflators ||= {}
+      end
+
+      def deflate(type, &block)
+        deflators[type.to_s] = block
+      end
+
+      def inflate(type, &block)
+        inflators[type.to_s] = block
+      end
+
       private
 
       def pb_type(type)

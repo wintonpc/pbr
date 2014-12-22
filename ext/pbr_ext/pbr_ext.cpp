@@ -20,6 +20,7 @@ VALUE UTF_8_ENCODING;
 ID ID_ENCODE;
 ID ID_ENCODING;
 ID FORCE_ID_ENCODING;
+ID ID_CALL;
 
 #define MODEL(handle) (Model*)NUM2LONG(handle);
 
@@ -70,7 +71,9 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
            << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
            << " (" << (int)fld.fld_type << ") "
            << "[" << (int)fld.wire_type << "]"
-           << "  packed=" << fld.is_packed
+           << "  packed=" << fld.is_packed << endl
+           << "  inflate: " << inspect(fld.inflate) << endl
+           << "  deflate: " << inspect(fld.deflate) << endl
            << endl;
     }
   }
@@ -80,6 +83,9 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
 }
 
 void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
+  VALUE deflators = rb_get(type, "deflators");
+  VALUE inflators = rb_get(type, "inflators");
+
   for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
     VALUE rFldName = sym_to_s(rb_get(rFld, "name"));
     Fld fld;
@@ -91,6 +97,8 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
     fld.label = NUM2INT(rb_get(rFld, "label"));
     fld.is_packed = RTEST(rb_get(rFld, "packed"));
+    fld.deflate = rb_hash_aref(deflators, rFldName);
+    fld.inflate = rb_hash_aref(inflators, rFldName);
 
     if (fld.wire_type == -1)
       continue;
@@ -187,6 +195,7 @@ extern "C" void Init_pbr_ext() {
   ID_ENCODE = rb_intern("encode");
   ID_ENCODING = rb_intern("encoding");
   FORCE_ID_ENCODING = rb_intern("force_encoding");
+  ID_CALL = rb_intern("call");
   VALUE encoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   UTF_8_ENCODING = rb_const_get(encoding, rb_intern("UTF_8"));
 

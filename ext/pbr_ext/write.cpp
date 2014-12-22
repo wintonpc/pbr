@@ -8,6 +8,7 @@ using namespace std;
 
 extern ID ID_ENCODING;
 extern ID ID_ENCODE;
+extern ID ID_CALL;
 extern VALUE UTF_8_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
@@ -104,13 +105,15 @@ void write_value(buf_t& buf, Fld* fld, VALUE obj) {
   fld->write(buf, obj, fld);
 }
 
+#define DEFLATE(val)  RTEST(fld->deflate) ? rb_funcall(fld->deflate, ID_CALL, 1, (val)) : (val)
+
 VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
     VALUE val = rb_funcall(obj, fld->target_field, 0);
     if (fld->label != LABEL_REPEATED) {
-      write_value(buf, fld, val);
+      write_value(buf, fld, DEFLATE(val));
     } else {
       if (fld->is_packed) {
         int len = RARRAY_LEN(val);
@@ -118,7 +121,7 @@ VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
           write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
           buf_t tmp_buf;
           for (int i=0; i<len; i++) {
-            VALUE elem = rb_ary_entry(val, i);
+            VALUE elem = DEFLATE(rb_ary_entry(val, i));
             fld->write(tmp_buf, elem, fld);
           }
           w_varint32(buf, tmp_buf.size());
@@ -127,7 +130,7 @@ VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
       } else {
         int len = RARRAY_LEN(val);
         for (int i=0; i<len; i++) {
-          VALUE elem = rb_ary_entry(val, i);
+          VALUE elem = DEFLATE(rb_ary_entry(val, i));
           write_value(buf, fld, elem);
         }        
       }

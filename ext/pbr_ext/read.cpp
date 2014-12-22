@@ -9,6 +9,7 @@ using namespace std;
 extern VALUE UTF_8_ENCODING;
 extern VALUE FORCE_ID_ENCODING;
 extern ID ID_CTOR;
+extern ID ID_CALL;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
@@ -70,6 +71,8 @@ read_val_func get_key_reader(wire_t wire_type, fld_t fld_type) {
   return NULL;
 }
 
+#define INFLATE(val)  RTEST(fld->inflate) ? rb_funcall(fld->inflate, ID_CALL, 1, (val)) : (val)
+
 VALUE read_obj(Msg* msg, ss_t& ss) {
   VALUE obj = rb_funcall(msg->target, ID_CTOR, 0);
   
@@ -82,7 +85,7 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
     fld_num_t fld_num = h >> 3;
     Fld* fld = msg->get_fld(msg, fld_num);
     if (fld->label != LABEL_REPEATED) {
-      VALUE val = fld->read(ss, fld);
+      VALUE val = INFLATE(fld->read(ss, fld));
       rb_funcall(obj, fld->target_field_setter, 1, val);
     } else {
       if (fld->is_packed) {
@@ -90,10 +93,10 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
         ss_t tmp_ss = ss_substream(ss, byte_len);
         VALUE rArr = rb_funcall(obj, fld->target_field, 0);
         while (ss_more(tmp_ss))
-          rb_ary_push(rArr, fld->read(tmp_ss, fld));
+          rb_ary_push(rArr, INFLATE(fld->read(tmp_ss, fld)));
       } else {
         VALUE val = fld->read(ss, fld);
-        rb_ary_push(rb_funcall(obj, fld->target_field, 0), val);
+        rb_ary_push(rb_funcall(obj, fld->target_field, 0), INFLATE(val));
       }
     }
   }
