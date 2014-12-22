@@ -50,6 +50,46 @@ public final class Test {
      * <code>required uint64 f_uint64 = 4;</code>
      */
     long getFUint64();
+
+    // required sint32 f_sint32 = 5;
+    /**
+     * <code>required sint32 f_sint32 = 5;</code>
+     */
+    boolean hasFSint32();
+    /**
+     * <code>required sint32 f_sint32 = 5;</code>
+     */
+    int getFSint32();
+
+    // required sint64 f_sint64 = 6;
+    /**
+     * <code>required sint64 f_sint64 = 6;</code>
+     */
+    boolean hasFSint64();
+    /**
+     * <code>required sint64 f_sint64 = 6;</code>
+     */
+    long getFSint64();
+
+    // required bool f_bool = 7;
+    /**
+     * <code>required bool f_bool = 7;</code>
+     */
+    boolean hasFBool();
+    /**
+     * <code>required bool f_bool = 7;</code>
+     */
+    boolean getFBool();
+
+    // required .com.indigobio.test.Everything.State f_enum = 8;
+    /**
+     * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+     */
+    boolean hasFEnum();
+    /**
+     * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+     */
+    com.indigobio.test.Test.Everything.State getFEnum();
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -122,6 +162,32 @@ public final class Test {
               fUint64_ = input.readUInt64();
               break;
             }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              fSint32_ = input.readSInt32();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              fSint64_ = input.readSInt64();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000040;
+              fBool_ = input.readBool();
+              break;
+            }
+            case 64: {
+              int rawValue = input.readEnum();
+              com.indigobio.test.Test.Everything.State value = com.indigobio.test.Test.Everything.State.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(8, rawValue);
+              } else {
+                bitField0_ |= 0x00000080;
+                fEnum_ = value;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -159,6 +225,88 @@ public final class Test {
     @java.lang.Override
     public com.google.protobuf.Parser<Everything> getParserForType() {
       return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code com.indigobio.test.Everything.State}
+     */
+    public enum State
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>ACTIVE = 1;</code>
+       */
+      ACTIVE(0, 1),
+      /**
+       * <code>INACTIVE = 2;</code>
+       */
+      INACTIVE(1, 2),
+      ;
+
+      /**
+       * <code>ACTIVE = 1;</code>
+       */
+      public static final int ACTIVE_VALUE = 1;
+      /**
+       * <code>INACTIVE = 2;</code>
+       */
+      public static final int INACTIVE_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static State valueOf(int value) {
+        switch (value) {
+          case 1: return ACTIVE;
+          case 2: return INACTIVE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<State>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<State>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<State>() {
+              public State findValueByNumber(int number) {
+                return State.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return com.indigobio.test.Test.Everything.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final State[] VALUES = values();
+
+      public static State valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private State(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:com.indigobio.test.Everything.State)
     }
 
     private int bitField0_;
@@ -226,11 +374,79 @@ public final class Test {
       return fUint64_;
     }
 
+    // required sint32 f_sint32 = 5;
+    public static final int F_SINT32_FIELD_NUMBER = 5;
+    private int fSint32_;
+    /**
+     * <code>required sint32 f_sint32 = 5;</code>
+     */
+    public boolean hasFSint32() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required sint32 f_sint32 = 5;</code>
+     */
+    public int getFSint32() {
+      return fSint32_;
+    }
+
+    // required sint64 f_sint64 = 6;
+    public static final int F_SINT64_FIELD_NUMBER = 6;
+    private long fSint64_;
+    /**
+     * <code>required sint64 f_sint64 = 6;</code>
+     */
+    public boolean hasFSint64() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>required sint64 f_sint64 = 6;</code>
+     */
+    public long getFSint64() {
+      return fSint64_;
+    }
+
+    // required bool f_bool = 7;
+    public static final int F_BOOL_FIELD_NUMBER = 7;
+    private boolean fBool_;
+    /**
+     * <code>required bool f_bool = 7;</code>
+     */
+    public boolean hasFBool() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>required bool f_bool = 7;</code>
+     */
+    public boolean getFBool() {
+      return fBool_;
+    }
+
+    // required .com.indigobio.test.Everything.State f_enum = 8;
+    public static final int F_ENUM_FIELD_NUMBER = 8;
+    private com.indigobio.test.Test.Everything.State fEnum_;
+    /**
+     * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+     */
+    public boolean hasFEnum() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+     */
+    public com.indigobio.test.Test.Everything.State getFEnum() {
+      return fEnum_;
+    }
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
       fUint32_ = 0;
       fUint64_ = 0L;
+      fSint32_ = 0;
+      fSint64_ = 0L;
+      fBool_ = false;
+      fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -253,6 +469,22 @@ public final class Test {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFSint32()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFSint64()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFBool()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFEnum()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -271,6 +503,18 @@ public final class Test {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeUInt64(4, fUint64_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeSInt32(5, fSint32_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeSInt64(6, fSint64_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBool(7, fBool_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeEnum(8, fEnum_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -296,6 +540,22 @@ public final class Test {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(4, fUint64_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(5, fSint32_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt64Size(6, fSint64_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(7, fBool_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(8, fEnum_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -421,6 +681,14 @@ public final class Test {
         bitField0_ = (bitField0_ & ~0x00000004);
         fUint64_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
+        fSint32_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        fSint64_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        fBool_ = false;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -465,6 +733,22 @@ public final class Test {
           to_bitField0_ |= 0x00000008;
         }
         result.fUint64_ = fUint64_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.fSint32_ = fSint32_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.fSint64_ = fSint64_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.fBool_ = fBool_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.fEnum_ = fEnum_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -493,6 +777,18 @@ public final class Test {
         if (other.hasFUint64()) {
           setFUint64(other.getFUint64());
         }
+        if (other.hasFSint32()) {
+          setFSint32(other.getFSint32());
+        }
+        if (other.hasFSint64()) {
+          setFSint64(other.getFSint64());
+        }
+        if (other.hasFBool()) {
+          setFBool(other.getFBool());
+        }
+        if (other.hasFEnum()) {
+          setFEnum(other.getFEnum());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -511,6 +807,22 @@ public final class Test {
           return false;
         }
         if (!hasFUint64()) {
+          
+          return false;
+        }
+        if (!hasFSint32()) {
+          
+          return false;
+        }
+        if (!hasFSint64()) {
+          
+          return false;
+        }
+        if (!hasFBool()) {
+          
+          return false;
+        }
+        if (!hasFEnum()) {
           
           return false;
         }
@@ -668,6 +980,141 @@ public final class Test {
         return this;
       }
 
+      // required sint32 f_sint32 = 5;
+      private int fSint32_ ;
+      /**
+       * <code>required sint32 f_sint32 = 5;</code>
+       */
+      public boolean hasFSint32() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>required sint32 f_sint32 = 5;</code>
+       */
+      public int getFSint32() {
+        return fSint32_;
+      }
+      /**
+       * <code>required sint32 f_sint32 = 5;</code>
+       */
+      public Builder setFSint32(int value) {
+        bitField0_ |= 0x00000010;
+        fSint32_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required sint32 f_sint32 = 5;</code>
+       */
+      public Builder clearFSint32() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        fSint32_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // required sint64 f_sint64 = 6;
+      private long fSint64_ ;
+      /**
+       * <code>required sint64 f_sint64 = 6;</code>
+       */
+      public boolean hasFSint64() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>required sint64 f_sint64 = 6;</code>
+       */
+      public long getFSint64() {
+        return fSint64_;
+      }
+      /**
+       * <code>required sint64 f_sint64 = 6;</code>
+       */
+      public Builder setFSint64(long value) {
+        bitField0_ |= 0x00000020;
+        fSint64_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required sint64 f_sint64 = 6;</code>
+       */
+      public Builder clearFSint64() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        fSint64_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // required bool f_bool = 7;
+      private boolean fBool_ ;
+      /**
+       * <code>required bool f_bool = 7;</code>
+       */
+      public boolean hasFBool() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>required bool f_bool = 7;</code>
+       */
+      public boolean getFBool() {
+        return fBool_;
+      }
+      /**
+       * <code>required bool f_bool = 7;</code>
+       */
+      public Builder setFBool(boolean value) {
+        bitField0_ |= 0x00000040;
+        fBool_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bool f_bool = 7;</code>
+       */
+      public Builder clearFBool() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        fBool_ = false;
+        onChanged();
+        return this;
+      }
+
+      // required .com.indigobio.test.Everything.State f_enum = 8;
+      private com.indigobio.test.Test.Everything.State fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
+      /**
+       * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+       */
+      public boolean hasFEnum() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+       */
+      public com.indigobio.test.Test.Everything.State getFEnum() {
+        return fEnum_;
+      }
+      /**
+       * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+       */
+      public Builder setFEnum(com.indigobio.test.Test.Everything.State value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000080;
+        fEnum_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
+       */
+      public Builder clearFEnum() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -693,9 +1140,13 @@ public final class Test {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\ntest.proto\022\022com.indigobio.test\"R\n\nEver" +
-      "ything\022\017\n\007f_int32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(\003" +
-      "\022\020\n\010f_uint32\030\003 \002(\r\022\020\n\010f_uint64\030\004 \002(\004"
+      "\n\ntest.proto\022\022com.indigobio.test\"\337\001\n\nEve" +
+      "rything\022\017\n\007f_int32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(" +
+      "\003\022\020\n\010f_uint32\030\003 \002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n" +
+      "\010f_sint32\030\005 \002(\021\022\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_b" +
+      "ool\030\007 \002(\010\0224\n\006f_enum\030\010 \002(\0162$.com.indigobi" +
+      "o.test.Everything.State\"!\n\005State\022\n\n\006ACTI" +
+      "VE\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -707,7 +1158,7 @@ public final class Test {
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", });
           return null;
         }
       };

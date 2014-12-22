@@ -9,12 +9,20 @@ describe Pbr do
         f_int64: 2**63 - 1,
         f_uint32: 2**32 - 1,
         f_uint64: 2**64 - 1,
+        f_sint32: 2**31 - 1,
+        f_sint64: 2**63 - 1,
+        f_bool: true,
+        f_enum: Everything::State::ACTIVE,
     )
     decoded = roundtrip(msg)
     expect(decoded.f_int32).to eql 2**31 - 1
     expect(decoded.f_int64).to eql 2**63 - 1
     expect(decoded.f_uint32).to eql 2**32 - 1
     expect(decoded.f_uint64).to eql 2**64 - 1
+    expect(decoded.f_sint32).to eql 2**31 - 1
+    expect(decoded.f_sint64).to eql 2**63 - 1
+    expect(decoded.f_bool).to eql true
+    expect(decoded.f_enum).to eql Everything::State::ACTIVE
   end
 
   def roundtrip(msg)
