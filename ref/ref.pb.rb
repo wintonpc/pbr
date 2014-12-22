@@ -20,4 +20,6 @@ class Everything
   required :f_fixed64, :fixed64, 9
   required :f_sfixed64, :sfixed64, 10
   required :f_double, :double, 11
+  required :f_string, :string, 12
+  required :f_bytes, :bytes, 13
 end

@@ -1,5 +1,6 @@
 package com.indigobio;
 
+import com.google.protobuf.ByteString;
 import com.indigobio.test.Test;
 
 public class App
@@ -18,6 +19,15 @@ public class App
         verify(msg.getFFixed64(), 0xffffffffffffffffL);
         verify(msg.getFSfixed64(), 0x7fffffffffffffffL);
         verify(msg.getFDouble(), 3.141592d);
+        verify(msg.getFString(), "hello");
+
+        ByteString fbytes = msg.getFBytes();
+        verify(fbytes.byteAt(0), (byte)0);
+        verify(fbytes.byteAt(1), (byte)1);
+        verify(fbytes.byteAt(2), (byte)2);
+        verify(fbytes.byteAt(3), (byte)3);
+        verify(fbytes.byteAt(4), (byte)255);
+
         msg.writeTo(System.out);
     }
 

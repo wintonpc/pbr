@@ -18,4 +18,6 @@ message Everything {
   required fixed64 f_fixed64 = 9;
   required sfixed64 f_sfixed64 = 10;
   required double f_double = 11;
+  required string f_string = 12;
+  required bytes f_bytes = 13;
 }

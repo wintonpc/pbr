@@ -120,6 +120,31 @@ public final class Test {
      * <code>required double f_double = 11;</code>
      */
     double getFDouble();
+
+    // required string f_string = 12;
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    boolean hasFString();
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    java.lang.String getFString();
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getFStringBytes();
+
+    // required bytes f_bytes = 13;
+    /**
+     * <code>required bytes f_bytes = 13;</code>
+     */
+    boolean hasFBytes();
+    /**
+     * <code>required bytes f_bytes = 13;</code>
+     */
+    com.google.protobuf.ByteString getFBytes();
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -231,6 +256,16 @@ public final class Test {
             case 89: {
               bitField0_ |= 0x00000400;
               fDouble_ = input.readDouble();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              fString_ = input.readBytes();
+              break;
+            }
+            case 106: {
+              bitField0_ |= 0x00001000;
+              fBytes_ = input.readBytes();
               break;
             }
           }
@@ -531,6 +566,65 @@ public final class Test {
       return fDouble_;
     }
 
+    // required string f_string = 12;
+    public static final int F_STRING_FIELD_NUMBER = 12;
+    private java.lang.Object fString_;
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    public boolean hasFString() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    public java.lang.String getFString() {
+      java.lang.Object ref = fString_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          fString_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string f_string = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFStringBytes() {
+      java.lang.Object ref = fString_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fString_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // required bytes f_bytes = 13;
+    public static final int F_BYTES_FIELD_NUMBER = 13;
+    private com.google.protobuf.ByteString fBytes_;
+    /**
+     * <code>required bytes f_bytes = 13;</code>
+     */
+    public boolean hasFBytes() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>required bytes f_bytes = 13;</code>
+     */
+    public com.google.protobuf.ByteString getFBytes() {
+      return fBytes_;
+    }
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
@@ -543,6 +637,8 @@ public final class Test {
       fFixed64_ = 0L;
       fSfixed64_ = 0L;
       fDouble_ = 0D;
+      fString_ = "";
+      fBytes_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -593,6 +689,14 @@ public final class Test {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFString()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFBytes()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -632,6 +736,12 @@ public final class Test {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeDouble(11, fDouble_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getFStringBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeBytes(13, fBytes_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -685,6 +795,14 @@ public final class Test {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(11, fDouble_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getFStringBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(13, fBytes_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -824,6 +942,10 @@ public final class Test {
         bitField0_ = (bitField0_ & ~0x00000200);
         fDouble_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000400);
+        fString_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
+        fBytes_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -896,6 +1018,14 @@ public final class Test {
           to_bitField0_ |= 0x00000400;
         }
         result.fDouble_ = fDouble_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.fString_ = fString_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.fBytes_ = fBytes_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -945,6 +1075,14 @@ public final class Test {
         if (other.hasFDouble()) {
           setFDouble(other.getFDouble());
         }
+        if (other.hasFString()) {
+          bitField0_ |= 0x00000800;
+          fString_ = other.fString_;
+          onChanged();
+        }
+        if (other.hasFBytes()) {
+          setFBytes(other.getFBytes());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -991,6 +1129,14 @@ public final class Test {
           return false;
         }
         if (!hasFDouble()) {
+          
+          return false;
+        }
+        if (!hasFString()) {
+          
+          return false;
+        }
+        if (!hasFBytes()) {
           
           return false;
         }
@@ -1382,6 +1528,116 @@ public final class Test {
         return this;
       }
 
+      // required string f_string = 12;
+      private java.lang.Object fString_ = "";
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public boolean hasFString() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public java.lang.String getFString() {
+        java.lang.Object ref = fString_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          fString_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFStringBytes() {
+        java.lang.Object ref = fString_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          fString_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public Builder setFString(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        fString_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public Builder clearFString() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        fString_ = getDefaultInstance().getFString();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string f_string = 12;</code>
+       */
+      public Builder setFStringBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        fString_ = value;
+        onChanged();
+        return this;
+      }
+
+      // required bytes f_bytes = 13;
+      private com.google.protobuf.ByteString fBytes_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>required bytes f_bytes = 13;</code>
+       */
+      public boolean hasFBytes() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>required bytes f_bytes = 13;</code>
+       */
+      public com.google.protobuf.ByteString getFBytes() {
+        return fBytes_;
+      }
+      /**
+       * <code>required bytes f_bytes = 13;</code>
+       */
+      public Builder setFBytes(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
+        fBytes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bytes f_bytes = 13;</code>
+       */
+      public Builder clearFBytes() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        fBytes_ = getDefaultInstance().getFBytes();
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -1407,14 +1663,15 @@ public final class Test {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\ntest.proto\022\022com.indigobio.test\"\230\002\n\nEve" +
+      "\n\ntest.proto\022\022com.indigobio.test\"\273\002\n\nEve" +
       "rything\022\017\n\007f_int32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(" +
       "\003\022\020\n\010f_uint32\030\003 \002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n" +
       "\010f_sint32\030\005 \002(\021\022\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_b" +
       "ool\030\007 \002(\010\0224\n\006f_enum\030\010 \002(\0162$.com.indigobi" +
       "o.test.Everything.State\022\021\n\tf_fixed64\030\t \002" +
       "(\006\022\022\n\nf_sfixed64\030\n \002(\020\022\020\n\010f_double\030\013 \002(\001" +
-      "\"!\n\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
+      "\022\020\n\010f_string\030\014 \002(\t\022\017\n\007f_bytes\030\r \002(\014\"!\n\005S" +
+      "tate\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1426,7 +1683,7 @@ public final class Test {
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", });
           return null;
         }
       };
