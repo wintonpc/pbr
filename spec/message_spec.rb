@@ -1,6 +1,7 @@
 require 'rspec'
 require 'pbr'
 require 'ostruct'
+require 'time'
 
 class TestMsg; end
 class SubMsg; end
@@ -11,6 +12,10 @@ class TestMsg
   repeated :words, :string, 2
   required :thing, SubMsg, 3
   repeated :children, SubMsg, 4
+  # required :stamp, :string, 5
+
+  # deflate(:stamp) {|time| time.utc.iso8601(3)}
+  # inflate(:stamp) {|iso_str| Time.parse(iso_str).localtime}
 end
 
 class SubMsg
@@ -26,6 +31,7 @@ describe 'My behaviour' do
                     words: ['ping', 'pong'],
                     thing: {bar: 55},
                     children: [{bar: 66}, {bar: 77}])
+                    # stamp: Time.now)
 
     bytes = pbr.write(x, TestMsg)
     y = pbr.read(bytes, TestMsg)
@@ -40,5 +46,11 @@ describe 'My behaviour' do
     expect(y.children[0].bar).to eql 66
     expect(y.children[1]).to be_a SubMsg
     expect(y.children[1].bar).to eql 77
+    # expect(y.stamp).to be_a Time
+    # expect(y.stamp.zone).to_not eql 'UTC'
+  end
+
+  it 'construct with bad field name' do
+    expect{TestMsg.new(not_here: 5)}.to raise_error 'Cannot set nonexistent field TestMsg.not_here'
   end
 end

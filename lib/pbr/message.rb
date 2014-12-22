@@ -9,6 +9,9 @@ class Pbr
     def initialize(attrs={})
       attrs.each_pair do |k, v|
         f = self.class.fields_by_name[k.to_sym]
+        unless f
+          raise "Cannot set nonexistent field #{self.class.name}.#{k}"
+        end
         send("#{k}=", construct(f, v))
       end
     end
@@ -48,7 +51,7 @@ class Pbr
         field(:optional, name, type, fn, opts)
       end
 
-      def field(label, name, type, num, opts)
+      def field(label, name, type, num, opts={})
         raise "a field named #{name} is already declared" if fields.any?{|f| f.name == name}
         raise "a field with number #{num} is already declared" if fields.any?{|f| f.num == num}
         fields_by_name[name.to_sym] = Field.new(label_value(label), pb_type(type), name, num, {msg_class: msg_class(type)}.merge(opts))

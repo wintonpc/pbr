@@ -94,8 +94,8 @@ describe Pbr do
     end
 
     it 'embedded messages' do
-      sub_msg = Pbr::TMessage.new('SubMsg', [Pbr::TField.new('bar', 1, Pbr::TFieldType::STRING)])
-      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::MESSAGE, msg_class: sub_msg)])
+      sub_msg = make_single_field_msg('SubMsg', :required, :bar, :string, 1)
+      message_type = make_single_field_msg('TestMsg', :required, :foo, sub_msg, 1)
 
       field_val = OpenStruct.new({bar: 'hello'})
 
@@ -106,18 +106,25 @@ describe Pbr do
     end
 
     it 'repeated fields' do
-      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::STRING, label: Pbr::Label::REPEATED)])
+      message_type = make_single_field_msg('TestMsg', :repeated, :foo, :string, 1)
       roundtrip_impl(message_type, ['hello', 'world'], 'foo')
     end
 
     it 'packed repeated fields' do
-      message_type = Pbr::TMessage.new('TestMsg', [Pbr::TField.new('foo', 1, Pbr::TFieldType::SINT32, label: Pbr::Label::REPEATED, packed: true)])
+      message_type = make_single_field_msg('TestMsg', :repeated, :foo, :sint32, 1, packed: true)
       roundtrip_impl(message_type, (0..8).step(2).map{|n| 10**n}, 'foo') # roundtrip some varints of various encoded sizes
     end
 
+    def make_single_field_msg(name, *args)
+      Class.new do
+        include Pbr::Message
+        type_name name
+        field(*args)
+      end
+    end
+
     def roundtrip(field_type_as_symbol, field_val, field_name=:foo, field_num=1, &block)
-      field_type = "Pbr::TFieldType::#{field_type_as_symbol.to_s.upcase}".constantize
-      message_type = Pbr::TMessage.new('TestMsg', [ Pbr::TField.new(field_name, field_num, field_type) ])
+      message_type = make_single_field_msg('TestMsg', :required, field_name, field_type_as_symbol, field_num)
       roundtrip_impl(message_type, field_val, field_name, &block)
     end
 
