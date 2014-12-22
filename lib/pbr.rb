@@ -11,16 +11,30 @@ class Pbr
     @rule = wrap_rule(rule)
     @handle = Ext::create_handle
     @registered_types = Set.new
+
+    # do a dance so that close/finalize doesn't resurrect the object
+    # and also to make the operation idempotent
+    @cookie = Object.new
+    Pbr.handles[@cookie] = @handle
+    ObjectSpace.define_finalizer(self, Pbr.make_finalizer(@cookie))
   end
 
   def close
-    Ext::destroy_handle(@handle) if @handle
-    @handle = nil
+    Pbr.close(@cookie)
   end
 
-  # def self.finalize(handle)
-  #   proc { Ext::destroy_handle(handle) }
-  # end
+  def self.close(cookie)
+    h = handles.delete(cookie)
+    Ext::destroy_handle(h) if h
+  end
+
+  def self.handles
+    @handles ||= {}
+  end
+
+  def self.make_finalizer(cookie)
+    proc { close(cookie) }
+  end
 
   def write(obj, type)
     ensure_type_registered(type)

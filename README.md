@@ -26,15 +26,6 @@ to inflect field names (or hash keys).
     - must take into account the possibility of required/expected fields being repeated too ?
   - raise error
 
-- make type declarations friendlier
-  - implement `protoc` plugin
-
-- consider field mapping
-  - ObjectId -> string
-  - Time -> string
-  - `deflate(:id) {|oid| oid.to_s}`
-  - `inflate(:id) {|id| BSON::ObjectId.new(id)}`
-
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
 
