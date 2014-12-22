@@ -46,7 +46,7 @@ DEF_WF(BOOL) {
     w_varint32(buf, 0);
   else {
     w_varint32(buf, 0);
-    cout << "bad boolean " << inspect(v) << ". wrote false." << endl;
+    cerr << "bad boolean " << inspect(v) << ". wrote false." << endl;
   }
 }
 
@@ -64,10 +64,10 @@ DEF_WF(STRING) {
   VALUE v;
 
   if (rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING) {
-    //cout << "string to write is UTF-8" << endl;
+    //cerr << "string to write is UTF-8" << endl;
     v = v_in;
   } else {
-    //cout << "string to write is NOT UTF-8" << endl;
+    //cerr << "string to write is NOT UTF-8" << endl;
     v = rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
   }
 
@@ -75,15 +75,15 @@ DEF_WF(STRING) {
 }
 
 DEF_WF(MESSAGE) {
-  cout << "writing msg field" << endl;
+  cerr << "writing msg field" << endl;
   buf_t tmp_buf;
   Msg* embedded_msg = fld->embedded_msg;
-  cout << "embedded type: " << embedded_msg->name << endl;
-  //cout << "embedded value: " << inspect(v) << endl;
+  cerr << "embedded type: " << embedded_msg->name << endl;
+  //cerr << "embedded value: " << inspect(v) << endl;
   embedded_msg->write(embedded_msg, tmp_buf, val);
   w_varint32(buf, tmp_buf.size());
   buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
-  cout << "wrote embedded message without throwing" << endl;
+  cerr << "wrote embedded message without throwing" << endl;
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {

@@ -8,6 +8,6 @@ describe 'My behaviour' do
     req = pbr.read(File.read('spec/pb.dat'), CodeGeneratorRequest)
     compiled = Pbr::Generator.compile(ns, req)
     res = pbr.write(compiled, CodeGeneratorResponse)
-    STDOUT.print(res.encode)
+    STDOUT.print(res)
   end
 end

@@ -2,15 +2,23 @@
 require 'rubygems'
 $LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
 require 'pbr'
+require 'pp'
 
 # borrowed from beefcake
-
-File.write('/home/pwinton/pb.dat', STDIN.read)
 
 ns = (ENV['PBR_NAMESPACE'] || '').split('::')
 
 pbr = Pbr.new(PbrRule.vanilla)
-req = pbr.read(STDIN.read, CodeGeneratorRequest)
+
+input = STDIN.read
+req = pbr.read(input, CodeGeneratorRequest)
 compiled = Pbr::Generator.compile(ns, req)
+
+compiled = CodeGeneratorResponse.new(file: [{name: 'name', content: 'hello'}])
+
 res = pbr.write(compiled, CodeGeneratorResponse)
-STDOUT.print(res.encode)
+res.force_encoding('ASCII-8BIT')
+
+STDOUT.print(res)
+# File.write('/home/pwinton/pb.log', "\ninput:\n" + input)
+File.write('/home/pwinton/pb.log', res.inspect)

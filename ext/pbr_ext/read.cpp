@@ -62,7 +62,7 @@ DEF_RF(MESSAGE) {
 }
 
 read_val_func get_fld_reader(wire_t wire_type, fld_t fld_type) {
-  switch (fld_type) { TYPE_MAP(rf); default: cout << "get_fld_reader failed" << endl; return NULL; }
+  switch (fld_type) { TYPE_MAP(rf); default: cerr << "get_fld_reader failed" << endl; return NULL; }
 }
 
 read_val_func get_key_reader(wire_t wire_type, fld_t fld_type) {
@@ -96,7 +96,7 @@ void skip(ss_t& ss, wire_t wire_type) {
 }
 
 VALUE read_obj(Msg* msg, ss_t& ss) {
-  //cout << "read_obj " << msg->name << endl;
+  //cerr << "read_obj " << msg->name << endl;
   VALUE obj = rb_funcall(msg->target, ID_CTOR, 0);
   
   for (Fld& fld : msg->flds_to_enumerate)
@@ -106,11 +106,11 @@ VALUE read_obj(Msg* msg, ss_t& ss) {
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
-    //cout << "# " << fld_num << "  " << ss.pos << "/" << ss.len << endl;
+    //cerr << "# " << fld_num << "  " << ss.pos << "/" << ss.len << endl;
     Fld* fld = msg->get_fld(msg, fld_num);
 
     if (fld == NULL) {
-      cout << "skipping unrecognized field " << msg->name << "." << fld_num << endl;
+      cerr << "skipping unrecognized field " << msg->name << "." << fld_num << endl;
       wire_t wire_type = h & 7;
       skip(ss, wire_type);
       continue;

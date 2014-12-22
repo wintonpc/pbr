@@ -61,12 +61,12 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
     register_fields(model, get_msg_for_type(model, type), type, rule);
 
   // print debugging info
-  cout << endl;
-  cout << "REGISTERED:" << endl;
+  cerr << endl;
+  cerr << "REGISTERED:" << endl;
   for (Msg& msg : model->msgs) {
-    cout << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
+    cerr << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds_to_enumerate) {
-      cout << "  " << fld.num << " " << fld.name
+      cerr << "  " << fld.num << " " << fld.name
            << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
            << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
            << " (" << (int)fld.fld_type << ") "
@@ -77,7 +77,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
         
     }
   }
-  cout << "---------------" << endl;
+  cerr << "---------------" << endl;
   
   return Qnil;
 }
@@ -130,7 +130,7 @@ vector<VALUE> arr2vec(VALUE array) {
 }
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
-  cout << "writing" << endl;
+  cerr << "writing" << endl;
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
@@ -138,7 +138,7 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
-  cout << "reading" << endl;
+  cerr << "reading" << endl;
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
@@ -173,7 +173,7 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
   case FLD_SINT32:   return WIRE_VARINT;
   case FLD_SINT64:   return WIRE_VARINT;
   default:
-    cout << "WARNING: unexpected field type " << (int)fld_type << endl;
+    cerr << "WARNING: unexpected field type " << (int)fld_type << endl;
     return -1;
   }
 }
