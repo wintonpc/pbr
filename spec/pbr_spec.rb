@@ -14,7 +14,7 @@ describe Pbr do
         roundtrip(type, -1)
         roundtrip(type, 1234)
         roundtrip(type, 2**(bits-1) - 1)
-        roundtrip(type, -2**(bits-1))
+        roundtrip(type, -(2**(bits-1)))
       end
     end
 
@@ -148,7 +148,7 @@ describe Pbr do
     def roundtrip_impl(message_type, field_val, field_name, &block)
       block ||= ->(v1, v2){expect(v2).to eql v1}
 
-      pbr = Pbr.new
+      pbr = Pbr.new(PbrRule.default)
       begin
         obj1 = OpenStruct.new
         obj1.send("#{field_name}=", field_val)

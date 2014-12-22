@@ -6,10 +6,7 @@ class PbrRule
   # get_target_field is used when the target type is not a hash.
 
   def self.default
-    r = PbrRule.new
-    r.get_target_type = ->t{OpenStruct}
-    r.get_target_field = ->f{f}
-    r
+    always(OpenStruct)
   end
 
   def self.always(type)
