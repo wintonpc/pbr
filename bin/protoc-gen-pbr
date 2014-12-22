@@ -11,5 +11,6 @@ ns = (ENV['PBR_NAMESPACE'] || '').split('::')
 
 pbr = Pbr.new(PbrRule.vanilla)
 req = pbr.read(STDIN.read, CodeGeneratorRequest)
-res = pbr.write(Pbr::Generator.compile(ns, req), CodeGeneratorResponse)
+compiled = Pbr::Generator.compile(ns, req)
+res = pbr.write(compiled, CodeGeneratorResponse)
 STDOUT.print(res.encode)

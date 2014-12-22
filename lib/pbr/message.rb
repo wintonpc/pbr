@@ -22,7 +22,11 @@ class Pbr
       if v.is_a?(Array)
         v.map{|x| construct(f, x)}
       elsif f.msg_class && f.msg_class != Hash
-        f.msg_class.new(v)
+        if v.is_a?(f.msg_class)
+          v
+        else
+          f.msg_class.new(v)
+        end
       else
         v
       end

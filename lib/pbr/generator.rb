@@ -99,7 +99,7 @@ class Pbr
 
     def field!(pkg, f)
       # Turn the label into Ruby
-      label = name_for(f, L, f.label)
+      label = name_for(L, f.label)
 
       # Turn the name into a Ruby
       name = ":#{f.name}"
@@ -116,7 +116,7 @@ class Pbr
 
         t.gsub('.', '::')  # Convert to Ruby namespacing syntax
       else
-        ":#{name_for(f, T, f.type)}"
+        ":#{name_for(T, f.type)}"
       end
 
       # Finally, generate the declaration
@@ -138,9 +138,8 @@ class Pbr
       puts out
     end
 
-    # Determines the name for a
-    def name_for(b, mod, val)
-      b.name_for(mod, val).to_s.gsub(/.*_/, '').downcase
+    def name_for(mod, val)
+      mod.name_for(val).to_s.gsub(/.*_/, '').downcase
     end
 
     def compile(ns, file)
