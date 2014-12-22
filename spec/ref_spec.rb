@@ -13,6 +13,9 @@ describe Pbr do
         f_sint64: 2**63 - 1,
         f_bool: true,
         f_enum: Everything::State::ACTIVE,
+        f_fixed64: 2**64 - 1,
+        f_sfixed64: 2**63 - 1,
+        f_double: 3.141592,
     )
     decoded = roundtrip(msg)
     expect(decoded.f_int32).to eql 2**31 - 1
@@ -23,6 +26,9 @@ describe Pbr do
     expect(decoded.f_sint64).to eql 2**63 - 1
     expect(decoded.f_bool).to eql true
     expect(decoded.f_enum).to eql Everything::State::ACTIVE
+    expect(decoded.f_fixed64).to eql 2**64 - 1
+    expect(decoded.f_sfixed64).to eql 2**63 - 1
+    expect(decoded.f_double).to eql 3.141592
   end
 
   def roundtrip(msg)

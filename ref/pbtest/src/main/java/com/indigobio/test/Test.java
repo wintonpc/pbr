@@ -90,6 +90,36 @@ public final class Test {
      * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
      */
     com.indigobio.test.Test.Everything.State getFEnum();
+
+    // required fixed64 f_fixed64 = 9;
+    /**
+     * <code>required fixed64 f_fixed64 = 9;</code>
+     */
+    boolean hasFFixed64();
+    /**
+     * <code>required fixed64 f_fixed64 = 9;</code>
+     */
+    long getFFixed64();
+
+    // required sfixed64 f_sfixed64 = 10;
+    /**
+     * <code>required sfixed64 f_sfixed64 = 10;</code>
+     */
+    boolean hasFSfixed64();
+    /**
+     * <code>required sfixed64 f_sfixed64 = 10;</code>
+     */
+    long getFSfixed64();
+
+    // required double f_double = 11;
+    /**
+     * <code>required double f_double = 11;</code>
+     */
+    boolean hasFDouble();
+    /**
+     * <code>required double f_double = 11;</code>
+     */
+    double getFDouble();
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -186,6 +216,21 @@ public final class Test {
                 bitField0_ |= 0x00000080;
                 fEnum_ = value;
               }
+              break;
+            }
+            case 73: {
+              bitField0_ |= 0x00000100;
+              fFixed64_ = input.readFixed64();
+              break;
+            }
+            case 81: {
+              bitField0_ |= 0x00000200;
+              fSfixed64_ = input.readSFixed64();
+              break;
+            }
+            case 89: {
+              bitField0_ |= 0x00000400;
+              fDouble_ = input.readDouble();
               break;
             }
           }
@@ -438,6 +483,54 @@ public final class Test {
       return fEnum_;
     }
 
+    // required fixed64 f_fixed64 = 9;
+    public static final int F_FIXED64_FIELD_NUMBER = 9;
+    private long fFixed64_;
+    /**
+     * <code>required fixed64 f_fixed64 = 9;</code>
+     */
+    public boolean hasFFixed64() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>required fixed64 f_fixed64 = 9;</code>
+     */
+    public long getFFixed64() {
+      return fFixed64_;
+    }
+
+    // required sfixed64 f_sfixed64 = 10;
+    public static final int F_SFIXED64_FIELD_NUMBER = 10;
+    private long fSfixed64_;
+    /**
+     * <code>required sfixed64 f_sfixed64 = 10;</code>
+     */
+    public boolean hasFSfixed64() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>required sfixed64 f_sfixed64 = 10;</code>
+     */
+    public long getFSfixed64() {
+      return fSfixed64_;
+    }
+
+    // required double f_double = 11;
+    public static final int F_DOUBLE_FIELD_NUMBER = 11;
+    private double fDouble_;
+    /**
+     * <code>required double f_double = 11;</code>
+     */
+    public boolean hasFDouble() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>required double f_double = 11;</code>
+     */
+    public double getFDouble() {
+      return fDouble_;
+    }
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
@@ -447,6 +540,9 @@ public final class Test {
       fSint64_ = 0L;
       fBool_ = false;
       fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
+      fFixed64_ = 0L;
+      fSfixed64_ = 0L;
+      fDouble_ = 0D;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -485,6 +581,18 @@ public final class Test {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFFixed64()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFSfixed64()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFDouble()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -515,6 +623,15 @@ public final class Test {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeEnum(8, fEnum_.getNumber());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeFixed64(9, fFixed64_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeSFixed64(10, fSfixed64_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeDouble(11, fDouble_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -556,6 +673,18 @@ public final class Test {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(8, fEnum_.getNumber());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFixed64Size(9, fFixed64_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSFixed64Size(10, fSfixed64_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(11, fDouble_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -689,6 +818,12 @@ public final class Test {
         bitField0_ = (bitField0_ & ~0x00000040);
         fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
         bitField0_ = (bitField0_ & ~0x00000080);
+        fFixed64_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        fSfixed64_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        fDouble_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -749,6 +884,18 @@ public final class Test {
           to_bitField0_ |= 0x00000080;
         }
         result.fEnum_ = fEnum_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.fFixed64_ = fFixed64_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.fSfixed64_ = fSfixed64_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.fDouble_ = fDouble_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -789,6 +936,15 @@ public final class Test {
         if (other.hasFEnum()) {
           setFEnum(other.getFEnum());
         }
+        if (other.hasFFixed64()) {
+          setFFixed64(other.getFFixed64());
+        }
+        if (other.hasFSfixed64()) {
+          setFSfixed64(other.getFSfixed64());
+        }
+        if (other.hasFDouble()) {
+          setFDouble(other.getFDouble());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -823,6 +979,18 @@ public final class Test {
           return false;
         }
         if (!hasFEnum()) {
+          
+          return false;
+        }
+        if (!hasFFixed64()) {
+          
+          return false;
+        }
+        if (!hasFSfixed64()) {
+          
+          return false;
+        }
+        if (!hasFDouble()) {
           
           return false;
         }
@@ -1115,6 +1283,105 @@ public final class Test {
         return this;
       }
 
+      // required fixed64 f_fixed64 = 9;
+      private long fFixed64_ ;
+      /**
+       * <code>required fixed64 f_fixed64 = 9;</code>
+       */
+      public boolean hasFFixed64() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>required fixed64 f_fixed64 = 9;</code>
+       */
+      public long getFFixed64() {
+        return fFixed64_;
+      }
+      /**
+       * <code>required fixed64 f_fixed64 = 9;</code>
+       */
+      public Builder setFFixed64(long value) {
+        bitField0_ |= 0x00000100;
+        fFixed64_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required fixed64 f_fixed64 = 9;</code>
+       */
+      public Builder clearFFixed64() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        fFixed64_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // required sfixed64 f_sfixed64 = 10;
+      private long fSfixed64_ ;
+      /**
+       * <code>required sfixed64 f_sfixed64 = 10;</code>
+       */
+      public boolean hasFSfixed64() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>required sfixed64 f_sfixed64 = 10;</code>
+       */
+      public long getFSfixed64() {
+        return fSfixed64_;
+      }
+      /**
+       * <code>required sfixed64 f_sfixed64 = 10;</code>
+       */
+      public Builder setFSfixed64(long value) {
+        bitField0_ |= 0x00000200;
+        fSfixed64_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required sfixed64 f_sfixed64 = 10;</code>
+       */
+      public Builder clearFSfixed64() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        fSfixed64_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // required double f_double = 11;
+      private double fDouble_ ;
+      /**
+       * <code>required double f_double = 11;</code>
+       */
+      public boolean hasFDouble() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>required double f_double = 11;</code>
+       */
+      public double getFDouble() {
+        return fDouble_;
+      }
+      /**
+       * <code>required double f_double = 11;</code>
+       */
+      public Builder setFDouble(double value) {
+        bitField0_ |= 0x00000400;
+        fDouble_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required double f_double = 11;</code>
+       */
+      public Builder clearFDouble() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        fDouble_ = 0D;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -1140,13 +1407,14 @@ public final class Test {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\ntest.proto\022\022com.indigobio.test\"\337\001\n\nEve" +
+      "\n\ntest.proto\022\022com.indigobio.test\"\230\002\n\nEve" +
       "rything\022\017\n\007f_int32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(" +
       "\003\022\020\n\010f_uint32\030\003 \002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n" +
       "\010f_sint32\030\005 \002(\021\022\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_b" +
       "ool\030\007 \002(\010\0224\n\006f_enum\030\010 \002(\0162$.com.indigobi" +
-      "o.test.Everything.State\"!\n\005State\022\n\n\006ACTI" +
-      "VE\020\001\022\014\n\010INACTIVE\020\002"
+      "o.test.Everything.State\022\021\n\tf_fixed64\030\t \002" +
+      "(\006\022\022\n\nf_sfixed64\030\n \002(\020\022\020\n\010f_double\030\013 \002(\001" +
+      "\"!\n\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1158,7 +1426,7 @@ public final class Test {
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", });
           return null;
         }
       };

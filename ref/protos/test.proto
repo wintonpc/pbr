@@ -15,4 +15,7 @@ message Everything {
   required sint64 f_sint64 = 6;
   required bool f_bool = 7;
   required State f_enum = 8;
+  required fixed64 f_fixed64 = 9;
+  required sfixed64 f_sfixed64 = 10;
+  required double f_double = 11;
 }

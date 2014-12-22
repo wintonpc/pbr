@@ -17,4 +17,7 @@ class Everything
   required :f_sint64, :sint64, 6
   required :f_bool, :bool, 7
   required :f_enum, ::Everything::State, 8
+  required :f_fixed64, :fixed64, 9
+  required :f_sfixed64, :sfixed64, 10
+  required :f_double, :double, 11
 end
