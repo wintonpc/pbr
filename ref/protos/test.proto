@@ -1,5 +1,9 @@
 package com.indigobio.test;
 
+message Something {
+  required string a = 1;
+}
+
 message Everything {
 
   enum State {
@@ -20,4 +24,6 @@ message Everything {
   required double f_double = 11;
   required string f_string = 12;
   required bytes f_bytes = 13;
+  required Something f_embedded = 14;
+  repeated int32 f_packed = 15 [packed=true];
 }

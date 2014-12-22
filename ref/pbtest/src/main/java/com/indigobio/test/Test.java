@@ -8,6 +8,485 @@ public final class Test {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+  public interface SomethingOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // required string a = 1;
+    /**
+     * <code>required string a = 1;</code>
+     */
+    boolean hasA();
+    /**
+     * <code>required string a = 1;</code>
+     */
+    java.lang.String getA();
+    /**
+     * <code>required string a = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getABytes();
+  }
+  /**
+   * Protobuf type {@code com.indigobio.test.Something}
+   */
+  public static final class Something extends
+      com.google.protobuf.GeneratedMessage
+      implements SomethingOrBuilder {
+    // Use Something.newBuilder() to construct.
+    private Something(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private Something(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Something defaultInstance;
+    public static Something getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public Something getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Something(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              a_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.indigobio.test.Test.Something.class, com.indigobio.test.Test.Something.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Something> PARSER =
+        new com.google.protobuf.AbstractParser<Something>() {
+      public Something parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Something(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Something> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // required string a = 1;
+    public static final int A_FIELD_NUMBER = 1;
+    private java.lang.Object a_;
+    /**
+     * <code>required string a = 1;</code>
+     */
+    public boolean hasA() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required string a = 1;</code>
+     */
+    public java.lang.String getA() {
+      java.lang.Object ref = a_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          a_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string a = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getABytes() {
+      java.lang.Object ref = a_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        a_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      a_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasA()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getABytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getABytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static com.indigobio.test.Test.Something parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static com.indigobio.test.Test.Something parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static com.indigobio.test.Test.Something parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.indigobio.test.Test.Something parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(com.indigobio.test.Test.Something prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.indigobio.test.Something}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.indigobio.test.Test.SomethingOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.indigobio.test.Test.Something.class, com.indigobio.test.Test.Something.Builder.class);
+      }
+
+      // Construct using com.indigobio.test.Test.Something.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        a_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_descriptor;
+      }
+
+      public com.indigobio.test.Test.Something getDefaultInstanceForType() {
+        return com.indigobio.test.Test.Something.getDefaultInstance();
+      }
+
+      public com.indigobio.test.Test.Something build() {
+        com.indigobio.test.Test.Something result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public com.indigobio.test.Test.Something buildPartial() {
+        com.indigobio.test.Test.Something result = new com.indigobio.test.Test.Something(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.a_ = a_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.indigobio.test.Test.Something) {
+          return mergeFrom((com.indigobio.test.Test.Something)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.indigobio.test.Test.Something other) {
+        if (other == com.indigobio.test.Test.Something.getDefaultInstance()) return this;
+        if (other.hasA()) {
+          bitField0_ |= 0x00000001;
+          a_ = other.a_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasA()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.indigobio.test.Test.Something parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.indigobio.test.Test.Something) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // required string a = 1;
+      private java.lang.Object a_ = "";
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public boolean hasA() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public java.lang.String getA() {
+        java.lang.Object ref = a_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          a_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getABytes() {
+        java.lang.Object ref = a_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          a_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public Builder setA(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        a_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public Builder clearA() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        a_ = getDefaultInstance().getA();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string a = 1;</code>
+       */
+      public Builder setABytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        a_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.indigobio.test.Something)
+    }
+
+    static {
+      defaultInstance = new Something(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:com.indigobio.test.Something)
+  }
+
   public interface EverythingOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
@@ -145,6 +624,34 @@ public final class Test {
      * <code>required bytes f_bytes = 13;</code>
      */
     com.google.protobuf.ByteString getFBytes();
+
+    // required .com.indigobio.test.Something f_embedded = 14;
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    boolean hasFEmbedded();
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    com.indigobio.test.Test.Something getFEmbedded();
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    com.indigobio.test.Test.SomethingOrBuilder getFEmbeddedOrBuilder();
+
+    // repeated int32 f_packed = 15 [packed = true];
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    java.util.List<java.lang.Integer> getFPackedList();
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    int getFPackedCount();
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    int getFPacked(int index);
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -268,6 +775,40 @@ public final class Test {
               fBytes_ = input.readBytes();
               break;
             }
+            case 114: {
+              com.indigobio.test.Test.Something.Builder subBuilder = null;
+              if (((bitField0_ & 0x00002000) == 0x00002000)) {
+                subBuilder = fEmbedded_.toBuilder();
+              }
+              fEmbedded_ = input.readMessage(com.indigobio.test.Test.Something.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(fEmbedded_);
+                fEmbedded_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00002000;
+              break;
+            }
+            case 120: {
+              if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+                fPacked_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00004000;
+              }
+              fPacked_.add(input.readInt32());
+              break;
+            }
+            case 122: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00004000) == 0x00004000) && input.getBytesUntilLimit() > 0) {
+                fPacked_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00004000;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                fPacked_.add(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -276,6 +817,9 @@ public final class Test {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+          fPacked_ = java.util.Collections.unmodifiableList(fPacked_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -625,6 +1169,52 @@ public final class Test {
       return fBytes_;
     }
 
+    // required .com.indigobio.test.Something f_embedded = 14;
+    public static final int F_EMBEDDED_FIELD_NUMBER = 14;
+    private com.indigobio.test.Test.Something fEmbedded_;
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    public boolean hasFEmbedded() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    public com.indigobio.test.Test.Something getFEmbedded() {
+      return fEmbedded_;
+    }
+    /**
+     * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+     */
+    public com.indigobio.test.Test.SomethingOrBuilder getFEmbeddedOrBuilder() {
+      return fEmbedded_;
+    }
+
+    // repeated int32 f_packed = 15 [packed = true];
+    public static final int F_PACKED_FIELD_NUMBER = 15;
+    private java.util.List<java.lang.Integer> fPacked_;
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getFPackedList() {
+      return fPacked_;
+    }
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    public int getFPackedCount() {
+      return fPacked_.size();
+    }
+    /**
+     * <code>repeated int32 f_packed = 15 [packed = true];</code>
+     */
+    public int getFPacked(int index) {
+      return fPacked_.get(index);
+    }
+    private int fPackedMemoizedSerializedSize = -1;
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
@@ -639,6 +1229,8 @@ public final class Test {
       fDouble_ = 0D;
       fString_ = "";
       fBytes_ = com.google.protobuf.ByteString.EMPTY;
+      fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
+      fPacked_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -697,6 +1289,14 @@ public final class Test {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasFEmbedded()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getFEmbedded().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -742,6 +1342,16 @@ public final class Test {
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeBytes(13, fBytes_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeMessage(14, fEmbedded_);
+      }
+      if (getFPackedList().size() > 0) {
+        output.writeRawVarint32(122);
+        output.writeRawVarint32(fPackedMemoizedSerializedSize);
+      }
+      for (int i = 0; i < fPacked_.size(); i++) {
+        output.writeInt32NoTag(fPacked_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -803,6 +1413,24 @@ public final class Test {
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(13, fBytes_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(14, fEmbedded_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < fPacked_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(fPacked_.get(i));
+        }
+        size += dataSize;
+        if (!getFPackedList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        fPackedMemoizedSerializedSize = dataSize;
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -912,6 +1540,7 @@ public final class Test {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getFEmbeddedFieldBuilder();
         }
       }
       private static Builder create() {
@@ -946,6 +1575,14 @@ public final class Test {
         bitField0_ = (bitField0_ & ~0x00000800);
         fBytes_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00001000);
+        if (fEmbeddedBuilder_ == null) {
+          fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
+        } else {
+          fEmbeddedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00002000);
+        fPacked_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
 
@@ -1026,6 +1663,19 @@ public final class Test {
           to_bitField0_ |= 0x00001000;
         }
         result.fBytes_ = fBytes_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        if (fEmbeddedBuilder_ == null) {
+          result.fEmbedded_ = fEmbedded_;
+        } else {
+          result.fEmbedded_ = fEmbeddedBuilder_.build();
+        }
+        if (((bitField0_ & 0x00004000) == 0x00004000)) {
+          fPacked_ = java.util.Collections.unmodifiableList(fPacked_);
+          bitField0_ = (bitField0_ & ~0x00004000);
+        }
+        result.fPacked_ = fPacked_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1083,6 +1733,19 @@ public final class Test {
         if (other.hasFBytes()) {
           setFBytes(other.getFBytes());
         }
+        if (other.hasFEmbedded()) {
+          mergeFEmbedded(other.getFEmbedded());
+        }
+        if (!other.fPacked_.isEmpty()) {
+          if (fPacked_.isEmpty()) {
+            fPacked_ = other.fPacked_;
+            bitField0_ = (bitField0_ & ~0x00004000);
+          } else {
+            ensureFPackedIsMutable();
+            fPacked_.addAll(other.fPacked_);
+          }
+          onChanged();
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -1137,6 +1800,14 @@ public final class Test {
           return false;
         }
         if (!hasFBytes()) {
+          
+          return false;
+        }
+        if (!hasFEmbedded()) {
+          
+          return false;
+        }
+        if (!getFEmbedded().isInitialized()) {
           
           return false;
         }
@@ -1638,6 +2309,189 @@ public final class Test {
         return this;
       }
 
+      // required .com.indigobio.test.Something f_embedded = 14;
+      private com.indigobio.test.Test.Something fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder> fEmbeddedBuilder_;
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public boolean hasFEmbedded() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public com.indigobio.test.Test.Something getFEmbedded() {
+        if (fEmbeddedBuilder_ == null) {
+          return fEmbedded_;
+        } else {
+          return fEmbeddedBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public Builder setFEmbedded(com.indigobio.test.Test.Something value) {
+        if (fEmbeddedBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          fEmbedded_ = value;
+          onChanged();
+        } else {
+          fEmbeddedBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public Builder setFEmbedded(
+          com.indigobio.test.Test.Something.Builder builderForValue) {
+        if (fEmbeddedBuilder_ == null) {
+          fEmbedded_ = builderForValue.build();
+          onChanged();
+        } else {
+          fEmbeddedBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public Builder mergeFEmbedded(com.indigobio.test.Test.Something value) {
+        if (fEmbeddedBuilder_ == null) {
+          if (((bitField0_ & 0x00002000) == 0x00002000) &&
+              fEmbedded_ != com.indigobio.test.Test.Something.getDefaultInstance()) {
+            fEmbedded_ =
+              com.indigobio.test.Test.Something.newBuilder(fEmbedded_).mergeFrom(value).buildPartial();
+          } else {
+            fEmbedded_ = value;
+          }
+          onChanged();
+        } else {
+          fEmbeddedBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public Builder clearFEmbedded() {
+        if (fEmbeddedBuilder_ == null) {
+          fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
+          onChanged();
+        } else {
+          fEmbeddedBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00002000);
+        return this;
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public com.indigobio.test.Test.Something.Builder getFEmbeddedBuilder() {
+        bitField0_ |= 0x00002000;
+        onChanged();
+        return getFEmbeddedFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      public com.indigobio.test.Test.SomethingOrBuilder getFEmbeddedOrBuilder() {
+        if (fEmbeddedBuilder_ != null) {
+          return fEmbeddedBuilder_.getMessageOrBuilder();
+        } else {
+          return fEmbedded_;
+        }
+      }
+      /**
+       * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder> 
+          getFEmbeddedFieldBuilder() {
+        if (fEmbeddedBuilder_ == null) {
+          fEmbeddedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder>(
+                  fEmbedded_,
+                  getParentForChildren(),
+                  isClean());
+          fEmbedded_ = null;
+        }
+        return fEmbeddedBuilder_;
+      }
+
+      // repeated int32 f_packed = 15 [packed = true];
+      private java.util.List<java.lang.Integer> fPacked_ = java.util.Collections.emptyList();
+      private void ensureFPackedIsMutable() {
+        if (!((bitField0_ & 0x00004000) == 0x00004000)) {
+          fPacked_ = new java.util.ArrayList<java.lang.Integer>(fPacked_);
+          bitField0_ |= 0x00004000;
+         }
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getFPackedList() {
+        return java.util.Collections.unmodifiableList(fPacked_);
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public int getFPackedCount() {
+        return fPacked_.size();
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public int getFPacked(int index) {
+        return fPacked_.get(index);
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public Builder setFPacked(
+          int index, int value) {
+        ensureFPackedIsMutable();
+        fPacked_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public Builder addFPacked(int value) {
+        ensureFPackedIsMutable();
+        fPacked_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public Builder addAllFPacked(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureFPackedIsMutable();
+        super.addAll(values, fPacked_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 f_packed = 15 [packed = true];</code>
+       */
+      public Builder clearFPacked() {
+        fPacked_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00004000);
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -1649,6 +2503,11 @@ public final class Test {
     // @@protoc_insertion_point(class_scope:com.indigobio.test.Everything)
   }
 
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_indigobio_test_Something_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_indigobio_test_Something_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_com_indigobio_test_Everything_descriptor;
   private static
@@ -1663,27 +2522,36 @@ public final class Test {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\ntest.proto\022\022com.indigobio.test\"\273\002\n\nEve" +
-      "rything\022\017\n\007f_int32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(" +
-      "\003\022\020\n\010f_uint32\030\003 \002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n" +
-      "\010f_sint32\030\005 \002(\021\022\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_b" +
-      "ool\030\007 \002(\010\0224\n\006f_enum\030\010 \002(\0162$.com.indigobi" +
-      "o.test.Everything.State\022\021\n\tf_fixed64\030\t \002" +
-      "(\006\022\022\n\nf_sfixed64\030\n \002(\020\022\020\n\010f_double\030\013 \002(\001" +
-      "\022\020\n\010f_string\030\014 \002(\t\022\017\n\007f_bytes\030\r \002(\014\"!\n\005S" +
-      "tate\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
+      "\n\ntest.proto\022\022com.indigobio.test\"\026\n\tSome" +
+      "thing\022\t\n\001a\030\001 \002(\t\"\204\003\n\nEverything\022\017\n\007f_int" +
+      "32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(\003\022\020\n\010f_uint32\030\003 " +
+      "\002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n\010f_sint32\030\005 \002(\021\022" +
+      "\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_bool\030\007 \002(\010\0224\n\006f_e" +
+      "num\030\010 \002(\0162$.com.indigobio.test.Everythin" +
+      "g.State\022\021\n\tf_fixed64\030\t \002(\006\022\022\n\nf_sfixed64" +
+      "\030\n \002(\020\022\020\n\010f_double\030\013 \002(\001\022\020\n\010f_string\030\014 \002" +
+      "(\t\022\017\n\007f_bytes\030\r \002(\014\0221\n\nf_embedded\030\016 \002(\0132" +
+      "\035.com.indigobio.test.Something\022\024\n\010f_pack",
+      "ed\030\017 \003(\005B\002\020\001\"!\n\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INA" +
+      "CTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
             com.google.protobuf.Descriptors.FileDescriptor root) {
           descriptor = root;
-          internal_static_com_indigobio_test_Everything_descriptor =
+          internal_static_com_indigobio_test_Something_descriptor =
             getDescriptor().getMessageTypes().get(0);
+          internal_static_com_indigobio_test_Something_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_com_indigobio_test_Something_descriptor,
+              new java.lang.String[] { "A", });
+          internal_static_com_indigobio_test_Everything_descriptor =
+            getDescriptor().getMessageTypes().get(1);
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", });
           return null;
         }
       };

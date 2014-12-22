@@ -1,5 +1,11 @@
 require 'pbr'
 
+class Something
+  include Pbr::Message
+
+  required :a, :string, 1
+end
+
 class Everything
   include Pbr::Message
 
@@ -22,4 +28,6 @@ class Everything
   required :f_double, :double, 11
   required :f_string, :string, 12
   required :f_bytes, :bytes, 13
+  required :f_embedded, Something, 14
+  repeated :f_packed, :int32, 15, packed: true
 end

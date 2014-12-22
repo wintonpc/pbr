@@ -28,12 +28,21 @@ public class App
         verify(fbytes.byteAt(3), (byte)3);
         verify(fbytes.byteAt(4), (byte)255);
 
+        verify(msg.getFEmbedded().getA(), "goodbye");
+
+        verify(msg.getFPackedCount(), 3);
+        verify(msg.getFPacked(0), 1);
+        verify(msg.getFPacked(1), 1000);
+        verify(msg.getFPacked(2), 1000000);
+
+        System.err.println("pbtest verification passed");
+
         msg.writeTo(System.out);
     }
 
     static <T> void verify(T actual, T expected) {
         if (!actual.equals(expected)) {
-            System.err.println(String.format("expected: %s, actual: %s", expected, actual));
+            System.err.println(String.format("pbtest expected: %s, actual: %s", expected, actual));
             System.exit(1);
         }
     }
