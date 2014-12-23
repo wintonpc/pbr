@@ -1,5 +1,3 @@
-require 'pbr/descriptors.pb'
-
 # borrowed from beefcake
 
 class CodeGeneratorRequest

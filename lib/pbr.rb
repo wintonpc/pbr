@@ -1,7 +1,14 @@
-Dir.glob(File.join(File.dirname(__FILE__), 'pbr/**/*.rb')).each{|path| require_relative(path)}
+require_relative 'pbr/version'
+require_relative 'pbr/pbr_rule'
+require_relative 'pbr/message'
+require_relative 'pbr/enum'
+require_relative 'pbr/descriptors.pb'
+require_relative 'pbr/plugin.pb'
+require_relative 'pbr/generator'
+
+require 'pbr_ext'
 
 require 'set'
-require 'pbr_ext'
 require 'ostruct'
 
 class Pbr

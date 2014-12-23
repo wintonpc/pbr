@@ -1,7 +1,8 @@
-require 'pbr/enum'
-require 'pbr/message'
-
 # borrowed from beefcake
+
+class FieldOptions
+  include Pbr::Message
+end
 
 class FieldDescriptorProto
   include Pbr::Message
@@ -34,6 +35,13 @@ class FieldDescriptorProto
     REQUIRED = 2
     REPEATED = 3
   end
+end
+
+class FieldOptions
+  optional :packed, :bool, 2
+end
+
+class FieldDescriptorProto
 
   optional :name,   :string, 1
   optional :number, :int32,  3
@@ -59,8 +67,9 @@ class FieldDescriptorProto
   ## For strings, contains the default text contents (not escaped in any way).
   ## For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
   optional :default_value, :string, 7
-end
 
+  optional :options, FieldOptions, 8
+end
 
 class EnumValueDescriptorProto
   include Pbr::Message

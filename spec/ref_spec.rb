@@ -1,9 +1,17 @@
 require 'rspec'
 require 'pbr'
-require_relative '../ref/ref.pb'
 
 describe Pbr do
   it 'should talk to a reference implementation' do
+    Dir.chdir('ref') do
+      system('./gen_proto.sh') or abort 'gen_proto.sh failed'
+    end
+    Dir.chdir('ref/pbtest') do
+      system('mvn clean package') or abort 'maven failed'
+    end
+
+    require_relative '../ref/test.pb'
+
     msg = Everything.new(
         f_int32: 2**31 - 1,
         f_int64: 2**63 - 1,

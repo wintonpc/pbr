@@ -3,7 +3,6 @@
 # maintain the internal format of the buffers, rather than converting the
 # buffer to US-ASCII
 
-require 'pbr/message'
 require 'stringio'
 
 # borrowed from beefcake
@@ -52,7 +51,7 @@ class Pbr
       puts "class #{mt.name}"
 
       indent do
-        puts 'include Beefcake::Message'
+        puts 'include Pbr::Message'
 
         ## Enum Types
         Array(mt.enum_type).each do |et|
@@ -90,6 +89,7 @@ class Pbr
       puts
       puts "module #{et.name}"
       indent do
+        puts 'include Pbr::Enum'
         et.value.each do |v|
           puts '%s = %d' % [v.name, v.number]
         end
@@ -120,7 +120,12 @@ class Pbr
       end
 
       # Finally, generate the declaration
-      out = '%s %s, %s, %d' % [label, name, type, f.number]
+      out = "#{label} #{name}, #{type}, #{f.number}"
+      opts = ''
+      if f.options && f.options.packed
+        opts += ', packed: true'
+      end
+      out += opts
 
       if f.default_value
         v = case f.type
@@ -144,7 +149,7 @@ class Pbr
 
     def compile(ns, file)
       puts "## Generated from #{file.name} for #{file.package}"
-      puts "require \"beefcake\""
+      puts "require 'pbr'"
       puts
 
       ns!(ns) do
