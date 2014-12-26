@@ -134,7 +134,8 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
-  return msg->write(msg, buf, obj);
+  msg->write(msg, buf, obj);
+  return rb_str_new((const char*)buf.data(), buf.size());
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
@@ -149,8 +150,7 @@ VALUE read_hash(Msg* msg, ss_t& ss) {
   return Qnil;
 }
 
-VALUE write_hash(Msg* msg, buf_t& buf, VALUE obj) {
-  return Qnil;
+void write_hash(Msg* msg, buf_t& buf, VALUE obj) {
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {

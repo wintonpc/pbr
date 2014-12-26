@@ -14,7 +14,7 @@ VALUE create_handle(VALUE self);
 VALUE destroy_handle(VALUE self, VALUE handle);
 VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule);
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type);
-VALUE write_hash(Msg* msg, buf_t& buf, VALUE obj);
+void write_hash(Msg* msg, buf_t& buf, VALUE obj);
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type);
 VALUE read_hash(Msg* msg, ss_t& ss);
 void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule);

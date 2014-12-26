@@ -107,7 +107,7 @@ void write_value(buf_t& buf, Fld* fld, VALUE obj) {
 
 #define DEFLATE(val)  RTEST(fld->deflate) ? rb_funcall(fld->deflate, ID_CALL, 1, (val)) : (val)
 
-VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
+void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
@@ -138,6 +138,5 @@ VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
       }
     }
   }
-  return rb_str_new((const char*)buf.data(), buf.size());
 }
 
