@@ -77,6 +77,7 @@ DEF_WF(STRING) {
 DEF_WF(MESSAGE) {
   //cerr << "writing msg field" << endl;
   buf_t tmp_buf;
+  tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY);
   Msg* embedded_msg = fld->embedded_msg;
   //cerr << "embedded type: " << embedded_msg->name << endl;
   //cerr << "embedded value: " << inspect(v) << endl;
@@ -122,6 +123,7 @@ void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
         if (len > 0) {
           write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
           buf_t tmp_buf;
+          tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY);
           for (int i=0; i<len; i++) {
             VALUE elem = DEFLATE(rb_ary_entry(val, i));
             fld->write(tmp_buf, elem, fld);

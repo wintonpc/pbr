@@ -134,6 +134,7 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   Model* model = MODEL(handle);
   Msg* msg = get_msg_for_type(model, type);
   buf_t buf;
+  buf.reserve(MSG_INITIAL_CAPACITY);
   msg->write(msg, buf, obj);
   return rb_str_new((const char*)buf.data(), buf.size());
 }
