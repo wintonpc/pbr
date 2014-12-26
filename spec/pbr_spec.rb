@@ -111,14 +111,38 @@ describe Pbr do
       msg2 = make_single_field_msg('Msg2', :required, :foo, msg3, 1)
       msg1 = make_single_field_msg('Msg1', :required, :foo, msg2, 1)
 
-      v3 = OpenStruct.new({foo: 42})
-      v2 = OpenStruct.new({foo: v3})
-      v1 = OpenStruct.new({foo: v2})
+      val3 = OpenStruct.new({foo: 42})
+      val2 = OpenStruct.new({foo: val3})
+      val1 = OpenStruct.new({foo: val2})
 
-      roundtrip_impl(msg1, v1, 'foo') do |v1, v2|
+      roundtrip_impl(msg1, val1, 'foo') do |v1, v2|
         expect(v2).to be_a OpenStruct
         expect(v2.foo.foo.foo).to eql 42
       end
+    end
+
+    it 'trigger embedded message move' do
+      msg2 = make_single_field_msg('Msg2', :repeated, :things, :int32, 1)
+      msg1 = make_single_field_msg('Msg1', :required, :foo, msg2, 1)
+
+      pbr = Pbr.new(PbrRule.always(OpenStruct))
+
+
+      obj1 = OpenStruct.new(things: 5.times.map { 42 })
+      obj1_written = pbr.write(OpenStruct.new(foo: obj1), msg1)
+      obj1_read = pbr.read(obj1_written, msg1)
+
+      expect(obj1_read.foo.things.size).to eql 5
+      expect(obj1_read.foo.things.last).to eql 42
+
+
+      obj2 = OpenStruct.new(things: 100000.times.map { 42 })
+      obj2_written = pbr.write(OpenStruct.new(foo: obj2), msg1)
+      obj2_read = pbr.read(obj2_written, msg1)
+
+      expect(obj2_read.foo.things.size).to eql 100000
+      expect(obj2_read.foo.things.last).to eql 42
+
     end
 
     it 'repeated fields' do

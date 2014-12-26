@@ -16,6 +16,16 @@ inline void w_varint32_bytes(buf_t& buf, uint32_t offset, uint32_t n, int32_t mi
   buf[offset + i] = (uint32_t)(n & 127);
 }
 
+inline int32_t varint32_size(uint32_t n) {
+  int32_t i = 0;
+  while (n > 127) {
+    i++;
+    n >>= 7;
+  }
+  i++;
+  return i;
+}
+
 
 #define DEF_W_VARINT(bits)                                       \
   inline void w_varint##bits(buf_t& buf, uint##bits##_t n) {     \

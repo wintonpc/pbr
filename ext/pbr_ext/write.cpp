@@ -77,12 +77,33 @@ DEF_WF(STRING) {
 DEF_WF(MESSAGE) {
   Msg* embedded_msg = fld->embedded_msg;
   uint32_t len_offset = buf.size();
-  for (int i=0; i<10; i++)
+  int32_t estimated_varint_size = embedded_msg->last_varint_size;
+  for (int i=0; i<estimated_varint_size; i++)
     buf.push_back(0);
   uint32_t msg_offset = buf.size();
   embedded_msg->write(embedded_msg, buf, val);
   uint32_t msg_len = buf.size() - msg_offset;
-  w_varint32_bytes(buf, len_offset, msg_len, 10);
+  int32_t actual_varint_size = varint32_size(msg_len);
+  int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
+
+  /*
+  cerr << "len_offset: " << len_offset << endl;
+  cerr << "msg_offset: " << msg_offset << endl;
+  cerr << "msg_len: " << msg_len << endl;
+
+  cerr << "estimated_varint_size: " << estimated_varint_size << endl;
+  cerr << "actual_varint_size: " << actual_varint_size << endl;
+  cerr << "extra_bytes_needed: " << extra_bytes_needed << endl;
+
+  cerr << endl;
+  */
+  if (extra_bytes_needed > 0) {
+    buf.insert(buf.begin() + msg_offset, extra_bytes_needed, 0);
+    w_varint32_bytes(buf, len_offset, msg_len, actual_varint_size);
+    //cerr << "inserted extra bytes for varint length" << endl;
+  } else {
+    w_varint32_bytes(buf, len_offset, msg_len, estimated_varint_size);    
+  }
   //buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
 }
 
@@ -108,6 +129,7 @@ void write_value(buf_t& buf, Fld* fld, VALUE obj) {
 #define DEFLATE(val)  RTEST(fld->deflate) ? rb_funcall(fld->deflate, ID_CALL, 1, (val)) : (val)
 
 void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
+  int32_t initial_offset = buf.size();
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
@@ -139,5 +161,8 @@ void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
       }
     }
   }
+  int32_t final_offset = buf.size();
+  msg->last_varint_size = varint32_size(final_offset - initial_offset);
+  //cerr << "msg_size: " << (final_offset - initial_offset) << "; varint: " << msg->last_varint_size << endl;
 }
 

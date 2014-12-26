@@ -36,6 +36,7 @@ struct Msg {
   get_fld_func get_fld;
   write_obj_func write;
   read_obj_func read;
+  int32_t last_varint_size = 1;
 };
 
 struct Fld {
