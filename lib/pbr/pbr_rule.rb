@@ -5,10 +5,6 @@ class PbrRule
   # get_target_key is used when the target type is a hash.
   # get_target_field is used when the target type is not a hash.
 
-  def self.default
-    always(OpenStruct)
-  end
-
   def self.always(type)
     r = PbrRule.new
     r.get_target_type = ->t{type}

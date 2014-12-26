@@ -75,15 +75,15 @@ DEF_WF(STRING) {
 }
 
 DEF_WF(MESSAGE) {
-  cerr << "writing msg field" << endl;
+  //cerr << "writing msg field" << endl;
   buf_t tmp_buf;
   Msg* embedded_msg = fld->embedded_msg;
-  cerr << "embedded type: " << embedded_msg->name << endl;
+  //cerr << "embedded type: " << embedded_msg->name << endl;
   //cerr << "embedded value: " << inspect(v) << endl;
   embedded_msg->write(embedded_msg, tmp_buf, val);
   w_varint32(buf, tmp_buf.size());
   buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
-  cerr << "wrote embedded message without throwing" << endl;
+  //cerr << "wrote embedded message without throwing" << endl;
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
@@ -115,6 +115,8 @@ VALUE write_obj(Msg* msg, buf_t& buf, VALUE obj) {
     if (fld->label != LABEL_REPEATED) {
       write_value(buf, fld, DEFLATE(val));
     } else {
+      if (val == Qnil)
+        continue;
       if (fld->is_packed) {
         int len = RARRAY_LEN(val);
         if (len > 0) {

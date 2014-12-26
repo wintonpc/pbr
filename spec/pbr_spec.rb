@@ -110,6 +110,14 @@ describe Pbr do
       roundtrip_impl(message_type, ['hello', 'world'], 'foo')
     end
 
+    it 'handles nil repeated' do
+      message_type = make_single_field_msg('TestMsg', :repeated, :foo, :int32, 1)
+      roundtrip_impl(message_type, nil, 'foo') do |v1, v2|
+        expect(v1).to be_nil
+        expect(v2).to eql []
+      end
+    end
+
     it 'packed repeated fields' do
       message_type = make_single_field_msg('TestMsg', :repeated, :foo, :sint32, 1, packed: true)
       roundtrip_impl(message_type, (0..8).step(2).map{|n| 10**n}, 'foo') # roundtrip some varints of various encoded sizes
@@ -148,7 +156,7 @@ describe Pbr do
     def roundtrip_impl(message_type, field_val, field_name, &block)
       block ||= ->(v1, v2){expect(v2).to eql v1}
 
-      pbr = Pbr.new(PbrRule.default)
+      pbr = Pbr.new(PbrRule.always(OpenStruct))
       begin
         obj1 = OpenStruct.new
         obj1.send("#{field_name}=", field_val)

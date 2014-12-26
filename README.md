@@ -10,9 +10,6 @@ to inflect field names (or hash keys).
 
 # To do
 
-- protoc plugin
-- test against another PB implementation
-
 - performance testing
   - test function pointers vs big `switch`
 
