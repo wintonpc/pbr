@@ -75,16 +75,15 @@ DEF_WF(STRING) {
 }
 
 DEF_WF(MESSAGE) {
-  //cerr << "writing msg field" << endl;
-  buf_t tmp_buf;
-  tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY);
   Msg* embedded_msg = fld->embedded_msg;
-  //cerr << "embedded type: " << embedded_msg->name << endl;
-  //cerr << "embedded value: " << inspect(v) << endl;
-  embedded_msg->write(embedded_msg, tmp_buf, val);
-  w_varint32(buf, tmp_buf.size());
-  buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
-  //cerr << "wrote embedded message without throwing" << endl;
+  uint32_t len_offset = buf.size();
+  for (int i=0; i<10; i++)
+    buf.push_back(0);
+  uint32_t msg_offset = buf.size();
+  embedded_msg->write(embedded_msg, buf, val);
+  uint32_t msg_len = buf.size() - msg_offset;
+  w_varint32_bytes(buf, len_offset, msg_len, 10);
+  //buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
@@ -123,7 +122,7 @@ void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
         if (len > 0) {
           write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
           buf_t tmp_buf;
-          tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY);
+          tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY); // could be smarter about this
           for (int i=0; i<len; i++) {
             VALUE elem = DEFLATE(rb_ary_entry(val, i));
             fld->write(tmp_buf, elem, fld);

@@ -4,6 +4,19 @@
 #include <cstdint>
 #include "pbr_ext.h"
 
+inline void w_varint32_bytes(buf_t& buf, uint32_t offset, uint32_t n, int32_t min_bytes) {
+  uint32_t i = 0;
+  min_bytes--;
+  while (n > 127 || min_bytes > 0) {
+    buf[offset + i] = (uint32_t)((n & 127) | 128);
+    n >>= 7;
+    min_bytes--;
+    i++;
+  }
+  buf[offset + i] = (uint32_t)(n & 127);
+}
+
+
 #define DEF_W_VARINT(bits)                                       \
   inline void w_varint##bits(buf_t& buf, uint##bits##_t n) {     \
     while (n > 127) {                                            \
