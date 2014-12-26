@@ -48,3 +48,7 @@ to inflect field names (or hash keys).
             (std::vector.insert() is likely performant enough for this)
   - reuse the same vector for temporary embedded message writing
 
+- performance findings
+  - function pointers are slightly faster than big switch. changing to big switch for writes
+    was 2% slower on average. expect it would be 4% slower with reads changed over too.
+
