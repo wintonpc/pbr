@@ -52,6 +52,10 @@ class Pbr
     Ext::read(@handle, buf, type)
   end
 
+  def register(type)
+    ensure_type_registered(type)
+  end
+
   def ensure_type_registered(type)
     unless @registered_types.include?(type)
       types = collect_type_dependencies(type).to_a

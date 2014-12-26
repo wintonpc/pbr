@@ -31,6 +31,7 @@ describe 'My behaviour' do
     )
 
     pb_encoded = nil
+    pbr.register(BigMsg)
     pb_time = time_it(:pb_roundtrip) do
       pb_encoded = pbr.write(pb_msg, BigMsg)
       pbr.read(pb_encoded, BigMsg)
@@ -50,8 +51,7 @@ describe 'My behaviour' do
 
   def report(name, byte_size, elapsed_seconds)
     puts "#{name.to_s.ljust(10)} #{(byte_size / 1024).to_s.rjust(4)} KB  " +
-             "#{(elapsed_seconds * 1000).round(1).to_s.rjust(6)} ms " +
-             "#{(byte_size / elapsed_seconds / (1024**2)).round(1).to_s.rjust(6)} MB/sec  read+write"
+             "#{(elapsed_seconds * 1000).round.to_s.rjust(4)} ms  read+write"
   end
 
   def rand_int(bits)
