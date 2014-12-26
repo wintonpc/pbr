@@ -105,6 +105,22 @@ describe Pbr do
       end
     end
 
+    it 'deeply embedded messages' do
+      msg4 = make_single_field_msg('Msg4', :required, :foo, :int32, 1)
+      msg3 = make_single_field_msg('Msg3', :required, :foo, msg4, 1)
+      msg2 = make_single_field_msg('Msg2', :required, :foo, msg3, 1)
+      msg1 = make_single_field_msg('Msg1', :required, :foo, msg2, 1)
+
+      v3 = OpenStruct.new({foo: 42})
+      v2 = OpenStruct.new({foo: v3})
+      v1 = OpenStruct.new({foo: v2})
+
+      roundtrip_impl(msg1, v1, 'foo') do |v1, v2|
+        expect(v2).to be_a OpenStruct
+        expect(v2.foo.foo.foo).to eql 42
+      end
+    end
+
     it 'repeated fields' do
       message_type = make_single_field_msg('TestMsg', :repeated, :foo, :string, 1)
       roundtrip_impl(message_type, ['hello', 'world'], 'foo')

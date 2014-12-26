@@ -10,9 +10,6 @@ to inflect field names (or hash keys).
 
 # To do
 
-- performance testing
-  - test function pointers vs big `switch`
-
 - hash support
   - consider being more flexible with determining if a target type should be treated as a hash
     (for things that act like a hashes but are not)
@@ -46,5 +43,11 @@ to inflect field names (or hash keys).
           - if this proves to be more than actually needed, pad with zero bits
           - if not enough, insert the appropriate number of additional bytes.
             (std::vector.insert() is likely performant enough for this)
-  - reuse the same vector for temporary embedded message writing
 
+- performance findings
+  - function pointers are slightly faster than big switch. changing to big switch for writes
+    was 2% slower on average. expect it would be 4% slower with reads changed over too.
+  - reusing the same vector for writing embedded messages added ~5% speed improvement.
+    - unfortunately, this break message embedding more than 1 level deep. could fix with
+      multiple temp buffers, but might not pull its weight.
+  - the ability to deflate/inflate incurs negligible overhead, about 1-2%
