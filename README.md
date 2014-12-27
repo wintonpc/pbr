@@ -10,7 +10,9 @@ to inflect field names (or hash keys).
 
 # To do
 
-- no temp buf for packed fields
+- validate metafields
+- field inflection
+- add custom `PbrRule` example to readme
 
 - hash support
   - consider being more flexible with determining if a target type should be treated as a hash
@@ -60,6 +62,7 @@ protoc -I=protos --pbr_out=lib/messages protos/my_message.proto
 resulting in
 
 ```ruby
+# lib/messages/my_message.pb.rb
 class MyMessage
   include Pbr::Message
 
