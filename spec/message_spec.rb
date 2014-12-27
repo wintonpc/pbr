@@ -30,7 +30,7 @@ end
 describe 'My behaviour' do
 
   it 'constructing' do
-    pbr = Pbr.new(PbrRule.vanilla)
+    pbr = Pbr.new(PbrMapping.vanilla)
     x = TestMsg.new(foo: 'hello',
                     words: ['ping', 'pong'],
                     thing: {bar: 55},

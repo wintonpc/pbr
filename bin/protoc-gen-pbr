@@ -8,7 +8,7 @@ require 'pp'
 
 ns = (ENV['PBR_NAMESPACE'] || '').split('::')
 
-pbr      = Pbr.new(PbrRule.vanilla)
+pbr      = Pbr.new(PbrMapping.vanilla)
 input    = STDIN.read
 request  = pbr.read(input, CodeGeneratorRequest)
 response = Pbr::Generator.compile(ns, request)

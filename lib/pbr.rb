@@ -1,5 +1,5 @@
 require_relative 'pbr/version'
-require_relative 'pbr/pbr_rule'
+require_relative 'pbr/pbr_mapping'
 require_relative 'pbr/message'
 require_relative 'pbr/enum'
 require_relative 'pbr/descriptors.pb'
@@ -13,7 +13,7 @@ require 'ostruct'
 
 class Pbr
 
-  def initialize(rule=PbrRule.vanilla)
+  def initialize(rule=PbrMapping.vanilla)
     @rule = wrap_rule(rule)
     @handle = Ext::create_handle
     @registered_types = Set.new
@@ -75,7 +75,7 @@ class Pbr
   end
 
   def wrap_rule(rule)
-    w = PbrRule.new
+    w = PbrMapping.new
     w.get_target_type = rule.get_target_type
     w.get_target_field = ->f{rule.get_target_field.call(f).to_s}
     w.get_target_key = rule.get_target_field

@@ -10,10 +10,9 @@ to inflect field names (or hash keys).
 
 # To do
 
-- rename PbrRule -> PbrMapping
 - validate metafields
 - field inflection
-- add custom `PbrRule` example to readme
+- add custom `PbrMapping` example to readme
 
 - hash support
   - consider being more flexible with determining if a target type should be treated as a hash
@@ -31,6 +30,14 @@ to inflect field names (or hash keys).
 - more realistic performance tests with wrapped, real messages
 
 - use references instead of pointers where appropriate
+
+- default values for optional fields??
+  - does this make sense when mapping to arbitrary types?
+  - ideally, cost would be paid at field read time, not deserialize time
+
+- consider
+  - eventmachine
+  - writing to/reading from a stream
 
 - performance findings
   - function pointers are slightly faster than big switch. changing to big switch for writes
@@ -98,12 +105,12 @@ Embedded messages can be initialized with subhashes, as with `bar` in this examp
 As seen above, Pbr can de/serialize to/from the generated types. Pbr can also target
 arbitrary types.
 
-A pbr object is instantiated with a `PbrRule` object. `PbrRule` describes a mapping from
+A pbr object is instantiated with a `PbrMapping` object. `PbrMapping` describes a mapping from
 the set of generated ("_source_") types to a set of arbitrary ("_target_") types. By default,
-Pbr uses rule `PbrRule.vanilla`,
-which maps each generated type to itself. `PbrRule.always(some_type)` maps each generated type to
-`some_type`. For instance, `PbrRule.always(OpenStruct)` realizes protobuf messages as OpenStruct
-objects. You may create custom `PbrRule` objects to express arbitrary mappings.
+Pbr uses rule `PbrMapping.vanilla`,
+which maps each generated type to itself. `PbrMapping.always(some_type)` maps each generated type to
+`some_type`. For instance, `PbrMapping.always(OpenStruct)` realizes protobuf messages as OpenStruct
+objects. You may create custom `PbrMapping` objects to express arbitrary mappings.
 
 Target types are manipulated by assuming the presence of `field_name` getters and `field_name=` setters.
 For hash target types, the rule expresses a mapping to arbitrary Ruby key values.
@@ -143,6 +150,12 @@ To read such a message, the first step is to read the `type` field to learn the 
 The second step is to deserialize `msg` as that type. Ruby's garbage collector is notoriously poor at
 managing strings efficiently. Pbr supports this case in pure C++, to avoid allocating a Ruby string for the
 `msg` field, only to pass it back to the C++ extension for deserialization. Details TBD.
+
+### Quirks
+
+- Unknown fields are discarded upon deserialization. Consequently, Pbr should not be used
+  when passthrough behavior is required.
+- default values for optional fields are not currently supported
 
 ## Optimizations
 

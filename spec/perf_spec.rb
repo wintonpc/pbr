@@ -37,7 +37,7 @@ describe 'My behaviour' do
       pbr.read(pb_encoded, BigMsg)
     end
 
-    oj_msg = Pbr.new(PbrRule.always(OpenStruct)).read(pb_encoded, BigMsg).to_h
+    oj_msg = Pbr.new(PbrMapping.always(OpenStruct)).read(pb_encoded, BigMsg).to_h
 
     oj_encoded = nil
     oj_time = time_it(:oj_roundtrip) do
