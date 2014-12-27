@@ -1,3 +1,5 @@
+require 'active_support/inflector'
+
 # borrowed from beefcake
 
 class FieldOptions

@@ -10,6 +10,9 @@ class Pbr
       def name_for(value)
         self.constants.detect{|sym| self.const_get(sym) == value}
       end
+      def from_symbol(sym)
+        "#{self.name}::#{sym.to_s.upcase}".constantize
+      end
     end
   end
 end

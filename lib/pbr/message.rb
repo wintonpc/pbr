@@ -56,9 +56,12 @@ class Pbr
       end
 
       def field(label, name, type, num, opts={})
-        raise "a field named #{name} is already declared" if fields.any?{|f| f.name == name}
-        raise "a field with number #{num} is already declared" if fields.any?{|f| f.num == num}
-        fields_by_name[name.to_sym] = Field.new(label_value(label), pb_type(type), name, num, {msg_class: msg_class(type)}.merge(opts))
+        Validate.field_label(label)
+        Validate.field_name(name)
+        raise "a field named #{name} is already declared" if fields.map(&:name).include?(name)
+        raise "a field with number #{num} is already declared" if fields.map(&:num).include?(num)
+        fields_by_name[name] =
+            Field.new(label_value(label), pb_type(type), name, num, {msg_class: msg_class(type)}.merge(opts))
         attr_accessor name
       end
 
@@ -86,20 +89,24 @@ class Pbr
         @inflators ||= {}
       end
 
-      def deflate(type, &block)
-        deflators[type.to_s] = block
+      def deflate(field_name, &block)
+        Pbr::Validate.field_name(field_name)
+        deflators[field_name] = block
       end
 
-      def inflate(type, &block)
-        inflators[type.to_s] = block
+      def inflate(field_name, &block)
+        Pbr::Validate.field_name(field_name)
+        inflators[field_name] = block
       end
 
       private
 
       def pb_type(type)
         case type
-          when Fixnum; type
-          when Symbol; "FieldDescriptorProto::Type::#{type.to_s.upcase}".constantize
+          when Fixnum
+            Validate.field_descriptor_proto_type(type)
+            type
+          when Symbol; FieldDescriptorProto::Type.from_symbol(type)
           when Class; FieldDescriptorProto::Type::MESSAGE
           when Module; FieldDescriptorProto::Type::ENUM
           else; raise "unexpected field type: #{type}"
@@ -114,7 +121,7 @@ class Pbr
       end
 
       def label_value(label)
-        "FieldDescriptorProto::Label::#{label.upcase}".constantize
+        FieldDescriptorProto::Label.from_symbol(label)
       end
     end
   end
