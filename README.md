@@ -25,6 +25,8 @@ to inflect field names (or hash keys).
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
 
+- more realistic performance tests with wrapped, real messages
+
 - use references instead of pointers where appropriate
 
 - performance findings

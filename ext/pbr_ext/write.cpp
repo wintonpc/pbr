@@ -139,34 +139,39 @@ void write_repeated(buf_t& buf, Fld* fld, VALUE arr) {
   }        
 }
 
+void write_packed(buf_t& buf, Fld* fld, VALUE arr) {
+  int len = RARRAY_LEN(arr);
+  if (len == 0)
+    return;
+
+  write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
+  int32_t len_offset = buf.size();
+  pad(buf, MAX_VARINT32_BYTE_SIZE);
+  int32_t data_offset = buf.size();
+  for (int i=0; i<len; i++) {
+    VALUE elem = DEFLATE(rb_ary_entry(arr, i));
+    fld->write(buf, elem, fld);
+  }
+  int32_t data_len = buf.size() - data_offset;
+  w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
+}
+
 void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int32_t initial_offset = buf.size();
   int num_flds = msg->flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld* fld = &msg->flds_to_enumerate[i];
     VALUE val = rb_funcall(obj, fld->target_field, 0);
-    if (fld->label != LABEL_REPEATED) {
+    if (fld->label != LABEL_REPEATED)
       write_value(buf, fld, DEFLATE(val));
-    } else {
+    else {
       if (val == Qnil)
         continue;
-      if (fld->is_packed) {
-        int len = RARRAY_LEN(val);
-        if (len > 0) {
-          write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
-          int32_t len_offset = buf.size();
-          pad(buf, MAX_VARINT32_BYTE_SIZE);
-          int32_t data_offset = buf.size();
-          for (int i=0; i<len; i++) {
-            VALUE elem = DEFLATE(rb_ary_entry(val, i));
-            fld->write(buf, elem, fld);
-          }
-          int32_t data_len = buf.size() - data_offset;
-          w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
-        }
-      } else {
+      
+      if (fld->is_packed)
+        write_packed(buf, fld, val);
+      else
         write_repeated(buf, fld, val);
-      }
     }
   }
   int32_t final_offset = buf.size();
