@@ -10,6 +10,7 @@ to inflect field names (or hash keys).
 
 # To do
 
+- rename PbrRule -> PbrMapping
 - validate metafields
 - field inflection
 - add custom `PbrRule` example to readme
@@ -90,18 +91,19 @@ SomeMessage.new(foo: 'hello', bar: {a: 1, b: 2})
 ```
 
 Objects may be initialized with an attributes hash.
-Embedded messages can be initialized with subhashes, as with `bar` in this examples.
+Embedded messages can be initialized with subhashes, as with `bar` in this example.
 
 ### Pbr instantiation
 
 As seen above, Pbr can de/serialize to/from the generated types. Pbr can also target
 arbitrary types.
 
-A pbr object is instantiated with a `PbrRules` object. `PbrRules` describes a mapping from
-the set of generated types to a set of arbitrary types. By default, Pbr uses rule `PbrRules.vanilla`,
-which maps each generated type to itself. `PbrRules.always(some_type)` maps each generated type to
-the provided type. For instance, `PbrRules.always(OpenStruct)` realizes protobuf messages as OpenStruct
-objects. You may create custom `PbrRules` objects to express arbitrary mappings.
+A pbr object is instantiated with a `PbrRule` object. `PbrRule` describes a mapping from
+the set of generated ("_source_") types to a set of arbitrary ("_target_") types. By default,
+Pbr uses rule `PbrRule.vanilla`,
+which maps each generated type to itself. `PbrRule.always(some_type)` maps each generated type to
+`some_type`. For instance, `PbrRule.always(OpenStruct)` realizes protobuf messages as OpenStruct
+objects. You may create custom `PbrRule` objects to express arbitrary mappings.
 
 Target types are manipulated by assuming the presence of `field_name` getters and `field_name=` setters.
 For hash target types, the rule expresses a mapping to arbitrary Ruby key values.
@@ -114,16 +116,19 @@ inflated upon deserialization.
 ```ruby
 class TestMsg
   include Pbr::Message
-  required :stamp, :string, 1  # the specified field type should be the deflated type
+  required :stamp, :string, 1  # this field contains a `Time` in Ruby, but is serialized as a string
 
   deflate(:stamp) {|time| time.utc.iso8601(3)}
   inflate(:stamp) {|iso_str| Time.parse(iso_str).localtime}
 end
 ```
 
+The recommended way to add inflators/deflators is to reopen the class in a separate file, so as to
+avoid modifying the generated `.pb.rb` file.
+
 ### Polymorphism
 
-One downside to ProtoBuf is that messages are not self-describing, in the sense that you
+One design tradeoff in ProtoBuf is that messages are not self-describing, in the sense that you
 cannot determine the type of a message by inspecting its serialized form. You can easily
 work around this problem with a wrapper message.
 
@@ -136,8 +141,8 @@ end
 
 To read such a message, the first step is to read the `type` field to learn the type of the wrapped message.
 The second step is to deserialize `msg` as that type. Ruby's garbage collector is notoriously poor at
-managing strings. Pbr supports this case in pure C++, to avoid allocating a Ruby string for the `msg` field,
-only to pass it back to the C++ extension for decoding. Details TBD.
+managing strings efficiently. Pbr supports this case in pure C++, to avoid allocating a Ruby string for the
+`msg` field, only to pass it back to the C++ extension for deserialization. Details TBD.
 
 ## Optimizations
 
