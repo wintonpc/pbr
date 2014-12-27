@@ -74,12 +74,16 @@ DEF_WF(STRING) {
   write_bytes(buf, v);
 }
 
+void pad(buf_t& buf, int num_bytes) {
+  for (int i=0; i<num_bytes; i++)
+    buf.push_back(0);
+}
+
 DEF_WF(MESSAGE) {
   Msg* embedded_msg = fld->embedded_msg;
   uint32_t len_offset = buf.size();
   int32_t estimated_varint_size = embedded_msg->last_varint_size;
-  for (int i=0; i<estimated_varint_size; i++)
-    buf.push_back(0);
+  pad(buf, estimated_varint_size);
   uint32_t msg_offset = buf.size();
   embedded_msg->write(embedded_msg, buf, val);
   uint32_t msg_len = buf.size() - msg_offset;
@@ -104,7 +108,6 @@ DEF_WF(MESSAGE) {
   } else {
     w_varint32_bytes(buf, len_offset, msg_len, estimated_varint_size);    
   }
-  //buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
 }
 
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
@@ -128,6 +131,14 @@ void write_value(buf_t& buf, Fld* fld, VALUE obj) {
 
 #define DEFLATE(val)  RTEST(fld->deflate) ? rb_funcall(fld->deflate, ID_CALL, 1, (val)) : (val)
 
+void write_repeated(buf_t& buf, Fld* fld, VALUE arr) {
+  int len = RARRAY_LEN(arr);
+  for (int i=0; i<len; i++) {
+    VALUE elem = DEFLATE(rb_ary_entry(arr, i));
+    write_value(buf, fld, elem);
+  }        
+}
+
 void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
   int32_t initial_offset = buf.size();
   int num_flds = msg->flds_to_enumerate.size();
@@ -143,21 +154,18 @@ void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
         int len = RARRAY_LEN(val);
         if (len > 0) {
           write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
-          buf_t tmp_buf;
-          tmp_buf.reserve(EMBEDDED_MSG_INITIAL_CAPACITY); // could be smarter about this
+          int32_t len_offset = buf.size();
+          pad(buf, MAX_VARINT32_BYTE_SIZE);
+          int32_t data_offset = buf.size();
           for (int i=0; i<len; i++) {
             VALUE elem = DEFLATE(rb_ary_entry(val, i));
-            fld->write(tmp_buf, elem, fld);
+            fld->write(buf, elem, fld);
           }
-          w_varint32(buf, tmp_buf.size());
-          buf.insert(buf.end(), tmp_buf.begin(), tmp_buf.end());
+          int32_t data_len = buf.size() - data_offset;
+          w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
         }
       } else {
-        int len = RARRAY_LEN(val);
-        for (int i=0; i<len; i++) {
-          VALUE elem = DEFLATE(rb_ary_entry(val, i));
-          write_value(buf, fld, elem);
-        }        
+        write_repeated(buf, fld, val);
       }
     }
   }

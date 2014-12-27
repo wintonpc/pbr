@@ -25,26 +25,7 @@ to inflect field names (or hash keys).
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type
 
-- optimization
-  - pointers vs references
-  - track average (or max) message byte-size per type.
-    - use to estimate byte size of varint embedded msg length.
-      if we guess correctly, we can write the embedded message in place
-      and back-fill the length, instead of writing to a temp buffer,
-      finding the length, then copying. Pad with one extra varint byte
-      of zeros to reduce likelihood of having to memmove.
-    - also use to estimate initial capacity of top level message.
-    - rethought:
-      remember last encoded size for each message type (on both write and read??),
-      as well as the number of bytes it took to encode the size as a varint.
-      (this is cheaper than averaging, and probably just as good)
-      - when writing a type:
-        - use the previous size as a basis for initializing the buffer capacity
-        - if embedded, allocate the previously required number of bytes
-          for the varint length.
-          - if this proves to be more than actually needed, pad with zero bits
-          - if not enough, insert the appropriate number of additional bytes.
-            (std::vector.insert() is likely performant enough for this)
+- use references instead of pointers where appropriate
 
 - performance findings
   - function pointers are slightly faster than big switch. changing to big switch for writes
@@ -173,7 +154,8 @@ other message types, metafields are stored in a dense vector and lookup is done 
 The typical way to determine which code to execute to de/serialize a field would probably
 be with a `switch` on field type. An alternative is to have each metafield store a function
 pointer to the appropriate code, as determined during type registration. The function pointer
-approach has shown to be marginally faster for Pbr.
+approach has shown to be marginally faster for Pbr. (If `switch` made the code significantly
+more readable, I would opt for it; but it does not.)
 
 ### Embedded messages
 
@@ -188,4 +170,16 @@ To minimize such memory operations, each metamessage remembers the length of its
 instance, specifically, the number of bytes it took to encode the length as a varint. When writing
 an embedded message, we assume the same number of bytes will be needed for the varint length. Space
 in the primary buffer is preallocated for the length, and the embedded message is written directly
-to the primary buffer. Afterward, the 
+to the primary buffer. Afterward, the preallocated bytes are filled in with the actual length.
+If too many bytes were preallocated, the extras are padded with zeros according to the varint
+algorithm. If too few were preallocated, bytes are inserted (with `std::vector.insert`) to
+accomodate the varint. With typical messages, this results in a low number of memmov operations
+on average, and no temporary buffer allocation.
+
+### Packed repeated fields
+
+Similarly to embedded messages, packed repeated fields prefix their data with a varint length.
+Since packed fields are an optimization for large array fields, saving one byte per element,
+it makes sense to preallocate the maximum varint size (5 bytes) to hold the length. The overhead
+is insignificant given the (assumed large) number of repeated values, and we are guaranteed that
+no memmov will be required.
