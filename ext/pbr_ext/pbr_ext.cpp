@@ -87,27 +87,27 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
   VALUE inflators = rb_get(type, "inflators");
 
   for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
-    VALUE rFldName = sym_to_s(rb_get(rFld, "name"));
+   VALUE fld_name = rb_get(rFld, "name");
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
-    fld.name = RSTRING_PTR(rFldName);
+    fld.name = RSTRING_PTR(rb_sym_to_s(fld_name));
     fld.fld_type = NUM2INT(rb_get(rFld, "type"));
     if (fld.fld_type == FLD_MESSAGE)
       fld.embedded_msg = get_msg_for_type(model, rb_get(rFld, "msg_class"));
     fld.wire_type = wire_type_for_fld_type(fld.fld_type);
     fld.label = NUM2INT(rb_get(rFld, "label"));
     fld.is_packed = RTEST(rb_get(rFld, "packed"));
-    fld.deflate = rb_hash_aref(deflators, rFldName);
-    fld.inflate = rb_hash_aref(inflators, rFldName);
+    fld.deflate = rb_hash_aref(deflators, fld_name);
+    fld.inflate = rb_hash_aref(inflators, fld_name);
 
     if (fld.wire_type == -1)
       continue;
     if (msg->target_is_hash) {
-      fld.target_key = rb_call1(rb_get(rule, "get_target_key"), rFldName);
+      fld.target_key = rb_call1(rb_get(rule, "get_target_key"), fld_name);
       fld.write = get_key_writer(fld.wire_type, fld.fld_type);
       fld.read = get_key_reader(fld.wire_type, fld.fld_type);
     } else {
-      string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), rFldName));
+      string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), fld_name));
       fld.target_field = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
       fld.write = get_fld_writer(fld.wire_type, fld.fld_type);
