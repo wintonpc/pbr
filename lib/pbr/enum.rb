@@ -11,7 +11,7 @@ class Pbr
         self.constants.detect{|sym| self.const_get(sym) == value}
       end
       def from_symbol(sym)
-        "#{self.name}::#{sym.to_s.upcase}".constantize
+        Validate.and_constantize("#{self.name}::#{sym.to_s.upcase}")
       end
     end
   end

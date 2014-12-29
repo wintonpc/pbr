@@ -40,11 +40,6 @@ describe Pbr do
 
     it_roundtrips_sint(32, :enum)
 
-    context 'allows field names to be' do
-      it('symbols') { roundtrip(:string, 'sss', :foo) }
-      it('string') { roundtrip(:string, 'sss', 'foo') }
-    end
-
     it 'field numbers' do
       min_field_num = 1
       max_field_num = 2 ** 29 - 1
@@ -166,7 +161,7 @@ describe Pbr do
     def make_single_field_msg(name, *args)
       Class.new do
         include Pbr::Message
-        type_name name
+        type_name(name)
         field(*args)
       end
     end

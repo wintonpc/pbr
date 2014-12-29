@@ -8,10 +8,7 @@ class Pbr
 
     def initialize(attrs={})
       attrs.each_pair do |k, v|
-        f = self.class.fields_by_name[k.to_sym]
-        unless f
-          raise "Cannot set nonexistent field #{self.class.name}.#{k}"
-        end
+        f = Validate.field_existence_and_get(self.class, k.to_sym)
         send("#{k}=", construct(f, v))
       end
     end
@@ -56,12 +53,11 @@ class Pbr
       end
 
       def field(label, name, type, num, opts={})
-        Validate.field_label(label)
-        Validate.field_name(name)
-        raise "a field named #{name} is already declared" if fields.map(&:name).include?(name)
-        raise "a field with number #{num} is already declared" if fields.map(&:num).include?(num)
-        fields_by_name[name] =
-            Field.new(label_value(label), pb_type(type), name, num, {msg_class: msg_class(type)}.merge(opts))
+        Validate.new_field(self, label, name, num)
+        f_label = FieldDescriptorProto::Label.from_symbol(label)
+        f_type = pb_type(type)
+        f_opts = {msg_class: msg_class(type)}.merge(opts)
+        fields_by_name[name] = Field.new(f_label, f_type, name, num, f_opts)
         attr_accessor name
       end
 
@@ -73,29 +69,19 @@ class Pbr
         end
       end
 
+      defaulted_attr_reader({}, :fields_by_name, :deflators, :inflators)
+
       def fields
         fields_by_name.values
       end
 
-      def fields_by_name
-        @fields_by_name ||= {}
-      end
-
-      def deflators
-        @deflators ||= {}
-      end
-
-      def inflators
-        @inflators ||= {}
-      end
-
       def deflate(field_name, &block)
-        Pbr::Validate.field_name(field_name)
+        Validate.field_name(field_name)
         deflators[field_name] = block
       end
 
       def inflate(field_name, &block)
-        Pbr::Validate.field_name(field_name)
+        Validate.field_name(field_name)
         inflators[field_name] = block
       end
 
@@ -104,24 +90,17 @@ class Pbr
       def pb_type(type)
         case type
           when Fixnum
-            Validate.field_descriptor_proto_type(type)
+            Validate.field_descriptor_field_type(type)
             type
           when Symbol; FieldDescriptorProto::Type.from_symbol(type)
           when Class; FieldDescriptorProto::Type::MESSAGE
           when Module; FieldDescriptorProto::Type::ENUM
-          else; raise "unexpected field type: #{type}"
+          else; raise DescriptorError, "unexpected field type: #{type}"
         end
       end
 
       def msg_class(type)
-        case type
-          when Class; type
-          else; nil
-        end
-      end
-
-      def label_value(label)
-        FieldDescriptorProto::Label.from_symbol(label)
+        type.is_a?(Class) ? type : nil
       end
     end
   end
