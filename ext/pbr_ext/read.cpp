@@ -62,12 +62,15 @@ DEF_RF(MESSAGE) {
 }
 
 read_val_func get_fld_reader(fld_t fld_type) {
-  switch (fld_type) { TYPE_MAP(rf); default: cerr << "get_fld_reader failed" << endl; return NULL; }
+  switch (fld_type) {
+    TYPE_MAP(rf);
+    default:
+      rb_raise(rb_eStandardError, "I don\'t know how to read field type %d", fld_type);
+  }
 }
 
 read_val_func get_key_reader(fld_t fld_type) {
-  //switch (fld_type) { TYPE_MAP(rk); default: return NULL; }
-  return NULL;
+  rb_raise(rb_eStandardError, "I don\'t know how to read field type %d", fld_type);
 }
 
 #define INFLATE(val)  RTEST(fld.inflate) ? rb_funcall(fld.inflate, ID_CALL, 1, (val)) : (val)

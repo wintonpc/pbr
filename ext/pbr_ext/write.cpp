@@ -116,12 +116,15 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
 }
 
 write_val_func get_fld_writer(fld_t fld_type) {
-  switch (fld_type) { TYPE_MAP(wf); default: return NULL; }
+  switch (fld_type) {
+    TYPE_MAP(wf);
+  default:
+    rb_raise(rb_eStandardError, "I don\'t know how to write field type %d", fld_type);
+  }
 }
 
 write_val_func get_key_writer(fld_t fld_type) {
-  //switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
-  return NULL;
+  rb_raise(rb_eStandardError, "I don\'t know how to write field type %d", fld_type);
 }
 
 void write_value(buf_t& buf, Fld& fld, VALUE obj) {
