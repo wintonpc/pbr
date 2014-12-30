@@ -89,18 +89,18 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
   VALUE deflators = rb_get(type, "deflators");
   VALUE inflators = rb_get(type, "inflators");
 
-  for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
-    VALUE fld_name = rb_get(rFld, "name");
+  for (VALUE rb_fld : arr2vec(rb_get(type, "fields"))) {
+    VALUE fld_name = rb_get(rb_fld, "name");
     Fld fld;
-    fld.num = NUM2INT(rb_get(rFld, "num"));
+    fld.num = NUM2INT(rb_get(rb_fld, "num"));
     fld.name = rb_sym_to_cstr(fld_name);
-    int fld_type = NUM2INT(rb_get(rFld, "type"));
+    int fld_type = NUM2INT(rb_get(rb_fld, "type"));
     fld.fld_type = fld_type;
     if (fld_type == FLD_MESSAGE)
-      fld.embedded_msg = &get_msg_for_type(model, rb_get(rFld, "msg_class"));
+      fld.embedded_msg = &get_msg_for_type(model, rb_get(rb_fld, "msg_class"));
     fld.wire_type = wire_type_for_fld_type(fld_type);
-    fld.label = NUM2INT(rb_get(rFld, "label"));
-    fld.is_packed = RTEST(rb_get(rFld, "packed"));
+    fld.label = NUM2INT(rb_get(rb_fld, "label"));
+    fld.is_packed = RTEST(rb_get(rb_fld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
     fld.inflate = rb_hash_aref(inflators, fld_name);
 
@@ -112,7 +112,7 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
       fld.write = get_key_writer(fld_type);
       fld.read = get_key_reader(fld_type);
     } else {
-      string target_field_name = rb_sym_to_cstr(rb_call1(rb_get(mapping, "get_target_field"), fld_name));
+      string target_field_name = rb_sym_to_cstr(rb_call1(rb_get(mapping, "get_target_field"), rb_fld));
       fld.target_field_getter = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
       fld.write = get_fld_writer(fld_type);

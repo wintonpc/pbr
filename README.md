@@ -10,8 +10,6 @@ to inflect field names (or hash keys).
 
 # To do
 
-- validate metafields
-- field inflection
 - add custom `PbrMapping` example to readme
 
 - hash support
@@ -29,7 +27,9 @@ to inflect field names (or hash keys).
 
 - more realistic performance tests with wrapped, real messages
 
-- use references instead of pointers where appropriate
+- add doc-comments
+  - fields passed to inflectors
+
 
 - default values for optional fields??
   - does this make sense when mapping to arbitrary types?

@@ -27,18 +27,17 @@ class SubMsg
   required :bar, :int32, 1
 end
 
+class TinyMsg
+  include Pbr::Message
+  required :foo, :string, 1
+  required :bar, :string, 2
+end
+
 describe 'My behaviour' do
 
   it 'constructing' do
     pbr = Pbr.new(PbrMapping.vanilla)
-    x = TestMsg.new(foo: 'hello',
-                    words: ['ping', 'pong'],
-                    thing: {bar: 55},
-                    children: [{bar: 66}, {bar: 77}],
-                    stamp: Time.now,
-                    ranges: [0..3, 5..9])
-
-    bytes = pbr.write(x, TestMsg)
+    bytes = pbr.write(make_valid_test_msg, TestMsg)
     y = pbr.read(bytes, TestMsg)
 
     expect(y).to be_a TestMsg
@@ -62,5 +61,30 @@ describe 'My behaviour' do
 
   it 'construct with bad field name' do
     expect{TestMsg.new(not_here: 5)}.to raise_error 'Cannot set nonexistent field TestMsg.not_here'
+  end
+
+  it 'allows custom field name mapping' do
+    mapping = PbrMapping.new
+    mapping.get_target_type = ->t{OpenStruct}
+    mapping.get_target_field = ->f{f.name == :foo ? "x#{f.name}x" : f.name}
+
+    obj = OpenStruct.new(xfoox: 'hello',
+                         bar: 'goodbye')
+
+    pbr = Pbr.new(mapping)
+    bytes = pbr.write(obj, TinyMsg)
+    y = pbr.read(bytes, TinyMsg)
+    expect(y).to be_a OpenStruct
+    expect(y.xfoox).to eql 'hello'
+    expect(y.bar).to eql 'goodbye'
+  end
+
+  def make_valid_test_msg
+    TestMsg.new(foo:      'hello',
+                words:    ['ping', 'pong'],
+                thing:    {bar: 55},
+                children: [{bar: 66}, {bar: 77}],
+                stamp:    Time.now,
+                ranges:   [0..3, 5..9])
   end
 end
