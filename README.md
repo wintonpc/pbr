@@ -10,13 +10,13 @@ to inflect field names (or hash keys).
 
 # To do
 
-- add custom `PbrMapping` example to readme
-
 - validation
   - when writing, verify value type
   - when reading, count actual required fields vs expected. only compute details if actual != expected.
     - must take into account the possibility of required/expected fields being repeated too ?
   - raise error
+
+- add custom `PbrMapping` example to readme
 
 - support nested serialized protobuf messages (for metadata-wrapped messages)
   - additional field option on `bytes` field contains pbr_type

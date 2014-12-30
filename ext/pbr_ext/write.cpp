@@ -57,17 +57,9 @@ DEF_WF(BYTES) { write_bytes(buf, val); }
 
 DEF_WF(STRING) {
   VALUE v_in = val;
-  VALUE v;
-
-  if (rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING) {
-    //cerr << "string to write is UTF-8" << endl;
-    v = v_in;
-  } else {
-    //cerr << "string to write is NOT UTF-8" << endl;
-    v = rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
-  }
-
-  write_bytes(buf, v);
+  bool is_already_utf8 = rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING;
+  VALUE v_out = is_already_utf8 ? v_in : rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
+  write_bytes(buf, v_out);
 }
 
 void pad(buf_t& buf, int num_bytes) {
@@ -86,21 +78,9 @@ DEF_WF(MESSAGE) {
   int32_t actual_varint_size = varint32_size(msg_len);
   int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
 
-  /*
-  cerr << "len_offset: " << len_offset << endl;
-  cerr << "msg_offset: " << msg_offset << endl;
-  cerr << "msg_len: " << msg_len << endl;
-
-  cerr << "estimated_varint_size: " << estimated_varint_size << endl;
-  cerr << "actual_varint_size: " << actual_varint_size << endl;
-  cerr << "extra_bytes_needed: " << extra_bytes_needed << endl;
-
-  cerr << endl;
-  */
   if (extra_bytes_needed > 0) {
     buf.insert(buf.begin() + msg_offset, extra_bytes_needed, 0);
     w_varint32_bytes(buf, len_offset, msg_len, actual_varint_size);
-    //cerr << "inserted extra bytes for varint length" << endl;
   } else {
     w_varint32_bytes(buf, len_offset, msg_len, estimated_varint_size);    
   }
@@ -111,16 +91,12 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   w_varint32(buf, h);
 }
 
-write_val_func get_fld_writer(fld_t fld_type) {
+write_val_func get_val_writer(fld_t fld_type) {
   switch (fld_type) {
     TYPE_MAP(wf);
   default:
     rb_raise(rb_eStandardError, "I don\'t know how to write field type %d", fld_type);
   }
-}
-
-write_val_func get_key_writer(fld_t fld_type) {
-  rb_raise(rb_eStandardError, "I don\'t know how to write field type %d", fld_type);
 }
 
 void write_value(buf_t& buf, Fld& fld, VALUE obj) {

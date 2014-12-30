@@ -115,19 +115,15 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
 
     if (msg.target_is_hash) {
       fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
-      cerr << "target_key for " << fld.name << " is " << inspect(fld.target_key) << endl;
-      fld.write = get_fld_writer(fld_type);
-      fld.read = get_fld_reader(fld_type);
     } else {
       VALUE tf = rb_call1(rb_get(mapping, "get_target_field"), rb_fld);
-      cerr << "tf = " << inspect(tf) << endl;
       string target_field_name = TYPE(tf) == T_STRING ? RSTRING_PTR(tf) : rb_sym_to_cstr(tf);
-      cerr << "target_field_name = " << target_field_name << endl;
       fld.target_field_getter = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
-      fld.write = get_fld_writer(fld_type);
-      fld.read = get_fld_reader(fld_type);
     }
+
+    fld.write = get_val_writer(fld_type);
+    fld.read = get_val_reader(fld_type);
     msg.add_fld(msg, fld);
   }
 }

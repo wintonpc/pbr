@@ -23,10 +23,8 @@ Msg* find_msg_for_type(Model& model, VALUE type);
 Msg& get_msg_for_type(Model& model, VALUE type);
 std::vector<VALUE> arr2vec(VALUE array);
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num);
-write_val_func get_fld_writer(fld_t fld_type);
-write_val_func get_key_writer(fld_t fld_type);
-read_val_func get_fld_reader(fld_t fld_type);
-read_val_func get_key_reader(fld_t fld_type);
+write_val_func get_val_writer(fld_t fld_type);
+read_val_func get_val_reader(fld_t fld_type);
 
 #endif
 

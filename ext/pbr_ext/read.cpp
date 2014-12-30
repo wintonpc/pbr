@@ -56,16 +56,12 @@ DEF_RF(MESSAGE) {
   return embedded_msg.read(embedded_msg, tmp_ss);
 }
 
-read_val_func get_fld_reader(fld_t fld_type) {
+read_val_func get_val_reader(fld_t fld_type) {
   switch (fld_type) {
     TYPE_MAP(rf);
     default:
       rb_raise(rb_eStandardError, "I don\'t know how to read field type %d", fld_type);
   }
-}
-
-read_val_func get_key_reader(fld_t fld_type) {
-  rb_raise(rb_eStandardError, "I don\'t know how to read field type %d", fld_type);
 }
 
 #define INFLATE(val)  RTEST(fld.inflate) ? rb_funcall(fld.inflate, ID_CALL, 1, (val)) : (val)
@@ -94,7 +90,6 @@ void skip(ss_t& ss, wire_t wire_type) {
 }
 
 VALUE read_obj(Msg& msg, ss_t& ss) {
-  //cerr << "read_obj " << msg.name << endl;
   VALUE obj = rb_funcall(msg.target, ID_CTOR, 0);
   
   for (Fld& fld : msg.flds_to_enumerate)
@@ -104,7 +99,6 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
-    //cerr << "# " << fld_num << "  " << ss.pos << "/" << ss.len << endl;
     Fld* fld_ptr = msg.find_fld(msg, fld_num);
 
     if (fld_ptr == NULL) {
