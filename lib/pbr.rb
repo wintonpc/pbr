@@ -1,3 +1,6 @@
+require 'set'
+require 'ostruct'
+
 require_relative 'pbr/version'
 require_relative 'pbr/util'
 require_relative 'pbr/exceptions/error'
@@ -11,15 +14,17 @@ require_relative 'pbr/descriptors.pb'
 require_relative 'pbr/plugin.pb'
 require_relative 'pbr/generator'
 
-require 'pbr_ext'
-
-require 'set'
-require 'ostruct'
+begin
+  require 'pbr_ext'
+rescue LoadError
+  raise "Failed to load extension 'pbr_ext'. Does lib/pbr_ext.so exist? " +
+            'If not, build it with `rake compile`'
+end
 
 class Pbr
 
-  def initialize(rule=PbrMapping.vanilla)
-    @rule = wrap_rule(rule)
+  def initialize(mapping=PbrMapping.vanilla)
+    @mapping = fix_up_mapping(mapping)
     @handle = Ext::create_handle
     @registered_types = Set.new
 
@@ -64,7 +69,7 @@ class Pbr
   def ensure_type_registered(type)
     unless @registered_types.include?(type)
       types = collect_type_dependencies(type).to_a
-      Ext::register_types(@handle, types, @rule)
+      Ext::register_types(@handle, types, @mapping)
       @registered_types += types
     end
   end
@@ -79,11 +84,11 @@ class Pbr
     seen
   end
 
-  def wrap_rule(rule)
+  def fix_up_mapping(mapping)
     w = PbrMapping.new
-    w.get_target_type = rule.get_target_type
-    w.get_target_field = ->f{rule.get_target_field.call(f).to_s}
-    w.get_target_key = rule.get_target_field
+    w.get_target_type = mapping.get_target_type
+    w.get_target_field = ->f{mapping.get_target_field.call(f).to_sym}
+    w.get_target_key = mapping.get_target_field
     w
   end
 end

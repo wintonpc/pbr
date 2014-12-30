@@ -22,25 +22,26 @@ ID ID_ENCODING;
 ID FORCE_ID_ENCODING;
 ID ID_CALL;
 
-#define MODEL(handle) (Model*)NUM2LONG(handle);
+#define MODEL_PTR(handle) (Model*)NUM2LONG(handle)
+#define MODEL(handle) *(MODEL_PTR(handle))
 
 VALUE create_handle(VALUE self) {
   return LONG2NUM((long int)(new Model()));
 }
 
 VALUE destroy_handle(VALUE self, VALUE handle) {
-  delete MODEL(handle);
+  delete MODEL_PTR(handle);
   return Qnil;
 }
 
-VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
+VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
 
-  Model* model = MODEL(handle);
+  Model& model = MODEL(handle);
 
   // filter out already registered
   vector<VALUE> new_types;
   for (VALUE type : arr2vec(types)) {
-    Msg *existing = get_msg_for_type(model, type);
+    Msg *existing = find_msg_for_type(model, type);
     if (existing == NULL)
       new_types.push_back(type);
   }
@@ -48,26 +49,26 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   // push msgs
   for (VALUE type : new_types) {
     Msg msg = make_msg(type_name(type), max_field_num(rb_get(type, "fields")));
-    msg.target = rb_call1(rb_get(rule, "get_target_type"), type);
+    msg.target = rb_call1(rb_get(mapping, "get_target_type"), type);
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
     msg.write = msg.target_is_hash ? write_hash : write_obj;
     msg.read = msg.target_is_hash ? read_hash : read_obj;
-    msg.index = model->msgs.size();
-    model->msgs.push_back(msg);
+    msg.index = model.msgs.size();
+    model.msgs.push_back(msg);
   }
 
   // fill in fields
   for (VALUE type : new_types)
-    register_fields(model, get_msg_for_type(model, type), type, rule);
+    register_fields(model, get_msg_for_type(model, type), type, mapping);
 
   // print debugging info
   cerr << endl;
   cerr << "REGISTERED:" << endl;
-  for (Msg& msg : model->msgs) {
+  for (Msg& msg : model.msgs) {
     cerr << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds_to_enumerate) {
       cerr << "  " << fld.num << " " << fld.name
-           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field)))
+           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_getter)))
            << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
            << " (" << (int)fld.fld_type << ") "
            << "[" << (int)fld.wire_type << "]"
@@ -82,19 +83,22 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE rule) {
   return Qnil;
 }
 
-void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
+#define rb_sym_to_cstr(sym)  RSTRING_PTR(rb_sym_to_s(sym))
+
+void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
   VALUE deflators = rb_get(type, "deflators");
   VALUE inflators = rb_get(type, "inflators");
 
   for (VALUE rFld : arr2vec(rb_get(type, "fields"))) {
-   VALUE fld_name = rb_get(rFld, "name");
+    VALUE fld_name = rb_get(rFld, "name");
     Fld fld;
     fld.num = NUM2INT(rb_get(rFld, "num"));
-    fld.name = RSTRING_PTR(rb_sym_to_s(fld_name));
-    fld.fld_type = NUM2INT(rb_get(rFld, "type"));
-    if (fld.fld_type == FLD_MESSAGE)
-      fld.embedded_msg = get_msg_for_type(model, rb_get(rFld, "msg_class"));
-    fld.wire_type = wire_type_for_fld_type(fld.fld_type);
+    fld.name = rb_sym_to_cstr(fld_name);
+    int fld_type = NUM2INT(rb_get(rFld, "type"));
+    fld.fld_type = fld_type;
+    if (fld_type == FLD_MESSAGE)
+      fld.embedded_msg = &get_msg_for_type(model, rb_get(rFld, "msg_class"));
+    fld.wire_type = wire_type_for_fld_type(fld_type);
     fld.label = NUM2INT(rb_get(rFld, "label"));
     fld.is_packed = RTEST(rb_get(rFld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
@@ -102,23 +106,32 @@ void register_fields(Model* model, Msg *msg, VALUE type, VALUE rule) {
 
     if (fld.wire_type == -1)
       continue;
-    if (msg->target_is_hash) {
-      fld.target_key = rb_call1(rb_get(rule, "get_target_key"), fld_name);
-      fld.write = get_key_writer(fld.wire_type, fld.fld_type);
-      fld.read = get_key_reader(fld.wire_type, fld.fld_type);
+
+    if (msg.target_is_hash) {
+      fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), fld_name);
+      fld.write = get_key_writer(fld_type);
+      fld.read = get_key_reader(fld_type);
     } else {
-      string target_field_name = RSTRING_PTR(rb_call1(rb_get(rule, "get_target_field"), fld_name));
-      fld.target_field = rb_intern(target_field_name.c_str());
+      string target_field_name = rb_sym_to_cstr(rb_call1(rb_get(mapping, "get_target_field"), fld_name));
+      fld.target_field_getter = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
-      fld.write = get_fld_writer(fld.wire_type, fld.fld_type);
-      fld.read = get_fld_reader(fld.wire_type, fld.fld_type);
+      fld.write = get_fld_writer(fld_type);
+      fld.read = get_fld_reader(fld_type);
     }
-    msg->add_fld(msg, fld);
+    msg.add_fld(msg, fld);
   }
 }
 
-Msg* get_msg_for_type(Model* model, VALUE type) {
-  return get_msg_by_name(model, type_name(type));
+Msg* find_msg_for_type(Model& model, VALUE type) {
+  return find_msg_by_name(model, type_name(type));
+}
+
+Msg& get_msg_for_type(Model& model, VALUE type) {
+  string name = type_name(type);
+  Msg* msg = find_msg_by_name(model, name);
+  if (msg == NULL)
+    rb_raise(rb_eStandardError, "Failed to lookup message named %s", name.c_str());
+  return *msg;
 }
 
 vector<VALUE> arr2vec(VALUE array) {
@@ -131,27 +144,27 @@ vector<VALUE> arr2vec(VALUE array) {
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   cerr << "writing" << endl;
-  Model* model = MODEL(handle);
-  Msg* msg = get_msg_for_type(model, type);
+  Model& model = MODEL(handle);
+  Msg& msg = get_msg_for_type(model, type);
   buf_t buf;
   buf.reserve(MSG_INITIAL_CAPACITY);
-  msg->write(msg, buf, obj);
+  msg.write(msg, buf, obj);
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
   cerr << "reading" << endl;
-  Model* model = MODEL(handle);
-  Msg* msg = get_msg_for_type(model, type);
+  Model& model = MODEL(handle);
+  Msg& msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
-  return msg->read(msg, ss);
+  return msg.read(msg, ss);
 }
 
-VALUE read_hash(Msg* msg, ss_t& ss) {
+VALUE read_hash(Msg& msg, ss_t& ss) {
   return Qnil;
 }
 
-void write_hash(Msg* msg, buf_t& buf, VALUE obj) {
+void write_hash(Msg& msg, buf_t& buf, VALUE obj) {
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {

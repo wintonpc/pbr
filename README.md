@@ -3,9 +3,9 @@
 # Overview
 
 Class-agnostic types are generated from protobuf files via `protoc` plugin facility.
-An instance of Pbr is constructed with a _rule_. A rule expresses a mapping of
+An instance of Pbr is constructed with a _mapping_. A rule expresses a mapping of
 PB types onto ruby classes. A mapping may target either hashes or "normal" classes
-with getter/setter attributes. The rule also has a field mapping that specifies how
+with getter/setter attributes. The mapping also has a field mapping that specifies how
 to inflect field names (or hash keys).
 
 # To do
@@ -107,13 +107,13 @@ arbitrary types.
 
 A pbr object is instantiated with a `PbrMapping` object. `PbrMapping` describes a mapping from
 the set of generated ("_source_") types to a set of arbitrary ("_target_") types. By default,
-Pbr uses rule `PbrMapping.vanilla`,
+Pbr uses mapping `PbrMapping.vanilla`,
 which maps each generated type to itself. `PbrMapping.always(some_type)` maps each generated type to
 `some_type`. For instance, `PbrMapping.always(OpenStruct)` realizes protobuf messages as OpenStruct
 objects. You may create custom `PbrMapping` objects to express arbitrary mappings.
 
 Target types are manipulated by assuming the presence of `field_name` getters and `field_name=` setters.
-For hash target types, the rule expresses a mapping to arbitrary Ruby key values.
+For hash target types, the mapping expresses a mapping to arbitrary Ruby key values.
 
 ### Field Inflation/Deflation
 

@@ -13,7 +13,7 @@ extern VALUE UTF_8_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE val, Fld* fld)
+#define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE val, Fld& fld)
 
 DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (val));  }
 DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(val));  }
@@ -80,12 +80,12 @@ void pad(buf_t& buf, int num_bytes) {
 }
 
 DEF_WF(MESSAGE) {
-  Msg* embedded_msg = fld->embedded_msg;
+  Msg* embedded_msg = fld.embedded_msg;
   uint32_t len_offset = buf.size();
   int32_t estimated_varint_size = embedded_msg->last_varint_size;
   pad(buf, estimated_varint_size);
   uint32_t msg_offset = buf.size();
-  embedded_msg->write(embedded_msg, buf, val);
+  embedded_msg->write(*embedded_msg, buf, val);
   uint32_t msg_len = buf.size() - msg_offset;
   int32_t actual_varint_size = varint32_size(msg_len);
   int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
@@ -115,23 +115,23 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
   w_varint32(buf, h);
 }
 
-write_val_func get_fld_writer(wire_t wire_type, fld_t fld_type) {
+write_val_func get_fld_writer(fld_t fld_type) {
   switch (fld_type) { TYPE_MAP(wf); default: return NULL; }
 }
 
-write_val_func get_key_writer(wire_t wire_type, fld_t fld_type) {
+write_val_func get_key_writer(fld_t fld_type) {
   //switch (fld_type) { TYPE_MAP(wk); default: return NULL; }
   return NULL;
 }
 
-void write_value(buf_t& buf, Fld* fld, VALUE obj) {
-  write_header(buf, fld->wire_type, fld->num);
-  fld->write(buf, obj, fld);
+void write_value(buf_t& buf, Fld& fld, VALUE obj) {
+  write_header(buf, fld.wire_type, fld.num);
+  fld.write(buf, obj, fld);
 }
 
-#define DEFLATE(val)  RTEST(fld->deflate) ? rb_funcall(fld->deflate, ID_CALL, 1, (val)) : (val)
+#define DEFLATE(val)  RTEST(fld.deflate) ? rb_funcall(fld.deflate, ID_CALL, 1, (val)) : (val)
 
-void write_repeated(buf_t& buf, Fld* fld, VALUE arr) {
+void write_repeated(buf_t& buf, Fld& fld, VALUE arr) {
   int len = RARRAY_LEN(arr);
   for (int i=0; i<len; i++) {
     VALUE elem = DEFLATE(rb_ary_entry(arr, i));
@@ -139,43 +139,43 @@ void write_repeated(buf_t& buf, Fld* fld, VALUE arr) {
   }        
 }
 
-void write_packed(buf_t& buf, Fld* fld, VALUE arr) {
+void write_packed(buf_t& buf, Fld& fld, VALUE arr) {
   int len = RARRAY_LEN(arr);
   if (len == 0)
     return;
 
-  write_header(buf, WIRE_LENGTH_DELIMITED, fld->num);
+  write_header(buf, WIRE_LENGTH_DELIMITED, fld.num);
   int32_t len_offset = buf.size();
   pad(buf, MAX_VARINT32_BYTE_SIZE);
   int32_t data_offset = buf.size();
   for (int i=0; i<len; i++) {
     VALUE elem = DEFLATE(rb_ary_entry(arr, i));
-    fld->write(buf, elem, fld);
+    fld.write(buf, elem, fld);
   }
   int32_t data_len = buf.size() - data_offset;
   w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
 }
 
-void write_obj(Msg* msg, buf_t& buf, VALUE obj) {
+void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
   int32_t initial_offset = buf.size();
-  int num_flds = msg->flds_to_enumerate.size();
+  int num_flds = msg.flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
-    Fld* fld = &msg->flds_to_enumerate[i];
-    VALUE val = rb_funcall(obj, fld->target_field, 0);
-    if (fld->label != LABEL_REPEATED)
+    Fld& fld = msg.flds_to_enumerate[i];
+    VALUE val = rb_funcall(obj, fld.target_field_getter, 0);
+    if (fld.label != LABEL_REPEATED)
       write_value(buf, fld, DEFLATE(val));
     else {
       if (val == Qnil)
         continue;
       
-      if (fld->is_packed)
+      if (fld.is_packed)
         write_packed(buf, fld, val);
       else
         write_repeated(buf, fld, val);
     }
   }
   int32_t final_offset = buf.size();
-  msg->last_varint_size = varint32_size(final_offset - initial_offset);
-  //cerr << "msg_size: " << (final_offset - initial_offset) << "; varint: " << msg->last_varint_size << endl;
+  msg.last_varint_size = varint32_size(final_offset - initial_offset);
+  //cerr << "msg_size: " << (final_offset - initial_offset) << "; varint: " << msg.last_varint_size << endl;
 }
 

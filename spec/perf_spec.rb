@@ -69,9 +69,11 @@ describe 'My behaviour' do
   end
 
   def time_it(name)
+    GC.disable
     start = Time.now
     yield
     stop = Time.now
+    GC.enable
     elapsed_seconds = stop - start
     puts "==> #{name} took #{elapsed_seconds} seconds"
     elapsed_seconds

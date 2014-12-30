@@ -5,7 +5,7 @@ class Pbr
     class << self
 
       def field_name(name)
-        raise DescriptorError, "Invalid name '#{name}', must be symbol" unless name.is_a?(Symbol)
+        raise DescriptorError, "Invalid name #{name.inspect}, must be symbol" unless name.is_a?(Symbol)
       end
 
       def new_field(parent_type, label, name, num)
@@ -14,10 +14,10 @@ class Pbr
         end
         field_name(name)
         if parent_type.fields.map(&:name).include?(name)
-          raise DescriptorError, "a field named #{name} is already declared"
+          raise DescriptorError, "A field named #{name} is already declared"
         end
         if parent_type.fields.map(&:num).include?(num)
-          raise DescriptorError, "a field with number #{num} is already declared"
+          raise DescriptorError, "A field with number #{num} is already declared"
         end
       end
 

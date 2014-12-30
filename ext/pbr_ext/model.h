@@ -12,14 +12,14 @@ struct Model;
 struct Msg;
 struct Fld;
 
-typedef void (*add_fld_func)(Msg*, Fld);
-typedef Fld* (*get_fld_func)(Msg*, fld_num_t);
+typedef void (*add_fld_func)(Msg&, Fld);
+typedef Fld* (*get_fld_func)(Msg&, fld_num_t);
 
-typedef void (*write_obj_func)(Msg* msg, buf_t& buf, VALUE obj);
-typedef void (*write_val_func)(buf_t& buf, VALUE val, Fld* fld);
+typedef void (*write_obj_func)(Msg& msg, buf_t& buf, VALUE obj);
+typedef void (*write_val_func)(buf_t& buf, VALUE val, Fld& fld);
 
-typedef VALUE (*read_obj_func)(Msg* msg, ss_t& ss);
-typedef VALUE (*read_val_func)(ss_t& ss, Fld* fld);
+typedef VALUE (*read_obj_func)(Msg& msg, ss_t& ss);
+typedef VALUE (*read_val_func)(ss_t& ss, Fld& fld);
 
 struct Model {
   std::vector<Msg> msgs;
@@ -33,7 +33,7 @@ struct Msg {
   std::vector<Fld> flds_to_lookup;
   std::vector<Fld> flds_to_enumerate;
   add_fld_func add_fld;
-  get_fld_func get_fld;
+  get_fld_func find_fld;
   write_obj_func write;
   read_obj_func read;
   int32_t last_varint_size = 1;
@@ -42,7 +42,7 @@ struct Msg {
 struct Fld {
   fld_num_t num;
   std::string name;
-  ID target_field;
+  ID target_field_getter;
   ID target_field_setter;
   VALUE target_key;
   wire_t wire_type;
@@ -58,6 +58,6 @@ struct Fld {
 
 
 Msg make_msg(std::string name, fld_num_t max_fld_num);
-Msg* get_msg_by_name(Model* model, std::string name);
+Msg* find_msg_by_name(Model& model, std::string name);
 
 #endif
