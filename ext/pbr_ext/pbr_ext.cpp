@@ -21,6 +21,8 @@ ID ID_ENCODE;
 ID ID_ENCODING;
 ID FORCE_ID_ENCODING;
 ID ID_CALL;
+ID ID_HASH_GET;
+ID ID_HASH_SET;
 
 #define MODEL_PTR(handle) (Model*)NUM2LONG(handle)
 #define MODEL(handle) *(MODEL_PTR(handle))
@@ -50,9 +52,9 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   for (VALUE type : new_types) {
     Msg msg = make_msg(type_name(type), max_field_num(rb_get(type, "fields")));
     msg.target = rb_call1(rb_get(mapping, "get_target_type"), type);
-    msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("is_a?"), 1, rb_cHash));
-    msg.write = msg.target_is_hash ? write_hash : write_obj;
-    msg.read = msg.target_is_hash ? read_hash : read_obj;
+    msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("<="), 1, rb_cHash));
+    msg.write = write_obj; // was necessary for indirection at one point. leave as is for
+    msg.read = read_obj;   // future flexibility. no noticeable performance hit.
     msg.index = model.msgs.size();
     model.msgs.push_back(msg);
   }
@@ -67,15 +69,19 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   for (Msg& msg : model.msgs) {
     cerr << msg.name << " => " << RSTRING_PTR(rb_inspect(msg.target)) << endl;
     for (Fld& fld : msg.flds_to_enumerate) {
-      cerr << "  " << fld.num << " " << fld.name
-           << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_getter)))
-           << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)))
-           << " (" << (int)fld.fld_type << ") "
-           << "[" << (int)fld.wire_type << "]"
+      cerr << "  " << fld.num << " " << fld.name;
+      if (msg.target_is_hash)
+        cerr << " => " << inspect(fld.target_key);
+      else
+        cerr << " => " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_getter)))
+             << " " << RSTRING_PTR(rb_inspect(ID2SYM(fld.target_field_setter)));
+      cerr << " (" << (int)fld.fld_type << ")"
+           << " [" << (int)fld.wire_type << "]"
            << "  packed=" << fld.is_packed << endl;
-           // << "  inflate: " << inspect(fld.inflate) << endl
-           // << "  deflate: " << inspect(fld.deflate) << endl
-        
+      if (fld.inflate != Qnil)
+        cerr  << "      inflate: " << inspect(fld.inflate) << endl;
+      if (fld.deflate != Qnil)
+        cerr  << "      deflate: " << inspect(fld.deflate) << endl;
     }
   }
   cerr << "---------------" << endl;
@@ -108,11 +114,15 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
       continue;
 
     if (msg.target_is_hash) {
-      fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), fld_name);
-      fld.write = get_key_writer(fld_type);
-      fld.read = get_key_reader(fld_type);
+      fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
+      cerr << "target_key for " << fld.name << " is " << inspect(fld.target_key) << endl;
+      fld.write = get_fld_writer(fld_type);
+      fld.read = get_fld_reader(fld_type);
     } else {
-      string target_field_name = rb_sym_to_cstr(rb_call1(rb_get(mapping, "get_target_field"), rb_fld));
+      VALUE tf = rb_call1(rb_get(mapping, "get_target_field"), rb_fld);
+      cerr << "tf = " << inspect(tf) << endl;
+      string target_field_name = TYPE(tf) == T_STRING ? RSTRING_PTR(tf) : rb_sym_to_cstr(tf);
+      cerr << "target_field_name = " << target_field_name << endl;
       fld.target_field_getter = rb_intern(target_field_name.c_str());
       fld.target_field_setter = rb_intern((target_field_name + "=").c_str());
       fld.write = get_fld_writer(fld_type);
@@ -160,13 +170,6 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
   return msg.read(msg, ss);
 }
 
-VALUE read_hash(Msg& msg, ss_t& ss) {
-  return Qnil;
-}
-
-void write_hash(Msg& msg, buf_t& buf, VALUE obj) {
-}
-
 wire_t wire_type_for_fld_type(fld_t fld_type) {
   switch (fld_type) {
   case FLD_DOUBLE:   return WIRE_64BIT;
@@ -212,6 +215,9 @@ extern "C" void Init_pbr_ext() {
   ID_CALL = rb_intern("call");
   VALUE encoding = rb_const_get(rb_cObject, rb_intern("Encoding"));
   UTF_8_ENCODING = rb_const_get(encoding, rb_intern("UTF_8"));
+  ID_HASH_GET = rb_intern("[]");
+  ID_HASH_SET = rb_intern("[]=");
+
 
   VALUE pbr = rb_define_class("Pbr", rb_cObject);
   VALUE ext = rb_define_module_under(pbr, "Ext");

@@ -6,11 +6,6 @@
 
 using namespace std;
 
-extern VALUE UTF_8_ENCODING;
-extern VALUE FORCE_ID_ENCODING;
-extern ID ID_CTOR;
-extern ID ID_CALL;
-
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
 #define DEF_RF(type)  VALUE rf_##type(ss_t& ss, Fld& fld)
@@ -104,7 +99,7 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
   
   for (Fld& fld : msg.flds_to_enumerate)
     if (fld.label == LABEL_REPEATED)
-      rb_funcall(obj, fld.target_field_setter, 1, rb_ary_new());
+      set_value(msg, fld, obj, rb_ary_new());
 
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
@@ -122,18 +117,17 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
     Fld& fld = *fld_ptr;
 
     if (fld.label != LABEL_REPEATED) {
-      VALUE val = INFLATE(fld.read(ss, fld));
-      rb_funcall(obj, fld.target_field_setter, 1, val);
+      set_value(msg, fld, obj, INFLATE(fld.read(ss, fld)));
     } else {
+      VALUE rb_arr = get_value(msg, fld, obj);
       if (fld.is_packed) {
         uint32_t byte_len = r_varint32(ss);
         ss_t tmp_ss = ss_substream(ss, byte_len);
-        VALUE rArr = rb_funcall(obj, fld.target_field_getter, 0);
         while (ss_more(tmp_ss))
-          rb_ary_push(rArr, INFLATE(fld.read(tmp_ss, fld)));
+          rb_ary_push(rb_arr, INFLATE(fld.read(tmp_ss, fld)));
       } else {
         VALUE val = fld.read(ss, fld);
-        rb_ary_push(rb_funcall(obj, fld.target_field_getter, 0), INFLATE(val));
+        rb_ary_push(rb_arr, INFLATE(val));
       }
     }
   }

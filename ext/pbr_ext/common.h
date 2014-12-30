@@ -12,6 +12,15 @@ const int32_t MSG_INITIAL_CAPACITY = 16384;
 const int32_t EMBEDDED_MSG_INITIAL_CAPACITY = 1024;
 const int32_t MAX_VARINT32_BYTE_SIZE = 5;
 
+extern ID ID_CTOR;
+extern VALUE UTF_8_ENCODING;
+extern ID ID_ENCODE;
+extern ID ID_ENCODING;
+extern ID FORCE_ID_ENCODING;
+extern ID ID_CALL;
+extern ID ID_HASH_GET;
+extern ID ID_HASH_SET;
+
 inline const char* inspect(VALUE x) {
   return RSTRING_PTR(rb_inspect(x));
 }

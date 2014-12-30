@@ -145,7 +145,7 @@ describe Pbr do
       roundtrip_impl(message_type, ['hello', 'world'], 'foo')
     end
 
-    it 'handles nil repeated' do
+    it 'handles nil as a repeated field value' do
       message_type = make_single_field_msg('TestMsg', :repeated, :foo, :int32, 1)
       roundtrip_impl(message_type, nil, 'foo') do |v1, v2|
         expect(v1).to be_nil
@@ -156,6 +156,43 @@ describe Pbr do
     it 'packed repeated fields' do
       message_type = make_single_field_msg('TestMsg', :repeated, :foo, :sint32, 1, packed: true)
       roundtrip_impl(message_type, (0..8).step(2).map{|n| 10**n}, 'foo') # roundtrip some varints of various encoded sizes
+    end
+
+    class Node
+      include Pbr::Message
+      required :value, :int32, 1
+      repeated :children, Node, 2
+    end
+
+    it 'recursive types' do
+      pbr = Pbr.new
+      v1 = Node.new(value: 1, children: [Node.new(value: 2), Node.new(value: 3)])
+      encoded = pbr.write(v1)
+      v2 = pbr.read(encoded, Node)
+      expect(v2.value).to eql 1
+      expect(v2.children[0].value).to eql 2
+      expect(v2.children[1].value).to eql 3
+    end
+
+    it 'hash support' do
+      test_msg_type = Class.new do
+        include Pbr::Message
+        type_name('TestMsg')
+
+        required :foo, :string, 1
+        optional :bar, self, 2
+        repeated :baz, :string, 3
+      end
+
+      pbr = Pbr.new(PbrMapping.hash_with_symbol_keys)
+      v1 = {foo: 'hello', bar: {foo: 'goodbye', baz: ['one', 'two']}}
+      encoded = pbr.write(v1, test_msg_type)
+      v2 = pbr.read(encoded, test_msg_type)
+      expect(v2).to be_a Hash
+      expect(v2[:foo]).to eql 'hello'
+      expect(v2[:baz]).to eql []
+      expect(v2[:bar][:foo]).to eql 'goodbye'
+      expect(v2[:bar][:baz]).to eql ['one', 'two']
     end
 
     def make_single_field_msg(name, *args)

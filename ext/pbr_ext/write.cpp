@@ -1,15 +1,11 @@
 #include <iostream>
 
+#include "common.h"
 #include "write.h"
 #include "read_write.h"
 #include "encode.h"
 
 using namespace std;
-
-extern ID ID_ENCODING;
-extern ID ID_ENCODE;
-extern ID ID_CALL;
-extern VALUE UTF_8_ENCODING;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
@@ -164,9 +160,12 @@ void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
   int num_flds = msg.flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
     Fld& fld = msg.flds_to_enumerate[i];
-    VALUE val = rb_funcall(obj, fld.target_field_getter, 0);
-    if (fld.label != LABEL_REPEATED)
+    VALUE val = get_value(msg, fld, obj);
+    if (fld.label != LABEL_REPEATED) {
+      if (val == Qnil)
+        continue; // TODO: validate
       write_value(buf, fld, DEFLATE(val));
+    }
     else {
       if (val == Qnil)
         continue;
@@ -179,6 +178,5 @@ void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
   }
   int32_t final_offset = buf.size();
   msg.last_varint_size = varint32_size(final_offset - initial_offset);
-  //cerr << "msg_size: " << (final_offset - initial_offset) << "; varint: " << msg.last_varint_size << endl;
 }
 

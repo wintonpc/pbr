@@ -12,10 +12,6 @@ to inflect field names (or hash keys).
 
 - add custom `PbrMapping` example to readme
 
-- hash support
-  - consider being more flexible with determining if a target type should be treated as a hash
-    (for things that act like a hashes but are not)
-
 - validation
   - when writing, verify value type
   - when reading, count actual required fields vs expected. only compute details if actual != expected.
@@ -29,7 +25,6 @@ to inflect field names (or hash keys).
 
 - add doc-comments
   - fields passed to inflectors
-
 
 - default values for optional fields??
   - does this make sense when mapping to arbitrary types?

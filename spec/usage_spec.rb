@@ -33,7 +33,7 @@ class TinyMsg
   required :bar, :string, 2
 end
 
-describe 'My behaviour' do
+describe Pbr do
 
   it 'constructing' do
     pbr = Pbr.new(PbrMapping.vanilla)
@@ -77,6 +77,29 @@ describe 'My behaviour' do
     expect(y).to be_a OpenStruct
     expect(y.xfoox).to eql 'hello'
     expect(y.bar).to eql 'goodbye'
+  end
+
+  it 'type is optional when writing when using vanilla mapping' do
+    m = make_valid_test_msg
+    pbr = Pbr.new
+    encoded = pbr.write(m)
+    v2 = pbr.read(encoded, TestMsg)
+    expect(v2).to be_a TestMsg
+
+    expect{pbr.write({})}.to raise_error Pbr::Error
+  end
+
+  it 'use with hashes' do
+    v1 = {'foo' =>      'hello',
+          'words' =>    ['ping', 'pong'],
+          'thing' =>    {'bar' => 55},
+          'children' => [{'bar' => 66}, {'bar' => 77}],
+          'stamp' =>    Time.now,
+          'ranges' =>   [0..3, 5..9]}
+    pbr = Pbr.new(PbrMapping.hash_with_string_keys)
+    v2 = pbr.read(pbr.write(v1, TestMsg), TestMsg)
+    expect(v2['foo']).to eql 'hello'
+    expect(v2['stamp']).to be_a Time
   end
 
   def make_valid_test_msg

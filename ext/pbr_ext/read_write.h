@@ -1,6 +1,8 @@
 #ifndef read_write_h__
 #define read_write_h__
 
+#include "common.h"
+
 // https://anteru.net/2007/12/18/200/
 #define REINTERPRET(type, value)  *reinterpret_cast<type*>(&value)
 
@@ -24,5 +26,17 @@
   MAP_TYPE(prefix, BOOL)                              \
   MAP_TYPE(prefix, MESSAGE)                           \
   MAP_TYPE(prefix, ENUM)                              \
+  
+inline VALUE get_value(Msg& msg, Fld& fld, VALUE obj) {
+  return msg.target_is_hash ?
+    rb_funcall(obj, ID_HASH_GET, 1, fld.target_key) :
+    rb_funcall(obj, fld.target_field_getter, 0);
+}
+
+inline void set_value(Msg& msg, Fld& fld, VALUE obj, VALUE val) {
+  msg.target_is_hash ?
+    rb_funcall(obj, ID_HASH_SET, 2, fld.target_key, val) :
+    rb_funcall(obj, fld.target_field_setter, 1, val);
+}
 
 #endif

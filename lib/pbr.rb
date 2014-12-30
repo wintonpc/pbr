@@ -24,7 +24,7 @@ end
 class Pbr
 
   def initialize(mapping=PbrMapping.vanilla)
-    @mapping = fix_up_mapping(mapping)
+    @mapping = mapping
     @handle = Ext::create_handle
     @registered_types = Set.new
 
@@ -52,7 +52,8 @@ class Pbr
     proc { close(cookie) }
   end
 
-  def write(obj, type)
+  def write(obj, type=obj.class)
+    raise Pbr::Error, "type argument #{type} is not a Pbr::Message" unless type.include?(Pbr::Message)
     ensure_type_registered(type)
     Ext::write(@handle, obj, type)
   end
@@ -82,13 +83,5 @@ class Pbr
           each{|f| collect_type_dependencies(f.msg_class, seen)}
     end
     seen
-  end
-
-  def fix_up_mapping(mapping)
-    w = PbrMapping.new
-    w.get_target_type = mapping.get_target_type
-    w.get_target_field = ->f{mapping.get_target_field.call(f).to_sym}
-    w.get_target_key = mapping.get_target_field
-    w
   end
 end
