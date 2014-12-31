@@ -96,6 +96,8 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
     if (fld.label == LABEL_REPEATED)
       set_value(msg, fld, obj, rb_ary_new());
 
+  int num_required_fields_read = 0;
+
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
@@ -111,6 +113,8 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
     Fld& fld = *fld_ptr;
 
     if (fld.label != LABEL_REPEATED) {
+      if (fld.label == LABEL_REQUIRED)
+        num_required_fields_read++;
       set_value(msg, fld, obj, INFLATE(fld.read(ss, fld)));
     } else {
       VALUE rb_arr = get_value(msg, fld, obj);
@@ -125,6 +129,12 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
       }
     }
   }
+
+  if (num_required_fields_read < msg.num_required_fields) {
+    rb_raise(VALIDATION_ERROR, "Some required fields were missing when reading a %s:\n%s",
+             msg.name.c_str(), pp(obj));
+  }
+
   return obj;
 }
  

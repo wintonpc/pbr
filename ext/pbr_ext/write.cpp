@@ -138,8 +138,13 @@ void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
     Fld& fld = msg.flds_to_enumerate[i];
     VALUE val = get_value(msg, fld, obj);
     if (fld.label != LABEL_REPEATED) {
-      if (val == Qnil)
-        continue; // TODO: validate
+      if (val == Qnil) {
+        if (msg.model->validate_on_write && fld.label == LABEL_REQUIRED)
+          rb_raise(VALIDATION_ERROR, "%s.%s is a required field but has value nil. On:\n%s",
+                   msg.name.c_str(), fld.name.c_str(), pp(obj));
+        else
+          continue;
+      }
       write_value(buf, fld, DEFLATE(val));
     }
     else {

@@ -23,9 +23,12 @@ end
 
 class Pbr
 
-  def initialize(mapping=PbrMapping.vanilla)
+  def initialize(mapping=PbrMapping.vanilla, opts={})
+    @opts = opts.dup
+    default_opt(:validate_on_write, true)
+    default_opt(:validate_on_read, true)
+    @handle = Ext::create_handle(opts)
     @mapping = mapping
-    @handle = Ext::create_handle
     @registered_types = Set.new
 
     # do a dance so that close/finalize doesn't resurrect the object
@@ -65,6 +68,12 @@ class Pbr
 
   def register(type)
     ensure_type_registered(type)
+  end
+
+  private
+
+  def default_opt(name, default_value)
+    @opts[name] = default_value if @opts[name].nil?
   end
 
   def ensure_type_registered(type)

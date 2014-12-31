@@ -22,10 +22,13 @@ typedef VALUE (*read_obj_func)(Msg& msg, ss_t& ss);
 typedef VALUE (*read_val_func)(ss_t& ss, Fld& fld);
 
 struct Model {
+  bool validate_on_write;
+  bool validate_on_read;
   std::vector<Msg> msgs;
 };
 
 struct Msg {
+  Model* model;
   int index;
   std::string name;
   VALUE target;
@@ -36,6 +39,7 @@ struct Msg {
   get_fld_func find_fld;
   write_obj_func write;
   read_obj_func read;
+  int32_t num_required_fields;
   int32_t last_varint_size = 1;
 };
 

@@ -23,12 +23,16 @@ ID FORCE_ID_ENCODING;
 ID ID_CALL;
 ID ID_HASH_GET;
 ID ID_HASH_SET;
+VALUE VALIDATION_ERROR;
 
 #define MODEL_PTR(handle) (Model*)NUM2LONG(handle)
 #define MODEL(handle) *(MODEL_PTR(handle))
 
-VALUE create_handle(VALUE self) {
-  return LONG2NUM((long int)(new Model()));
+VALUE create_handle(VALUE self, VALUE opts) {
+  Model* m = new Model();
+  m->validate_on_write = rb_hash_get_sym(opts, "validate_on_write");
+  m->validate_on_read = rb_hash_get_sym(opts, "validate_on_read");
+  return LONG2NUM((long int)(m));
 }
 
 VALUE destroy_handle(VALUE self, VALUE handle) {
@@ -51,11 +55,13 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   // push msgs
   for (VALUE type : new_types) {
     Msg msg = make_msg(type_name(type), max_field_num(rb_get(type, "fields")));
+    msg.model = &model;
     msg.target = rb_call1(rb_get(mapping, "get_target_type"), type);
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("<="), 1, rb_cHash));
     msg.write = write_obj; // was necessary for indirection at one point. leave as is for
     msg.read = read_obj;   // future flexibility. no noticeable performance hit.
     msg.index = model.msgs.size();
+    msg.num_required_fields = 0;
     model.msgs.push_back(msg);
   }
 
@@ -106,12 +112,12 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
       fld.embedded_msg = &get_msg_for_type(model, rb_get(rb_fld, "msg_class"));
     fld.wire_type = wire_type_for_fld_type(fld_type);
     fld.label = NUM2INT(rb_get(rb_fld, "label"));
+    if (fld.label == LABEL_REQUIRED)
+      msg.num_required_fields++;
     fld.is_packed = RTEST(rb_get(rb_fld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
     fld.inflate = rb_hash_aref(inflators, fld_name);
 
-    if (fld.wire_type == -1)
-      continue;
 
     if (msg.target_is_hash) {
       fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
@@ -185,9 +191,7 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
   case FLD_SFIXED64: return WIRE_64BIT;
   case FLD_SINT32:   return WIRE_VARINT;
   case FLD_SINT64:   return WIRE_VARINT;
-  default:
-    cerr << "WARNING: unexpected field type " << (int)fld_type << endl;
-    return -1;
+  default: rb_raise(rb_eStandardError, "unexpected field type %d", (int)fld_type);
   }
 }
 
@@ -214,14 +218,17 @@ extern "C" void Init_pbr_ext() {
   ID_HASH_GET = rb_intern("[]");
   ID_HASH_SET = rb_intern("[]=");
 
-
   VALUE pbr = rb_define_class("Pbr", rb_cObject);
   VALUE ext = rb_define_module_under(pbr, "Ext");
 
-  rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 0);
+  VALIDATION_ERROR = rb_const_get(pbr, rb_intern("ValidationError"));
+
+  rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 1);
   rb_define_singleton_method(ext, "destroy_handle", (VALUE(*)(ANYARGS))destroy_handle, 1);
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
   rb_define_singleton_method(ext, "read", (VALUE(*)(ANYARGS))read, 3);
+
+  rb_require("pp");
 }
 
