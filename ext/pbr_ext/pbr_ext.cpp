@@ -118,8 +118,11 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
     fld.is_packed = RTEST(rb_get(rb_fld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
     fld.inflate = rb_hash_aref(inflators, fld_name);
-
-
+    if (fld_type == FLD_ENUM) {
+      fld.enum_module = rb_get(rb_fld, "msg_class");
+      fld.enum_values = arr2vec(rb_get(fld.enum_module, "values"));
+    }
+                                
     if (msg.target_is_hash) {
       fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
     } else {

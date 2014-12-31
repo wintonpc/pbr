@@ -22,14 +22,6 @@ extern ID ID_HASH_GET;
 extern ID ID_HASH_SET;
 extern VALUE VALIDATION_ERROR;
 
-inline const char* inspect(VALUE x) {
-  return RSTRING_PTR(rb_inspect(x));
-}
-
-inline const char* pp(VALUE x) {
-  return RSTRING_PTR(rb_funcall(rb_const_get(rb_cObject, rb_intern("PP")), rb_intern("pp"), 2, x, rb_str_new("", 0)));
-}
-
 inline VALUE rb_get(VALUE receiver, const char* name) {
   return rb_funcall(receiver, rb_intern(name), 0);
 }
@@ -44,6 +36,16 @@ inline VALUE rb_hash_get_sym(VALUE hash, const char* sym) {
 
 inline std::string type_name(VALUE type) {
   return RSTRING_PTR(rb_get(type, "type_name"));
+}
+
+inline const char* inspect(VALUE x) {
+  return RSTRING_PTR(rb_inspect(x));
+}
+
+inline const char* pp(VALUE x) {
+  VALUE PP = rb_const_get(rb_cObject, rb_intern("PP"));
+  VALUE pretty = rb_funcall(PP, rb_intern("pp"), 2, x, rb_str_new("", 0));
+  return RSTRING_PTR(rb_get(pretty, "chomp"));
 }
 
 #endif

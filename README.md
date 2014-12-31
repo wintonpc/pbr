@@ -11,12 +11,6 @@ to inflect field names (or hash keys).
 # Notes
 
 - TODO
-  - validation
-    - when writing, verify value type
-    - when reading, count actual required fields vs expected. only compute details if actual != expected.
-      - must take into account the possibility of required/expected fields being repeated too ?
-    - raise error
-
   - more realistic performance tests with wrapped, real messages
 
   - support nested serialized protobuf messages (for metadata-wrapped messages)
@@ -152,6 +146,10 @@ managing strings efficiently. Pbr supports this case in pure C++, to avoid alloc
   when passthrough behavior is required.
 - default values for optional fields are not currently supported
 - A Float in an integer-typed field is truncated when serializing, as with Float::to_i
+- The test for missing required fields when reading a message may exhibit false negatives
+  when required fields are duplicated in the protobuf. Duplicate fields are unlikely.
+  Validating on read is somewhat dubious anyway; presumably the originator would have
+  detected the error on write.
 
 ## Optimizations
 

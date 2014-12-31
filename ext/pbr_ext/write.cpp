@@ -22,7 +22,11 @@ DEF_WV(FIXED32)  { w_int32   (buf,          NUM2UINT(val));  }
 DEF_WV(SFIXED64) { w_int64   (buf,          NUM2LL  (val));  }
 DEF_WV(FIXED64)  { w_int64   (buf,          NUM2ULL (val));  }
 
-DEF_WV(ENUM)     { w_varint32(buf,          NUM2INT (val));  }
+DEF_WV(ENUM) {
+  if (fld.msg->model->validate_on_write)
+    validate_enum(fld, val);
+  w_varint32(buf, NUM2INT(val));
+}
 
 DEF_WV(FLOAT) {
   float v = (float)NUM2DBL(val);

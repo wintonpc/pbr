@@ -59,6 +59,8 @@ struct Fld {
   read_val_func read;
   VALUE deflate;
   VALUE inflate;
+  std::vector<VALUE> enum_values;
+  VALUE enum_module;
 };
 
 

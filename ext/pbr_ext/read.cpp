@@ -21,7 +21,12 @@ DEF_RV(FIXED32)  { return (UINT2NUM         (r_int32   (ss)));  }
 DEF_RV(SFIXED64) { return (LL2NUM           (r_int64   (ss)));  }
 DEF_RV(FIXED64)  { return (ULL2NUM          (r_int64   (ss)));  }
 
-DEF_RV(ENUM)     { return (INT2NUM          (r_varint32(ss)));  }
+DEF_RV(ENUM) {
+  VALUE val = INT2NUM(r_varint32(ss)); 
+  if (fld.msg->model->validate_on_read)
+    validate_enum(fld, val);
+  return val;
+}
 
 DEF_RV(FLOAT) {
   uint32_t v = r_int32(ss);

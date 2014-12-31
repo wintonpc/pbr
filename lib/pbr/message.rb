@@ -19,7 +19,7 @@ class Pbr
       if v.is_a?(Array)
         v.map{|x| construct(f, x)}
       elsif f.msg_class && f.msg_class != Hash
-        if v.is_a?(f.msg_class)
+        if v.is_a?(f.msg_class) || f.msg_class.include?(Pbr::Enum)
           v
         else
           f.msg_class.new(v)
@@ -100,7 +100,7 @@ class Pbr
       end
 
       def msg_class(type)
-        type.is_a?(Class) ? type : nil
+        type.is_a?(Module) ? type : nil # is_a?(Module) covers both messages and enums
       end
     end
   end

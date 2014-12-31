@@ -38,8 +38,6 @@ describe Pbr do
     it_roundtrips_uint(64, :uint64)
     it_roundtrips_uint(64, :fixed64)
 
-    it_roundtrips_sint(32, :enum)
-
     it 'field numbers' do
       min_field_num = 1
       max_field_num = 2 ** 29 - 1
@@ -193,6 +191,30 @@ describe Pbr do
       expect(v2[:baz]).to eql []
       expect(v2[:bar][:foo]).to eql 'goodbye'
       expect(v2[:bar][:baz]).to eql ['one', 'two']
+    end
+
+    class Plate
+      include Pbr::Message
+
+      module Meal
+        include Pbr::Enum
+        BREAKFAST = 1
+        LUNCH = 2
+        DINNER = 3
+      end
+
+      required :meal, Meal, 1
+    end
+
+    it 'roundtrips enums' do
+
+      pbr = Pbr.new
+      v1 = Plate.new(meal: Plate::Meal::DINNER)
+      encoded = pbr.write(v1, Plate)
+      v2 = pbr.read(encoded, Plate)
+
+      expect(v2.meal).to eql Plate::Meal::DINNER
+
     end
 
     def make_single_field_msg(name, *args)
