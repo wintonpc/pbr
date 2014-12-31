@@ -19,7 +19,6 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping);
 int32_t max_field_num(VALUE fields);
 wire_t wire_type_for_fld_type(fld_t fld_type);
 std::string type_name(VALUE type);
-Msg* find_msg_for_type(Model& model, VALUE type);
 Msg& get_msg_for_type(Model& model, VALUE type);
 std::vector<VALUE> arr2vec(VALUE array);
 void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num);

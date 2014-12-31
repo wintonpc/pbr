@@ -9,7 +9,7 @@ using namespace std;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_WV(type)  void wv_##type(buf_t& buf, VALUE val, Fld& fld)
+#define DEF_WV(type)  void wv_##type(buf_t& buf, VALUE obj, VALUE val, Fld& fld)
 
 DEF_WV(INT32)    { w_varint32(buf,          NUM2INT (val));  }
 DEF_WV(UINT32)   { w_varint32(buf,          NUM2UINT(val));  }
@@ -56,7 +56,19 @@ void write_bytes(buf_t& buf, VALUE rstr) {
   buf.insert(buf.end(), s, s + len);
 }
 
-DEF_WV(BYTES) { write_bytes(buf, val); }
+DEF_WV(BYTES) {
+  if (TYPE(val) != T_STRING) {
+    if (fld.get_lazy_type != Qnil) {
+      //VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
+      rb_raise(rb_eStandardError, "Not implemented");
+    } else {
+      rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
+               fld.msg->name.c_str(), fld.name.c_str(), pp(val));
+    }
+  }
+
+  write_bytes(buf, val);
+}
 
 DEF_WV(STRING) {
   VALUE v_in = val;
@@ -106,22 +118,22 @@ write_val_func get_val_writer(fld_t fld_type) {
   }
 }
 
-void write_value(buf_t& buf, Fld& fld, VALUE obj) {
+ void write_value(buf_t& buf, Fld& fld, VALUE obj, VALUE val) {
   write_header(buf, fld.wire_type, fld.num);
-  fld.write(buf, obj, fld);
+  fld.write(buf, obj, val, fld);
 }
 
 #define DEFLATE(val)  RTEST(fld.deflate) ? rb_funcall(fld.deflate, ID_CALL, 1, (val)) : (val)
 
-void write_repeated(buf_t& buf, Fld& fld, VALUE arr) {
+void write_repeated(buf_t& buf, Fld& fld, VALUE obj, VALUE arr) {
   int len = RARRAY_LEN(arr);
   for (int i=0; i<len; i++) {
     VALUE elem = DEFLATE(rb_ary_entry(arr, i));
-    write_value(buf, fld, elem);
+    write_value(buf, fld, obj, elem);
   }        
 }
 
-void write_packed(buf_t& buf, Fld& fld, VALUE arr) {
+void write_packed(buf_t& buf, Fld& fld, VALUE obj, VALUE arr) {
   int len = RARRAY_LEN(arr);
   if (len == 0)
     return;
@@ -132,7 +144,7 @@ void write_packed(buf_t& buf, Fld& fld, VALUE arr) {
   int32_t data_offset = buf.size();
   for (int i=0; i<len; i++) {
     VALUE elem = DEFLATE(rb_ary_entry(arr, i));
-    fld.write(buf, elem, fld);
+    fld.write(buf, obj, elem, fld);
   }
   int32_t data_len = buf.size() - data_offset;
   w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
@@ -152,16 +164,16 @@ void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
         else
           continue;
       }
-      write_value(buf, fld, DEFLATE(val));
+      write_value(buf, fld, obj, DEFLATE(val));
     }
     else {
       if (val == Qnil)
         continue;
       
       if (fld.is_packed)
-        write_packed(buf, fld, val);
+        write_packed(buf, fld, obj, val);
       else
-        write_repeated(buf, fld, val);
+        write_repeated(buf, fld, obj, val);
     }
   }
   int32_t final_offset = buf.size();

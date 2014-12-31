@@ -8,7 +8,7 @@ class Pbr
 
     def initialize(attrs={})
       attrs.each_pair do |k, v|
-        f = Validate.field_existence_and_get(self.class, k.to_sym)
+        f = Validate.field_existence_and_get(self.class, k.to_sym, 'set', ValidationError)
         send("#{k}=", construct(f, v))
       end
     end
@@ -30,7 +30,7 @@ class Pbr
     end
 
     class Field
-      attr_accessor :label, :type, :name, :num, :msg_class, :packed
+      attr_accessor :label, :type, :name, :num, :msg_class, :get_lazy_type, :packed
 
       def initialize(label, type, name, num, opts={})
         @label, @type, @name, @num = label, type, name, num
@@ -83,6 +83,11 @@ class Pbr
       def inflate(field_name, &block)
         Validate.field_name(field_name)
         inflators[field_name] = block
+      end
+
+      def type_of(field_name, &block)
+        f = Validate.and_get_bytes_field(self, field_name)
+        f.get_lazy_type = block
       end
 
       private

@@ -22,7 +22,7 @@ describe 'Performance' do
         f_sfixed64: repeat(n){rand_int(64)},
         f_double: repeat(n){Random.rand},
         f_string: repeat(n){SecureRandom.uuid},
-        f_bytes: repeat(n){20.times.map{Random.rand(0..255)}},
+        f_bytes: repeat(n){20.times.map{Random.rand(0..255)}.pack('c*')},
         f_embedded: repeat(n){BigHelper.new(a: 10.times.map{rand_int(32)})},
         f_packed: repeat(n){rand_int(32)},
         f_fixed32: repeat(n){rand_uint(32)},

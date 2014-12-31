@@ -135,7 +135,7 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
     }
   }
 
-  if (num_required_fields_read < msg.num_required_fields) {
+  if (msg.model->validate_on_read && num_required_fields_read < msg.num_required_fields) {
     rb_raise(VALIDATION_ERROR, "Some required fields were missing when reading a %s:\n%s",
              msg.name.c_str(), pp(obj));
   }

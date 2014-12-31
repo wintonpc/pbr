@@ -62,6 +62,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
     msg.read = read_obj;   // future flexibility. no noticeable performance hit.
     msg.index = model.msgs.size();
     msg.num_required_fields = 0;
+    msg.last_varint_size = 1;
     model.msgs.push_back(msg);
   }
 
@@ -118,11 +119,12 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
     fld.is_packed = RTEST(rb_get(rb_fld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
     fld.inflate = rb_hash_aref(inflators, fld_name);
+    fld.get_lazy_type = rb_get(rb_fld, "get_lazy_type");
     if (fld_type == FLD_ENUM) {
       fld.enum_module = rb_get(rb_fld, "msg_class");
       fld.enum_values = arr2vec(rb_get(fld.enum_module, "values"));
     }
-                                
+
     if (msg.target_is_hash) {
       fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
     } else {
@@ -136,10 +138,6 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
     fld.read = get_val_reader(fld_type);
     msg.add_fld(msg, fld);
   }
-}
-
-Msg* find_msg_for_type(Model& model, VALUE type) {
-  return find_msg_by_name(model, type_name(type));
 }
 
 Msg& get_msg_for_type(Model& model, VALUE type) {

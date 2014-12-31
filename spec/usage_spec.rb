@@ -33,6 +33,14 @@ class TinyMsg
   required :bar, :string, 2
 end
 
+class WrappedMsg
+  include Pbr::Message
+  required :type, :string, 1
+  required :msg, :bytes, 2
+
+  type_of(:msg) {|wrapped| wrapped.type.constantize }
+end
+
 describe Pbr do
 
   it 'constructing' do
@@ -100,6 +108,16 @@ describe Pbr do
     v2 = pbr.read(pbr.write(v1, TestMsg), TestMsg)
     expect(v2['foo']).to eql 'hello'
     expect(v2['stamp']).to be_a Time
+  end
+
+  it 'wrapped message' do
+    pbr = Pbr.new
+    v1 = WrappedMsg.new(type: 'TinyMsg', msg: TinyMsg.new(foo: 'hello', bar: 'hello'))
+    encoded = pbr.write(v1, WrappedMsg)
+    v2 = pbr.read(encoded, WrappedMsg)
+    expect(v2.msg).to be_a TinyMsg
+    expect(v2.msg.foo).to eql 'hello'
+    expect(v2.msg.bar).to eql 'goodbye'
   end
 
   def make_valid_test_msg

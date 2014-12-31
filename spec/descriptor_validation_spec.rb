@@ -30,6 +30,16 @@ describe 'Descriptor validation' do
     expect_error("'FieldDescriptorProto::Type::INT33' has not been defined as a constant", [:required, :foo, :int33, 1])
   end
 
+  it 'validates specifying lazy type of non-bytes fields' do
+    expect {
+      Class.new do
+      include Pbr::Message
+      required :foo, :string, 1
+      type_of(:foo) {|_| nil}
+      end
+    }.to raise_error Pbr::DescriptorError, "'type_of' can only be used on 'bytes' fields"
+  end
+
   def expect_error(expected_msg, *multiple_field_args)
     expect {
       Class.new do

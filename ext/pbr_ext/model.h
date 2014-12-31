@@ -16,7 +16,7 @@ typedef void (*add_fld_func)(Msg&, Fld);
 typedef Fld* (*get_fld_func)(Msg&, fld_num_t);
 
 typedef void (*write_obj_func)(Msg& msg, buf_t& buf, VALUE obj);
-typedef void (*write_val_func)(buf_t& buf, VALUE val, Fld& fld);
+typedef void (*write_val_func)(buf_t& buf, VALUE obj, VALUE val, Fld& fld);
 
 typedef VALUE (*read_obj_func)(Msg& msg, ss_t& ss);
 typedef VALUE (*read_val_func)(ss_t& ss, Fld& fld);
@@ -40,7 +40,7 @@ struct Msg {
   write_obj_func write;
   read_obj_func read;
   int32_t num_required_fields;
-  int32_t last_varint_size = 1;
+  int32_t last_varint_size;
 };
 
 struct Fld {
@@ -61,10 +61,13 @@ struct Fld {
   VALUE inflate;
   std::vector<VALUE> enum_values;
   VALUE enum_module;
+  VALUE get_lazy_type;
 };
 
 
 Msg make_msg(std::string name, fld_num_t max_fld_num);
 Msg* find_msg_by_name(Model& model, std::string name);
+Msg* find_msg_for_type(Model& model, VALUE type);
+
 
 #endif

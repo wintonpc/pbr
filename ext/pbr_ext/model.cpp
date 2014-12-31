@@ -43,6 +43,10 @@ Msg* find_msg_by_name(Model& model, std::string name) {
   return NULL;
 }
 
+Msg* find_msg_for_type(Model& model, VALUE type) {
+  return find_msg_by_name(model, type_name(type));
+}
+
 Msg make_msg(std::string name, fld_num_t max_fld_num) {
   Msg msg;
   msg.name = name;

@@ -35,10 +35,19 @@ class Pbr
         end
       end
 
-      def field_existence_and_get(type, name)
+      def field_existence_and_get(type, name, action, error_type)
         f = type.fields_by_name[name]
         unless f
-          raise ValidationError, "Cannot set nonexistent field #{type.type_name}.#{name}"
+          raise error_type, "Cannot #{action} nonexistent field #{type.type_name}.#{name}"
+        end
+        f
+      end
+
+      def and_get_bytes_field(type, name)
+        Validate.field_name(name)
+        f = field_existence_and_get(type, name, 'set type of', DescriptorError)
+        if f.type != FieldDescriptorProto::Type::BYTES
+          raise DescriptorError, "'type_of' can only be used on 'bytes' fields"
         end
         f
       end
