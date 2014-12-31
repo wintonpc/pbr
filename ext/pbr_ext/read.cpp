@@ -106,7 +106,7 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
-    Fld* fld_ptr = msg.find_fld(msg, fld_num);
+    Fld *fld_ptr = msg.find_fld(msg, fld_num);
 
     if (fld_ptr == NULL) {
       cerr << "skipping unrecognized field " << msg.name << "." << fld_num << endl;

@@ -57,11 +57,31 @@ void write_bytes(buf_t& buf, VALUE rstr) {
 }
 
 DEF_WV(BYTES) {
+  cerr << "BYTES" << endl;
+  cerr << "is it not a string?" << endl;
   if (TYPE(val) != T_STRING) {
+    cerr << "not a string. is there a lazy type?" << endl;
     if (fld.get_lazy_type != Qnil) {
-      //VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
-      rb_raise(rb_eStandardError, "Not implemented");
+      cerr << "yes. figure out what it is" << endl;
+      VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
+      cerr << "it is " << inspect(type) << endl;
+      cerr << "look it up" << endl;
+      cerr << "fld.msg = " << (long int)fld.msg << endl;
+      cerr << "fld.msg->name = " << fld.msg->name.c_str() << endl;
+      cerr << "fld.msg->model = " << (long int)fld.msg->model << endl;
+      Msg *lazy_msg = find_msg_for_type(*fld.msg->model, type);
+      cerr << "registered?" << endl;
+      if (lazy_msg == NULL) {
+        cerr << "no" << endl;
+        rb_raise(rb_eStandardError, "Lazy type %s for %s.%s has not been registered.",
+                 pp(type), fld.msg->name.c_str(), fld.name.c_str());
+      } else {
+        cerr << "yes" << endl;
+        cerr << "found lazy type " << inspect(type) << endl;
+        rb_raise(rb_eStandardError, "Not implemented");
+      }
     } else {
+      cerr << "no" << endl;
       rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
                fld.msg->name.c_str(), fld.name.c_str(), pp(val));
     }
@@ -87,7 +107,7 @@ void pad(buf_t& buf, int num_bytes) {
 }
 
 DEF_WV(MESSAGE) {
-  Msg* embedded_msg = fld.embedded_msg;
+  Msg *embedded_msg = fld.embedded_msg;
   uint32_t len_offset = buf.size();
   int32_t estimated_varint_size = embedded_msg->last_varint_size;
   pad(buf, estimated_varint_size);

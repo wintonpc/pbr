@@ -113,6 +113,9 @@ describe Pbr do
   it 'wrapped message' do
     pbr = Pbr.new
     v1 = WrappedMsg.new(type: 'TinyMsg', msg: TinyMsg.new(foo: 'hello', bar: 'hello'))
+    expect{pbr.write(v1, WrappedMsg)}.to raise_error 'Lazy type TinyMsg for WrappedMsg.msg has not been registered.'
+
+    pbr.register(TinyMsg)
     encoded = pbr.write(v1, WrappedMsg)
     v2 = pbr.read(encoded, WrappedMsg)
     expect(v2.msg).to be_a TinyMsg

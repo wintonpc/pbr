@@ -10,7 +10,7 @@ void add_indexing_fld(Msg& msg, Fld fld) {
   msg.flds_to_lookup[fld.num] = fld;
 }
 
-Fld* find_indexing_fld(Msg& msg, fld_num_t fld_num) {
+Fld *find_indexing_fld(Msg& msg, fld_num_t fld_num) {
   if (fld_num >= msg.flds_to_lookup.size())
     return NULL;
   else {
@@ -26,14 +26,14 @@ void add_scanning_fld(Msg& msg, Fld fld) {
   msg.flds_to_lookup.push_back(fld);
 }
 
-Fld* find_scanning_fld(Msg& msg, fld_num_t fld_num) {
+Fld *find_scanning_fld(Msg& msg, fld_num_t fld_num) {
   for (Fld& fld : msg.flds_to_lookup)
     if (fld.num == fld_num)
       return &fld;
   return NULL;
 }
 
-Msg* find_msg_by_name(Model& model, std::string name) {
+Msg *find_msg_by_name(Model& model, std::string name) {
   int len = model.msgs.size();
   for (int i=0; i<len; i++) {
     Msg& msg = model.msgs[i];
@@ -43,7 +43,7 @@ Msg* find_msg_by_name(Model& model, std::string name) {
   return NULL;
 }
 
-Msg* find_msg_for_type(Model& model, VALUE type) {
+Msg *find_msg_for_type(Model& model, VALUE type) {
   return find_msg_by_name(model, type_name(type));
 }
 

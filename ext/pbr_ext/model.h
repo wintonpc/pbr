@@ -13,7 +13,7 @@ struct Msg;
 struct Fld;
 
 typedef void (*add_fld_func)(Msg&, Fld);
-typedef Fld* (*get_fld_func)(Msg&, fld_num_t);
+typedef Fld *(*get_fld_func)(Msg&, fld_num_t);
 
 typedef void (*write_obj_func)(Msg& msg, buf_t& buf, VALUE obj);
 typedef void (*write_val_func)(buf_t& buf, VALUE obj, VALUE val, Fld& fld);
@@ -28,7 +28,7 @@ struct Model {
 };
 
 struct Msg {
-  Model* model;
+  Model *model;
   int index;
   std::string name;
   VALUE target;
@@ -44,7 +44,7 @@ struct Msg {
 };
 
 struct Fld {
-  Msg* msg;
+  Msg *msg;
   fld_num_t num;
   std::string name;
   ID target_field_getter;
@@ -54,7 +54,7 @@ struct Fld {
   fld_t fld_type;
   label_t label;
   bool is_packed;
-  Msg* embedded_msg;
+  Msg *embedded_msg;
   write_val_func write;
   read_val_func read;
   VALUE deflate;
@@ -66,8 +66,8 @@ struct Fld {
 
 
 Msg make_msg(std::string name, fld_num_t max_fld_num);
-Msg* find_msg_by_name(Model& model, std::string name);
-Msg* find_msg_for_type(Model& model, VALUE type);
+Msg *find_msg_by_name(Model& model, std::string name);
+Msg *find_msg_for_type(Model& model, VALUE type);
 
 
 #endif

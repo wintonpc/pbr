@@ -29,7 +29,7 @@ VALUE VALIDATION_ERROR;
 #define MODEL(handle) *(MODEL_PTR(handle))
 
 VALUE create_handle(VALUE self, VALUE opts) {
-  Model* m = new Model();
+  Model *m = new Model();
   m->validate_on_write = rb_hash_get_sym(opts, "validate_on_write");
   m->validate_on_read = rb_hash_get_sym(opts, "validate_on_read");
   return LONG2NUM((long int)(m));
@@ -70,6 +70,11 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   for (VALUE type : new_types)
     register_fields(model, get_msg_for_type(model, type), type, mapping);
 
+  // refresh parent pointers
+  for (Msg& msg : model.msgs)
+    for (Fld& fld : msg.flds_to_enumerate)
+      fld.msg = &msg;
+
   // print debugging info
   cerr << endl;
   cerr << "REGISTERED:" << endl;
@@ -105,7 +110,6 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
   for (VALUE rb_fld : arr2vec(rb_get(type, "fields"))) {
     VALUE fld_name = rb_get(rb_fld, "name");
     Fld fld;
-    fld.msg = &msg;
     fld.num = NUM2INT(rb_get(rb_fld, "num"));
     fld.name = rb_sym_to_cstr(fld_name);
     int fld_type = NUM2INT(rb_get(rb_fld, "type"));
@@ -142,7 +146,7 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
 
 Msg& get_msg_for_type(Model& model, VALUE type) {
   string name = type_name(type);
-  Msg* msg = find_msg_by_name(model, name);
+  Msg *msg = find_msg_by_name(model, name);
   if (msg == NULL)
     rb_raise(rb_eStandardError, "Failed to lookup message named %s", name.c_str());
   return *msg;
