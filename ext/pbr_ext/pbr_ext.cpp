@@ -104,6 +104,7 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
   for (VALUE rb_fld : arr2vec(rb_get(type, "fields"))) {
     VALUE fld_name = rb_get(rb_fld, "name");
     Fld fld;
+    fld.msg = &msg;
     fld.num = NUM2INT(rb_get(rb_fld, "num"));
     fld.name = rb_sym_to_cstr(fld_name);
     int fld_type = NUM2INT(rb_get(rb_fld, "type"));

@@ -57,6 +57,10 @@ DEF_WF(BYTES) { write_bytes(buf, val); }
 
 DEF_WF(STRING) {
   VALUE v_in = val;
+  if (TYPE(v_in) != T_STRING)
+    rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
+             fld.msg->name.c_str(), fld.name.c_str(), pp(v_in));
+
   bool is_already_utf8 = rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING;
   VALUE v_out = is_already_utf8 ? v_in : rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
   write_bytes(buf, v_out);

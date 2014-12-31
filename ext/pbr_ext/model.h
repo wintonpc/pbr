@@ -44,6 +44,7 @@ struct Msg {
 };
 
 struct Fld {
+  Msg* msg;
   fld_num_t num;
   std::string name;
   ID target_field_getter;
