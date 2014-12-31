@@ -1,7 +1,7 @@
 require 'rspec'
 require 'pbr'
 
-describe 'Pbr' do
+describe 'Descriptor validation' do
 
   it 'validates field names' do
     field_args = [:required, 'foo', :int32, 1]

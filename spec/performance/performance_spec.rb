@@ -4,9 +4,9 @@ require 'oj'
 require 'securerandom'
 require_relative 'bigmsg.pb'
 
-describe 'Pbr' do
+describe 'Performance' do
 
-  it 'should be performant' do
+  it 'it should be fast' do
     pbr = Pbr.new
     n = 10000
     pb_msg = BigMsg.new(

@@ -8,31 +8,31 @@ PB types onto ruby classes. A mapping may target either hashes or "normal" class
 with getter/setter attributes. The mapping also has a field mapping that specifies how
 to inflect field names (or hash keys).
 
-# To do
+# Notes
 
-- validation
-  - when writing, verify value type
-  - when reading, count actual required fields vs expected. only compute details if actual != expected.
-    - must take into account the possibility of required/expected fields being repeated too ?
-  - raise error
+- TODO
+  - validation
+    - when writing, verify value type
+    - when reading, count actual required fields vs expected. only compute details if actual != expected.
+      - must take into account the possibility of required/expected fields being repeated too ?
+    - raise error
 
-- add custom `PbrMapping` example to readme
+  - more realistic performance tests with wrapped, real messages
 
-- support nested serialized protobuf messages (for metadata-wrapped messages)
-  - additional field option on `bytes` field contains pbr_type
+  - support nested serialized protobuf messages (for metadata-wrapped messages)
+    - additional field option on `bytes` field contains pbr_type
 
-- more realistic performance tests with wrapped, real messages
+- documentation
+  - add custom `PbrMapping` example to readme
+  - add doc-comments
+    - fields passed to inflectors
 
-- add doc-comments
-  - fields passed to inflectors
-
-- default values for optional fields??
-  - does this make sense when mapping to arbitrary types?
-  - ideally, cost would be paid at field read time, not deserialize time
-
-- consider
-  - eventmachine
+- parking lot
+  - default values for optional fields??
+    - does this make sense when mapping to arbitrary types?
+    - ideally, cost would be paid at field read time, not deserialize time
   - writing to/reading from a stream
+  - eventmachine implications, if any
 
 - performance findings
   - function pointers are slightly faster than big switch. changing to big switch for writes
@@ -201,3 +201,6 @@ Since packed fields are an optimization for large array fields, saving one byte 
 it makes sense to preallocate the maximum varint size (5 bytes) to hold the length. The overhead
 is insignificant given the (assumed large) number of repeated values, and we are guaranteed that
 no memmov will be required.
+
+
+# Test strategy

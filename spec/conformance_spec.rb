@@ -1,7 +1,7 @@
 require 'rspec'
 require 'pbr'
 
-describe Pbr do
+describe 'Conformance' do
   it 'should talk to a reference implementation' do
     Dir.chdir('ref') do
       system('./gen_proto.sh') or abort 'gen_proto.sh failed'
@@ -33,6 +33,7 @@ describe Pbr do
         f_float: 3.141592,
         f_things: %w(foo bar baz).map{|s| Something.new(a: s)}
     )
+
     decoded = roundtrip(msg)
     expect(decoded.f_int32).to eql 2**31 - 1
     expect(decoded.f_int64).to eql 2**63 - 1
@@ -52,7 +53,7 @@ describe Pbr do
     expect(decoded.f_packed).to eql [1, 1000, 1000000]
     expect(decoded.f_fixed32).to eql 2**32 - 1
     expect(decoded.f_sfixed32).to eql 2**31 - 1
-    # expect(decoded.f_float).to eql 3.141592  # don't bother with approximation here
+    # expect(decoded.f_float).to eql 3.141592  # don't bother with approximation concerns here. tested in pbr_spec.
     expect(decoded.f_things.map(&:a)).to eql %w(foo bar baz)
   end
 

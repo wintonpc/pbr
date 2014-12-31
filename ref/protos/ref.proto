@@ -1,5 +1,0 @@
-package com.indigobio.test;
-
-message Everything {
-  optional int32 f_int32 = 1;
-}
