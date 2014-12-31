@@ -8,48 +8,48 @@ using namespace std;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_RF(type)  VALUE rf_##type(ss_t& ss, Fld& fld)
+#define DEF_RV(type)  VALUE rv_##type(ss_t& ss, Fld& fld)
 
-DEF_RF(INT32)    { return (INT2NUM          (r_varint32(ss)));  }
-DEF_RF(UINT32)   { return (UINT2NUM         (r_varint32(ss)));  }
-DEF_RF(INT64)    { return (LL2NUM           (r_varint64(ss)));  }
-DEF_RF(UINT64)   { return (ULL2NUM          (r_varint64(ss)));  }
-DEF_RF(SINT32)   { return (INT2NUM (zz_dec32(r_varint32(ss)))); }
-DEF_RF(SINT64)   { return (LL2NUM  (zz_dec64(r_varint64(ss)))); }
-DEF_RF(SFIXED32) { return (INT2NUM          (r_int32   (ss)));  }
-DEF_RF(FIXED32)  { return (UINT2NUM         (r_int32   (ss)));  }
-DEF_RF(SFIXED64) { return (LL2NUM           (r_int64   (ss)));  }
-DEF_RF(FIXED64)  { return (ULL2NUM          (r_int64   (ss)));  }
+DEF_RV(INT32)    { return (INT2NUM          (r_varint32(ss)));  }
+DEF_RV(UINT32)   { return (UINT2NUM         (r_varint32(ss)));  }
+DEF_RV(INT64)    { return (LL2NUM           (r_varint64(ss)));  }
+DEF_RV(UINT64)   { return (ULL2NUM          (r_varint64(ss)));  }
+DEF_RV(SINT32)   { return (INT2NUM (zz_dec32(r_varint32(ss)))); }
+DEF_RV(SINT64)   { return (LL2NUM  (zz_dec64(r_varint64(ss)))); }
+DEF_RV(SFIXED32) { return (INT2NUM          (r_int32   (ss)));  }
+DEF_RV(FIXED32)  { return (UINT2NUM         (r_int32   (ss)));  }
+DEF_RV(SFIXED64) { return (LL2NUM           (r_int64   (ss)));  }
+DEF_RV(FIXED64)  { return (ULL2NUM          (r_int64   (ss)));  }
 
-DEF_RF(ENUM)     { return (INT2NUM          (r_varint32(ss)));  }
+DEF_RV(ENUM)     { return (INT2NUM          (r_varint32(ss)));  }
 
-DEF_RF(FLOAT) {
+DEF_RV(FLOAT) {
   uint32_t v = r_int32(ss);
   return (DBL2NUM((double)REINTERPRET(float, v)));
 }
 
-DEF_RF(DOUBLE) {
+DEF_RV(DOUBLE) {
   uint64_t v = r_int64(ss);
   return (DBL2NUM(REINTERPRET(double, v)));
 }
 
-DEF_RF(BOOL) {
+DEF_RV(BOOL) {
   uint32_t v = r_varint32(ss);
   return (v == 0 ? Qfalse : Qtrue);
 }
 
-DEF_RF(STRING) {
+DEF_RV(STRING) {
   int32_t len = r_varint32(ss);
   VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
   return (rb_funcall(rstr, FORCE_ID_ENCODING, 1, UTF_8_ENCODING));
 }
 
-DEF_RF(BYTES) {
+DEF_RV(BYTES) {
   int32_t len = r_varint32(ss);
   return (rb_str_new(ss_read_chars(ss, len), len));
 }
 
-DEF_RF(MESSAGE) {
+DEF_RV(MESSAGE) {
   int32_t len = r_varint32(ss);
   ss_t tmp_ss = ss_substream(ss, len);
   Msg& embedded_msg = *fld.embedded_msg;
@@ -58,7 +58,7 @@ DEF_RF(MESSAGE) {
 
 read_val_func get_val_reader(fld_t fld_type) {
   switch (fld_type) {
-    TYPE_MAP(rf);
+    TYPE_MAP(rv);
     default:
       rb_raise(rb_eStandardError, "I don\'t know how to read field type %d", fld_type);
   }

@@ -9,32 +9,32 @@ using namespace std;
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_WF(type)  void wf_##type(buf_t& buf, VALUE val, Fld& fld)
+#define DEF_WV(type)  void wv_##type(buf_t& buf, VALUE val, Fld& fld)
 
-DEF_WF(INT32)    { w_varint32(buf,          NUM2INT (val));  }
-DEF_WF(UINT32)   { w_varint32(buf,          NUM2UINT(val));  }
-DEF_WF(INT64)    { w_varint64(buf,          NUM2LL  (val));  }
-DEF_WF(UINT64)   { w_varint64(buf,          NUM2ULL (val));  }
-DEF_WF(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT (val))); }
-DEF_WF(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL  (val))); }
-DEF_WF(SFIXED32) { w_int32   (buf,          NUM2INT (val));  }
-DEF_WF(FIXED32)  { w_int32   (buf,          NUM2UINT(val));  }
-DEF_WF(SFIXED64) { w_int64   (buf,          NUM2LL  (val));  }
-DEF_WF(FIXED64)  { w_int64   (buf,          NUM2ULL (val));  }
+DEF_WV(INT32)    { w_varint32(buf,          NUM2INT (val));  }
+DEF_WV(UINT32)   { w_varint32(buf,          NUM2UINT(val));  }
+DEF_WV(INT64)    { w_varint64(buf,          NUM2LL  (val));  }
+DEF_WV(UINT64)   { w_varint64(buf,          NUM2ULL (val));  }
+DEF_WV(SINT32)   { w_varint32(buf, zz_enc32(NUM2INT (val))); }
+DEF_WV(SINT64)   { w_varint64(buf, zz_enc64(NUM2LL  (val))); }
+DEF_WV(SFIXED32) { w_int32   (buf,          NUM2INT (val));  }
+DEF_WV(FIXED32)  { w_int32   (buf,          NUM2UINT(val));  }
+DEF_WV(SFIXED64) { w_int64   (buf,          NUM2LL  (val));  }
+DEF_WV(FIXED64)  { w_int64   (buf,          NUM2ULL (val));  }
 
-DEF_WF(ENUM)     { w_varint32(buf,          NUM2INT (val));  }
+DEF_WV(ENUM)     { w_varint32(buf,          NUM2INT (val));  }
 
-DEF_WF(FLOAT) {
+DEF_WV(FLOAT) {
   float v = (float)NUM2DBL(val);
   w_int32(buf, REINTERPRET(uint32_t, v));
 }
 
-DEF_WF(DOUBLE) {
+DEF_WV(DOUBLE) {
   double v = NUM2DBL(val);
   w_int64(buf, REINTERPRET(uint64_t, v));
 }
 
-DEF_WF(BOOL) {
+DEF_WV(BOOL) {
   VALUE v = val;
   if (v == Qtrue)
     w_varint32(buf, 1);
@@ -53,9 +53,9 @@ void write_bytes(buf_t& buf, VALUE rstr) {
   buf.insert(buf.end(), s, s + len);
 }
 
-DEF_WF(BYTES) { write_bytes(buf, val); }
+DEF_WV(BYTES) { write_bytes(buf, val); }
 
-DEF_WF(STRING) {
+DEF_WV(STRING) {
   VALUE v_in = val;
   if (TYPE(v_in) != T_STRING)
     rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
@@ -71,7 +71,7 @@ void pad(buf_t& buf, int num_bytes) {
     buf.push_back(0);
 }
 
-DEF_WF(MESSAGE) {
+DEF_WV(MESSAGE) {
   Msg* embedded_msg = fld.embedded_msg;
   uint32_t len_offset = buf.size();
   int32_t estimated_varint_size = embedded_msg->last_varint_size;
@@ -97,7 +97,7 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
 
 write_val_func get_val_writer(fld_t fld_type) {
   switch (fld_type) {
-    TYPE_MAP(wf);
+    TYPE_MAP(wv);
   default:
     rb_raise(rb_eStandardError, "I don\'t know how to write field type %d", fld_type);
   }
