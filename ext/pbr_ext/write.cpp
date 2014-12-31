@@ -35,14 +35,13 @@ DEF_WV(DOUBLE) {
 }
 
 DEF_WV(BOOL) {
-  VALUE v = val;
-  if (v == Qtrue)
+  if (val == Qtrue)
     w_varint32(buf, 1);
-  else if (v == Qfalse)
+  else if (val == Qfalse)
     w_varint32(buf, 0);
   else {
-    w_varint32(buf, 0);
-    cerr << "bad boolean " << inspect(v) << ". wrote false." << endl;
+    rb_raise(VALIDATION_ERROR, "%s.%s should be a boolean but is: %s",
+             fld.msg->name.c_str(), fld.name.c_str(), pp(val));
   }
 }
 

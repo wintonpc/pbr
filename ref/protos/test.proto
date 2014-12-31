@@ -30,4 +30,5 @@ message Everything {
   required sfixed32 f_sfixed32 = 17;
   required float f_float = 18;
   repeated Something f_things = 19;
+  required int32 f_another_int32 = 20;
 }

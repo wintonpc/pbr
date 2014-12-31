@@ -11,25 +11,34 @@ describe 'Message validation' do
       required :req, :string, 1
       optional :opt, :string, 2
       repeated :rep, :string, 3
+
+      optional :an_int, :int32, 4
+      optional :a_bool, :bool, 5
     end
   }
 
-  def self.it_validates_read(what, msg)
+  def self.it_validates_read(what, msg, err_type=Pbr::ValidationError, err_msg=nil)
     it "#{what} (read)" do
       pbr = Pbr.new(PbrMapping.hash_with_symbol_keys)
       crap = Pbr.new(PbrMapping.hash_with_symbol_keys, validate_on_write: false).write(msg, message_type)
-      expect{pbr.read(crap, message_type)}.to raise_error Pbr::ValidationError
+      expect{pbr.read(crap, message_type)}.to raise_error(err_type, err_msg)
     end
   end
 
-  def self.it_validates_write(what, msg)
+  def self.it_validates_write(what, msg, err_type=Pbr::ValidationError, err_msg=nil)
     it "#{what} (write)" do
       pbr = Pbr.new(PbrMapping.hash_with_symbol_keys)
-      expect{pbr.write(msg, message_type)}.to raise_error Pbr::ValidationError
+      expect{pbr.write(msg, message_type)}.to raise_error(err_type, err_msg)
     end
+  end
+
+  def self.it_throws_on(what, msg, err_type, err_msg)
+    it_validates_write(what, msg, err_type, err_msg)
   end
 
   it_validates_write('missing required fields', {opt: 'foo'})
   it_validates_read('missing required fields', {opt: 'foo'})
   it_validates_write('bad strings', {req: 555})
+  it_throws_on('bad integers (string)', {req: '', an_int: 'hello'}, TypeError, 'no implicit conversion of String into Integer')
+  it_validates_write('bad booleans', {req: '', a_bool: 0})
 end

@@ -31,7 +31,8 @@ describe 'Conformance' do
         f_fixed32: 2**32 - 1,
         f_sfixed32: 2**31 - 1,
         f_float: 3.141592,
-        f_things: %w(foo bar baz).map{|s| Something.new(a: s)}
+        f_things: %w(foo bar baz).map{|s| Something.new(a: s)},
+        f_another_int32: 3.14
     )
 
     decoded = roundtrip(msg)
@@ -55,6 +56,7 @@ describe 'Conformance' do
     expect(decoded.f_sfixed32).to eql 2**31 - 1
     # expect(decoded.f_float).to eql 3.141592  # don't bother with approximation concerns here. tested in pbr_spec.
     expect(decoded.f_things.map(&:a)).to eql %w(foo bar baz)
+    expect(decoded.f_another_int32).to eql 3 # converts float to int during write to int field
   end
 
   def roundtrip(msg)

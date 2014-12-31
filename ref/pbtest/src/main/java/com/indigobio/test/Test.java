@@ -707,6 +707,16 @@ public final class Test {
      */
     com.indigobio.test.Test.SomethingOrBuilder getFThingsOrBuilder(
         int index);
+
+    // required int32 f_another_int32 = 20;
+    /**
+     * <code>required int32 f_another_int32 = 20;</code>
+     */
+    boolean hasFAnotherInt32();
+    /**
+     * <code>required int32 f_another_int32 = 20;</code>
+     */
+    int getFAnotherInt32();
   }
   /**
    * Protobuf type {@code com.indigobio.test.Everything}
@@ -885,6 +895,11 @@ public final class Test {
                 mutable_bitField0_ |= 0x00040000;
               }
               fThings_.add(input.readMessage(com.indigobio.test.Test.Something.PARSER, extensionRegistry));
+              break;
+            }
+            case 160: {
+              bitField0_ |= 0x00020000;
+              fAnotherInt32_ = input.readInt32();
               break;
             }
           }
@@ -1380,6 +1395,22 @@ public final class Test {
       return fThings_.get(index);
     }
 
+    // required int32 f_another_int32 = 20;
+    public static final int F_ANOTHER_INT32_FIELD_NUMBER = 20;
+    private int fAnotherInt32_;
+    /**
+     * <code>required int32 f_another_int32 = 20;</code>
+     */
+    public boolean hasFAnotherInt32() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    /**
+     * <code>required int32 f_another_int32 = 20;</code>
+     */
+    public int getFAnotherInt32() {
+      return fAnotherInt32_;
+    }
+
     private void initFields() {
       fInt32_ = 0;
       fInt64_ = 0L;
@@ -1400,6 +1431,7 @@ public final class Test {
       fSfixed32_ = 0;
       fFloat_ = 0F;
       fThings_ = java.util.Collections.emptyList();
+      fAnotherInt32_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1471,6 +1503,10 @@ public final class Test {
         return false;
       }
       if (!hasFFloat()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFAnotherInt32()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1551,6 +1587,9 @@ public final class Test {
       }
       for (int i = 0; i < fThings_.size(); i++) {
         output.writeMessage(19, fThings_.get(i));
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeInt32(20, fAnotherInt32_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1646,6 +1685,10 @@ public final class Test {
       for (int i = 0; i < fThings_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(19, fThings_.get(i));
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(20, fAnotherInt32_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1811,6 +1854,8 @@ public final class Test {
         } else {
           fThingsBuilder_.clear();
         }
+        fAnotherInt32_ = 0;
+        bitField0_ = (bitField0_ & ~0x00080000);
         return this;
       }
 
@@ -1925,6 +1970,10 @@ public final class Test {
         } else {
           result.fThings_ = fThingsBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        result.fAnotherInt32_ = fAnotherInt32_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2030,6 +2079,9 @@ public final class Test {
             }
           }
         }
+        if (other.hasFAnotherInt32()) {
+          setFAnotherInt32(other.getFAnotherInt32());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -2100,6 +2152,10 @@ public final class Test {
           return false;
         }
         if (!hasFFloat()) {
+          
+          return false;
+        }
+        if (!hasFAnotherInt32()) {
           
           return false;
         }
@@ -3133,6 +3189,39 @@ public final class Test {
         return fThingsBuilder_;
       }
 
+      // required int32 f_another_int32 = 20;
+      private int fAnotherInt32_ ;
+      /**
+       * <code>required int32 f_another_int32 = 20;</code>
+       */
+      public boolean hasFAnotherInt32() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
+      }
+      /**
+       * <code>required int32 f_another_int32 = 20;</code>
+       */
+      public int getFAnotherInt32() {
+        return fAnotherInt32_;
+      }
+      /**
+       * <code>required int32 f_another_int32 = 20;</code>
+       */
+      public Builder setFAnotherInt32(int value) {
+        bitField0_ |= 0x00080000;
+        fAnotherInt32_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 f_another_int32 = 20;</code>
+       */
+      public Builder clearFAnotherInt32() {
+        bitField0_ = (bitField0_ & ~0x00080000);
+        fAnotherInt32_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.indigobio.test.Everything)
     }
 
@@ -3164,7 +3253,7 @@ public final class Test {
   static {
     java.lang.String[] descriptorData = {
       "\n\ntest.proto\022\022com.indigobio.test\"\026\n\tSome" +
-      "thing\022\t\n\001a\030\001 \002(\t\"\355\003\n\nEverything\022\017\n\007f_int" +
+      "thing\022\t\n\001a\030\001 \002(\t\"\206\004\n\nEverything\022\017\n\007f_int" +
       "32\030\001 \002(\005\022\017\n\007f_int64\030\002 \002(\003\022\020\n\010f_uint32\030\003 " +
       "\002(\r\022\020\n\010f_uint64\030\004 \002(\004\022\020\n\010f_sint32\030\005 \002(\021\022" +
       "\020\n\010f_sint64\030\006 \002(\022\022\016\n\006f_bool\030\007 \002(\010\0224\n\006f_e" +
@@ -3175,8 +3264,9 @@ public final class Test {
       "\035.com.indigobio.test.Something\022\024\n\010f_pack",
       "ed\030\017 \003(\005B\002\020\001\022\021\n\tf_fixed32\030\020 \002(\007\022\022\n\nf_sfi" +
       "xed32\030\021 \002(\017\022\017\n\007f_float\030\022 \002(\002\022/\n\010f_things" +
-      "\030\023 \003(\0132\035.com.indigobio.test.Something\"!\n" +
-      "\005State\022\n\n\006ACTIVE\020\001\022\014\n\010INACTIVE\020\002"
+      "\030\023 \003(\0132\035.com.indigobio.test.Something\022\027\n" +
+      "\017f_another_int32\030\024 \002(\005\"!\n\005State\022\n\n\006ACTIV" +
+      "E\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3194,7 +3284,7 @@ public final class Test {
           internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", "FFixed32", "FSfixed32", "FFloat", "FThings", });
+              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", "FFixed32", "FSfixed32", "FFloat", "FThings", "FAnotherInt32", });
           return null;
         }
       };

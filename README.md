@@ -151,6 +151,7 @@ managing strings efficiently. Pbr supports this case in pure C++, to avoid alloc
 - Unknown fields are discarded upon deserialization. Consequently, Pbr should not be used
   when passthrough behavior is required.
 - default values for optional fields are not currently supported
+- A Float in an integer-typed field is truncated when serializing, as with Float::to_i
 
 ## Optimizations
 
