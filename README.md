@@ -11,8 +11,6 @@ to inflect field names (or hash keys).
 # Notes
 
 - TODO
-  - support nested serialized protobuf messages (for metadata-wrapped messages)
-    - additional field option on `bytes` field contains pbr_type
 
   - test descriptors with same name but in different namespaces
 

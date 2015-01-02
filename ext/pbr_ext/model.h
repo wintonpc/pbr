@@ -11,6 +11,7 @@
 struct Model;
 struct Msg;
 struct Fld;
+struct LazyField;
 
 typedef void (*add_fld_func)(Msg&, Fld);
 typedef Fld *(*get_fld_func)(Msg&, fld_num_t);
@@ -19,7 +20,7 @@ typedef void (*write_obj_func)(buf_t& buf, Msg& msg, VALUE obj);
 typedef void (*write_val_func)(buf_t& buf, Msg& msg, Fld& fld, VALUE obj, VALUE val);
 
 typedef VALUE (*read_obj_func)(ss_t& ss, Msg& msg);
-typedef VALUE (*read_val_func)(ss_t& ss, Msg& msg, Fld& fld);
+typedef VALUE (*read_val_func)(ss_t& ss, Msg& msg, Fld& fld, std::vector<LazyField> *lazy_fields);
 
 struct Model {
   bool validate_on_write;
@@ -63,6 +64,10 @@ struct Fld {
   VALUE get_lazy_type;
 };
 
+struct LazyField {
+  ss_t ss;
+  Fld *fld;
+};
 
 Msg make_msg(std::string name, fld_num_t max_fld_num);
 Msg *find_msg_by_name(Model& model, std::string name);

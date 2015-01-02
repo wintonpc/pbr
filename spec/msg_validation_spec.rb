@@ -23,6 +23,7 @@ describe 'Message validation' do
       optional :a_bool, :bool, 5
       optional :an_enum, Meal, 6
       optional :some_bytes, :bytes, 7
+      optional :some_msg, self, 8
     end
   }
 
@@ -53,4 +54,5 @@ describe 'Message validation' do
   it_validates_write('bad enums', {req: '', an_enum: 4})
   it_validates_read('bad enums', {req: '', an_enum: 4})
   it_validates_write('bad bytes (object)', {req: '', some_bytes: {a: :z}})
+  it_validates_write('bad embedded msg (integer)', {req: '', some_msg: 42})
 end

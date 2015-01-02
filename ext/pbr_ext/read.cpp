@@ -18,7 +18,7 @@ void skip(ss_t& ss, wire_t wire_type);
 
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_RV(type)  VALUE rv_##type(ss_t& ss, Msg& msg, Fld& fld)
+#define DEF_RV(type)  VALUE rv_##type(ss_t& ss, Msg& msg, Fld& fld, vector<LazyField> *lazy_fields)
 #define INFLATE(val)  RTEST(fld.inflate) ? rb_funcall(fld.inflate, ID_CALL, 1, (val)) : (val)
 
 DEF_RV(INT32)    { return (INT2NUM          (r_varint32(ss)));  }
@@ -57,12 +57,20 @@ DEF_RV(BOOL) {
 DEF_RV(STRING) {
   int32_t len = r_varint32(ss);
   VALUE rstr = rb_str_new(ss_read_chars(ss, len), len);
-  return (rb_funcall(rstr, FORCE_ID_ENCODING, 1, UTF_8_ENCODING));
+  return rb_funcall(rstr, FORCE_ID_ENCODING, 1, UTF_8_ENCODING);
 }
 
 DEF_RV(BYTES) {
   int32_t len = r_varint32(ss);
-  return (rb_str_new(ss_read_chars(ss, len), len));
+  if (fld.get_lazy_type == Qnil) {
+    return rb_str_new(ss_read_chars(ss, len), len);
+  } else {
+    LazyField lf;
+    lf.ss = ss_substream(ss, len);
+    lf.fld = &fld;
+    lazy_fields->push_back(lf);
+    return Qnil;
+  }
 }
 
 DEF_RV(MESSAGE) {
@@ -89,6 +97,8 @@ VALUE read_obj(ss_t& ss, Msg& msg) {
 
   int num_required_fields_read = 0;
 
+  vector<LazyField> lazy_fields;
+
   while (ss_more(ss)) {
     uint32_t h = r_varint32(ss);
     fld_num_t fld_num = h >> 3;
@@ -106,16 +116,16 @@ VALUE read_obj(ss_t& ss, Msg& msg) {
     if (fld.label != LABEL_REPEATED) {
       if (fld.label == LABEL_REQUIRED)
         num_required_fields_read++;
-      set_value(msg, fld, obj, INFLATE(fld.read(ss, msg, fld)));
+      set_value(msg, fld, obj, INFLATE(fld.read(ss, msg, fld, &lazy_fields)));
     } else {
       VALUE rb_arr = get_value(msg, fld, obj);
       if (fld.is_packed) {
         uint32_t byte_len = r_varint32(ss);
         ss_t tmp_ss = ss_substream(ss, byte_len);
         while (ss_more(tmp_ss))
-          rb_ary_push(rb_arr, INFLATE(fld.read(tmp_ss, msg, fld)));
+          rb_ary_push(rb_arr, INFLATE(fld.read(tmp_ss, msg, fld, NULL)));
       } else {
-        VALUE val = fld.read(ss, msg, fld);
+        VALUE val = fld.read(ss, msg, fld, NULL);
         rb_ary_push(rb_arr, INFLATE(val));
       }
     }
@@ -124,6 +134,13 @@ VALUE read_obj(ss_t& ss, Msg& msg) {
   if (msg.model->validate_on_read && num_required_fields_read < msg.num_required_fields) {
     rb_raise(VALIDATION_ERROR, "Some required fields were missing when reading a %s:\n%s",
              msg.name.c_str(), pp(obj));
+  }
+
+  for (LazyField& lf : lazy_fields) {
+    Fld& fld = *lf.fld;
+    Msg& lazy_msg = get_lazy_msg_type(msg, fld, obj);
+    VALUE val = lazy_msg.read(lf.ss, lazy_msg);
+    set_value(msg, fld, obj, val);
   }
 
   return obj;

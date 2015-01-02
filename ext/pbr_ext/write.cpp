@@ -16,7 +16,7 @@ void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num);
 void write_value(WRITE_ARGS);
 void write_packed(WRITE_ARGS);
 void write_repeated(WRITE_ARGS);
-write_val_func get_val_writer(fld_t fld_type);
+void write_embedded(buf_t& buf, Msg& msg, VALUE obj);
 
 // conventional variables used in this file
 // buf_t& buf  - the write buffer
@@ -71,23 +71,13 @@ DEF_WV(BOOL) {
 }
 
 DEF_WV(BYTES) {
-  if (TYPE(val) != T_STRING) {
-    if (fld.get_lazy_type != Qnil) {
-      VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
-      Msg *lazy_msg = find_msg_for_type(*msg.model, type);
-      if (lazy_msg == NULL) {
-        rb_raise(rb_eStandardError, "Lazy type %s for %s.%s has not been registered.",
-                 pp(type), msg.name.c_str(), fld.name.c_str());
-      } else {
-        rb_raise(rb_eStandardError, "Not implemented");
-      }
-    } else {
-      rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
-               msg.name.c_str(), fld.name.c_str(), pp(val));
-    }
-  }
-
-  write_bytes(buf, val);
+  if (TYPE(val) == T_STRING)
+    write_bytes(buf, val);
+  else if (fld.get_lazy_type != Qnil)
+    write_embedded(buf, get_lazy_msg_type(msg, fld, obj), val);
+  else
+    rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
+             msg.name.c_str(), fld.name.c_str(), pp(val));
 }
 
 DEF_WV(STRING) {
@@ -103,21 +93,7 @@ DEF_WV(STRING) {
 
 DEF_WV(MESSAGE) {
   Msg& embedded_msg = *fld.embedded_msg;
-  uint32_t len_offset = buf.size();
-  int32_t estimated_varint_size = embedded_msg.last_varint_size;
-  pad(buf, estimated_varint_size);
-  uint32_t msg_offset = buf.size();
-  embedded_msg.write(buf, embedded_msg, val);
-  uint32_t msg_len = buf.size() - msg_offset;
-  int32_t actual_varint_size = varint32_size(msg_len);
-  int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
-
-  if (extra_bytes_needed > 0) {
-    buf.insert(buf.begin() + msg_offset, extra_bytes_needed, 0);
-    w_varint32_bytes(buf, len_offset, msg_len, actual_varint_size);
-  } else {
-    w_varint32_bytes(buf, len_offset, msg_len, estimated_varint_size);    
-  }
+  write_embedded(buf, embedded_msg, val);
 }
 
 write_val_func get_val_writer(fld_t fld_type) {
@@ -131,6 +107,9 @@ write_val_func get_val_writer(fld_t fld_type) {
 // private
 
 void write_obj(buf_t& buf, Msg& msg, VALUE obj) {
+  if (!rb_obj_is_kind_of(obj, msg.target))
+    rb_raise(VALIDATION_ERROR, "Expected %s but got: %s", pp(msg.target), pp(obj));
+  
   int32_t initial_offset = buf.size();
   int num_flds = msg.flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
@@ -200,6 +179,24 @@ void write_packed(WRITE_ARGS) {
   }
   int32_t data_len = buf.size() - data_offset;
   w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
+}
+
+void write_embedded(buf_t& buf, Msg& msg, VALUE obj) {
+  uint32_t len_offset = buf.size();
+  int32_t estimated_varint_size = msg.last_varint_size;
+  pad(buf, estimated_varint_size);
+  uint32_t msg_offset = buf.size();
+  msg.write(buf, msg, obj);
+  uint32_t msg_len = buf.size() - msg_offset;
+  int32_t actual_varint_size = varint32_size(msg_len);
+  int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
+
+  if (extra_bytes_needed > 0) {
+    buf.insert(buf.begin() + msg_offset, extra_bytes_needed, 0);
+    w_varint32_bytes(buf, len_offset, msg_len, actual_varint_size);
+  } else {
+    w_varint32_bytes(buf, len_offset, msg_len, estimated_varint_size);
+  }
 }
 
 void pad(buf_t& buf, int num_bytes) {

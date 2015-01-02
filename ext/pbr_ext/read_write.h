@@ -2,6 +2,7 @@
 #define read_write_h__
 
 #include "common.h"
+#include "model.h"
 
 // https://anteru.net/2007/12/18/200/
 #define REINTERPRET(type, value)  *reinterpret_cast<type*>(&value)
@@ -51,6 +52,17 @@ inline void validate_enum(Msg& msg, Fld& fld, VALUE val) {
   if (!is_valid)
     rb_raise(VALIDATION_ERROR, "%s.%s is %s, which is not a member of %s",
              msg.name.c_str(), fld.name.c_str(), pp(val), pp(fld.enum_module));
+}
+
+inline Msg& get_lazy_msg_type(Msg& msg, Fld& fld, VALUE obj) {
+  VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
+  Msg *lazy_msg = find_msg_for_type(*msg.model, type);
+
+  if (lazy_msg == NULL)
+    rb_raise(rb_eStandardError, "Lazy type %s for %s.%s has not been registered.",
+             pp(type), msg.name.c_str(), fld.name.c_str());
+
+  return *lazy_msg;
 }
 
 #endif
