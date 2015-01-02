@@ -13,6 +13,19 @@
 
 using namespace std;
 
+int32_t max_field_num(VALUE rb_flds);
+wire_t wire_type_for_fld_type(fld_t fld_type);
+Msg& get_msg_for_type(Model& model, VALUE type);
+std::vector<VALUE> arr2vec(VALUE array);
+write_val_func get_val_writer(fld_t fld_type);
+read_val_func get_val_reader(fld_t fld_type);
+
+// conventional variables used in thie file
+// VALUE type - a ruby message descriptor (a Class that includes Pbr::Message)
+// VALUE mapping - the PbrMapping
+// Msg& msg  - the metamessage
+// Fld& fld  - the metafield
+
 // "constants" we don't want to compute repeatedly.
 // set in Init_pbr_ext.
 ID ID_CTOR; 
@@ -69,11 +82,6 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   // fill in fields
   for (VALUE type : new_types)
     register_fields(model, get_msg_for_type(model, type), type, mapping);
-
-  // refresh parent pointers
-  for (Msg& msg : model.msgs)
-    for (Fld& fld : msg.flds_to_enumerate)
-      fld.msg = &msg;
 
   // print debugging info
   cerr << endl;
@@ -166,7 +174,7 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
   Msg& msg = get_msg_for_type(model, type);
   buf_t buf;
   buf.reserve(MSG_INITIAL_CAPACITY);
-  msg.write(msg, buf, obj);
+  msg.write(buf, msg, obj);
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
@@ -175,7 +183,7 @@ VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
-  return msg.read(msg, ss);
+  return msg.read(ss, msg);
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {
@@ -201,12 +209,12 @@ wire_t wire_type_for_fld_type(fld_t fld_type) {
   }
 }
 
-int32_t max_field_num(VALUE flds) {
+int32_t max_field_num(VALUE rb_flds) {
   int32_t max = 0;
-  int len = RARRAY_LEN(flds);
+  int len = RARRAY_LEN(rb_flds);
   for (int i=0; i<len; i++) {
-    VALUE fld = rb_ary_entry(flds, i);
-    int32_t fn = NUM2INT(rb_get(fld, "num"));
+    VALUE rb_fld = rb_ary_entry(rb_flds, i);
+    int32_t fn = NUM2INT(rb_get(rb_fld, "num"));
     if (fn > max)
       max = fn;
   }

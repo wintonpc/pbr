@@ -15,11 +15,11 @@ struct Fld;
 typedef void (*add_fld_func)(Msg&, Fld);
 typedef Fld *(*get_fld_func)(Msg&, fld_num_t);
 
-typedef void (*write_obj_func)(Msg& msg, buf_t& buf, VALUE obj);
-typedef void (*write_val_func)(buf_t& buf, VALUE obj, VALUE val, Fld& fld);
+typedef void (*write_obj_func)(buf_t& buf, Msg& msg, VALUE obj);
+typedef void (*write_val_func)(buf_t& buf, Msg& msg, Fld& fld, VALUE obj, VALUE val);
 
-typedef VALUE (*read_obj_func)(Msg& msg, ss_t& ss);
-typedef VALUE (*read_val_func)(ss_t& ss, Fld& fld);
+typedef VALUE (*read_obj_func)(ss_t& ss, Msg& msg);
+typedef VALUE (*read_val_func)(ss_t& ss, Msg& msg, Fld& fld);
 
 struct Model {
   bool validate_on_write;
@@ -44,7 +44,6 @@ struct Msg {
 };
 
 struct Fld {
-  Msg *msg;
   fld_num_t num;
   std::string name;
   ID target_field_getter;

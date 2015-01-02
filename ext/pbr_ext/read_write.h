@@ -39,7 +39,7 @@ inline void set_value(Msg& msg, Fld& fld, VALUE obj, VALUE val) {
     rb_funcall(obj, fld.target_field_setter, 1, val);
 }
 
-inline void validate_enum(Fld& fld, VALUE val) {
+inline void validate_enum(Msg& msg, Fld& fld, VALUE val) {
   bool is_valid = false;
   for (VALUE m : fld.enum_values) {
     if (m == val) {
@@ -50,7 +50,7 @@ inline void validate_enum(Fld& fld, VALUE val) {
   
   if (!is_valid)
     rb_raise(VALIDATION_ERROR, "%s.%s is %s, which is not a member of %s",
-             fld.msg->name.c_str(), fld.name.c_str(), pp(val), pp(fld.enum_module));
+             msg.name.c_str(), fld.name.c_str(), pp(val), pp(fld.enum_module));
 }
 
 #endif

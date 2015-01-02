@@ -7,9 +7,30 @@
 
 using namespace std;
 
+#define WRITE_ARGS  buf_t& buf, Msg& msg, Fld& fld, VALUE obj, VALUE val
+
+void write_bytes(buf_t& buf, VALUE rstr);
+void pad(buf_t& buf, int num_bytes);
+void write_bytes(buf_t& buf, VALUE rstr);
+void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num);
+void write_value(WRITE_ARGS);
+void write_packed(WRITE_ARGS);
+void write_repeated(WRITE_ARGS);
+write_val_func get_val_writer(fld_t fld_type);
+
+// conventional variables used in this file
+// buf_t& buf  - the write buffer
+// Msg& msg  - the metamessage
+// Fld& fld  - the metafield
+// VALUE obj - the object being written
+// VALUE val - the field value on obj being written
+
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_WV(type)  void wv_##type(buf_t& buf, VALUE obj, VALUE val, Fld& fld)
+#define DEF_WV(type)  void wv_##type(WRITE_ARGS)
+#define DEFLATE(val)  RTEST(fld.deflate) ? rb_funcall(fld.deflate, ID_CALL, 1, (val)) : (val)
+
+// define all the type writers up front to avoid the need for declarations.
 
 DEF_WV(INT32)    { w_varint32(buf,          NUM2INT (val));  }
 DEF_WV(UINT32)   { w_varint32(buf,          NUM2UINT(val));  }
@@ -23,8 +44,8 @@ DEF_WV(SFIXED64) { w_int64   (buf,          NUM2LL  (val));  }
 DEF_WV(FIXED64)  { w_int64   (buf,          NUM2ULL (val));  }
 
 DEF_WV(ENUM) {
-  if (fld.msg->model->validate_on_write)
-    validate_enum(fld, val);
+  if (msg.model->validate_on_write)
+    validate_enum(msg, fld, val);
   w_varint32(buf, NUM2INT(val));
 }
 
@@ -45,45 +66,24 @@ DEF_WV(BOOL) {
     w_varint32(buf, 0);
   else {
     rb_raise(VALIDATION_ERROR, "%s.%s should be a boolean but is: %s",
-             fld.msg->name.c_str(), fld.name.c_str(), pp(val));
+             msg.name.c_str(), fld.name.c_str(), pp(val));
   }
 }
 
-void write_bytes(buf_t& buf, VALUE rstr) {
-  const char *s = RSTRING_PTR(rstr);
-  int len = RSTRING_LEN(rstr);
-  w_varint32(buf, len);
-  buf.insert(buf.end(), s, s + len);
-}
-
 DEF_WV(BYTES) {
-  cerr << "BYTES" << endl;
-  cerr << "is it not a string?" << endl;
   if (TYPE(val) != T_STRING) {
-    cerr << "not a string. is there a lazy type?" << endl;
     if (fld.get_lazy_type != Qnil) {
-      cerr << "yes. figure out what it is" << endl;
       VALUE type = rb_funcall(fld.get_lazy_type, ID_CALL, 1, obj);
-      cerr << "it is " << inspect(type) << endl;
-      cerr << "look it up" << endl;
-      cerr << "fld.msg = " << (long int)fld.msg << endl;
-      cerr << "fld.msg->name = " << fld.msg->name.c_str() << endl;
-      cerr << "fld.msg->model = " << (long int)fld.msg->model << endl;
-      Msg *lazy_msg = find_msg_for_type(*fld.msg->model, type);
-      cerr << "registered?" << endl;
+      Msg *lazy_msg = find_msg_for_type(*msg.model, type);
       if (lazy_msg == NULL) {
-        cerr << "no" << endl;
         rb_raise(rb_eStandardError, "Lazy type %s for %s.%s has not been registered.",
-                 pp(type), fld.msg->name.c_str(), fld.name.c_str());
+                 pp(type), msg.name.c_str(), fld.name.c_str());
       } else {
-        cerr << "yes" << endl;
-        cerr << "found lazy type " << inspect(type) << endl;
         rb_raise(rb_eStandardError, "Not implemented");
       }
     } else {
-      cerr << "no" << endl;
       rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
-               fld.msg->name.c_str(), fld.name.c_str(), pp(val));
+               msg.name.c_str(), fld.name.c_str(), pp(val));
     }
   }
 
@@ -94,25 +94,20 @@ DEF_WV(STRING) {
   VALUE v_in = val;
   if (TYPE(v_in) != T_STRING)
     rb_raise(VALIDATION_ERROR, "While writing %s.%s, expected a string but got: %s",
-             fld.msg->name.c_str(), fld.name.c_str(), pp(v_in));
+             msg.name.c_str(), fld.name.c_str(), pp(v_in));
 
   bool is_already_utf8 = rb_funcall(v_in, ID_ENCODING, 0) == UTF_8_ENCODING;
   VALUE v_out = is_already_utf8 ? v_in : rb_funcall(v_in, ID_ENCODE, 1, UTF_8_ENCODING);
   write_bytes(buf, v_out);
 }
 
-void pad(buf_t& buf, int num_bytes) {
-  for (int i=0; i<num_bytes; i++)
-    buf.push_back(0);
-}
-
 DEF_WV(MESSAGE) {
-  Msg *embedded_msg = fld.embedded_msg;
+  Msg& embedded_msg = *fld.embedded_msg;
   uint32_t len_offset = buf.size();
-  int32_t estimated_varint_size = embedded_msg->last_varint_size;
+  int32_t estimated_varint_size = embedded_msg.last_varint_size;
   pad(buf, estimated_varint_size);
   uint32_t msg_offset = buf.size();
-  embedded_msg->write(*embedded_msg, buf, val);
+  embedded_msg.write(buf, embedded_msg, val);
   uint32_t msg_len = buf.size() - msg_offset;
   int32_t actual_varint_size = varint32_size(msg_len);
   int32_t extra_bytes_needed = actual_varint_size - estimated_varint_size;
@@ -125,11 +120,6 @@ DEF_WV(MESSAGE) {
   }
 }
 
-void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
-  uint32_t h = (fld_num << 3) | wire_type;
-  w_varint32(buf, h);
-}
-
 write_val_func get_val_writer(fld_t fld_type) {
   switch (fld_type) {
     TYPE_MAP(wv);
@@ -138,39 +128,9 @@ write_val_func get_val_writer(fld_t fld_type) {
   }
 }
 
- void write_value(buf_t& buf, Fld& fld, VALUE obj, VALUE val) {
-  write_header(buf, fld.wire_type, fld.num);
-  fld.write(buf, obj, val, fld);
-}
+// private
 
-#define DEFLATE(val)  RTEST(fld.deflate) ? rb_funcall(fld.deflate, ID_CALL, 1, (val)) : (val)
-
-void write_repeated(buf_t& buf, Fld& fld, VALUE obj, VALUE arr) {
-  int len = RARRAY_LEN(arr);
-  for (int i=0; i<len; i++) {
-    VALUE elem = DEFLATE(rb_ary_entry(arr, i));
-    write_value(buf, fld, obj, elem);
-  }        
-}
-
-void write_packed(buf_t& buf, Fld& fld, VALUE obj, VALUE arr) {
-  int len = RARRAY_LEN(arr);
-  if (len == 0)
-    return;
-
-  write_header(buf, WIRE_LENGTH_DELIMITED, fld.num);
-  int32_t len_offset = buf.size();
-  pad(buf, MAX_VARINT32_BYTE_SIZE);
-  int32_t data_offset = buf.size();
-  for (int i=0; i<len; i++) {
-    VALUE elem = DEFLATE(rb_ary_entry(arr, i));
-    fld.write(buf, obj, elem, fld);
-  }
-  int32_t data_len = buf.size() - data_offset;
-  w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
-}
-
-void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
+void write_obj(buf_t& buf, Msg& msg, VALUE obj) {
   int32_t initial_offset = buf.size();
   int num_flds = msg.flds_to_enumerate.size();
   for (int i=0; i<num_flds; i++) {
@@ -184,19 +144,65 @@ void write_obj(Msg& msg, buf_t& buf, VALUE obj) {
         else
           continue;
       }
-      write_value(buf, fld, obj, DEFLATE(val));
+      write_value(buf, msg, fld, obj, DEFLATE(val));
     }
     else {
       if (val == Qnil)
         continue;
       
       if (fld.is_packed)
-        write_packed(buf, fld, obj, val);
+        write_packed(buf, msg, fld, obj, val);
       else
-        write_repeated(buf, fld, obj, val);
+        write_repeated(buf, msg, fld, obj, val);
     }
   }
   int32_t final_offset = buf.size();
   msg.last_varint_size = varint32_size(final_offset - initial_offset);
 }
 
+void write_header(buf_t& buf, wire_t wire_type, fld_num_t fld_num) {
+  uint32_t h = (fld_num << 3) | wire_type;
+  w_varint32(buf, h);
+}
+
+void write_bytes(buf_t& buf, VALUE rstr) {
+  const char *s = RSTRING_PTR(rstr);
+  int len = RSTRING_LEN(rstr);
+  w_varint32(buf, len);
+  buf.insert(buf.end(), s, s + len);
+}
+
+void write_value(WRITE_ARGS) {
+  write_header(buf, fld.wire_type, fld.num);
+  fld.write(buf, msg, fld, obj, val);
+}
+
+void write_repeated(WRITE_ARGS) {
+  int len = RARRAY_LEN(val);
+  for (int i=0; i<len; i++) {
+    VALUE elem = DEFLATE(rb_ary_entry(val, i));
+    write_value(buf, msg, fld, obj, elem);
+  }        
+}
+
+void write_packed(WRITE_ARGS) {
+  int len = RARRAY_LEN(val);
+  if (len == 0)
+    return;
+
+  write_header(buf, WIRE_LENGTH_DELIMITED, fld.num);
+  int32_t len_offset = buf.size();
+  pad(buf, MAX_VARINT32_BYTE_SIZE);
+  int32_t data_offset = buf.size();
+  for (int i=0; i<len; i++) {
+    VALUE elem = DEFLATE(rb_ary_entry(val, i));
+    fld.write(buf, msg, fld, obj, elem);
+  }
+  int32_t data_len = buf.size() - data_offset;
+  w_varint32_bytes(buf, len_offset, data_len, MAX_VARINT32_BYTE_SIZE);
+}
+
+void pad(buf_t& buf, int num_bytes) {
+  for (int i=0; i<num_bytes; i++)
+    buf.push_back(0);
+}

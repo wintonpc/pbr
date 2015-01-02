@@ -6,9 +6,20 @@
 
 using namespace std;
 
+void ss_skip(ss_t& ss, int32_t n);
+void skip(ss_t& ss, wire_t wire_type);
+
+// conventional variables used in this file
+// ss_t& ss  - the read buffer
+// Msg& msg  - the metamessage
+// Fld& fld  - the metafield
+// VALUE obj - the object being written
+// VALUE val - the field value on obj being written
+
 // these macros are unhygienic, but that's ok since they are
 // local to this file.
-#define DEF_RV(type)  VALUE rv_##type(ss_t& ss, Fld& fld)
+#define DEF_RV(type)  VALUE rv_##type(ss_t& ss, Msg& msg, Fld& fld)
+#define INFLATE(val)  RTEST(fld.inflate) ? rb_funcall(fld.inflate, ID_CALL, 1, (val)) : (val)
 
 DEF_RV(INT32)    { return (INT2NUM          (r_varint32(ss)));  }
 DEF_RV(UINT32)   { return (UINT2NUM         (r_varint32(ss)));  }
@@ -23,8 +34,8 @@ DEF_RV(FIXED64)  { return (ULL2NUM          (r_int64   (ss)));  }
 
 DEF_RV(ENUM) {
   VALUE val = INT2NUM(r_varint32(ss)); 
-  if (fld.msg->model->validate_on_read)
-    validate_enum(fld, val);
+  if (msg.model->validate_on_read)
+    validate_enum(msg, fld, val);
   return val;
 }
 
@@ -58,7 +69,7 @@ DEF_RV(MESSAGE) {
   int32_t len = r_varint32(ss);
   ss_t tmp_ss = ss_substream(ss, len);
   Msg& embedded_msg = *fld.embedded_msg;
-  return embedded_msg.read(embedded_msg, tmp_ss);
+  return embedded_msg.read(tmp_ss, embedded_msg);
 }
 
 read_val_func get_val_reader(fld_t fld_type) {
@@ -69,32 +80,7 @@ read_val_func get_val_reader(fld_t fld_type) {
   }
 }
 
-#define INFLATE(val)  RTEST(fld.inflate) ? rb_funcall(fld.inflate, ID_CALL, 1, (val)) : (val)
-
-void ss_skip(ss_t& ss, int32_t n) {
-  ss.pos += n;
-}
-
-void skip(ss_t& ss, wire_t wire_type) {
-  uint32_t len;
-  switch (wire_type) {
-  case WIRE_VARINT: 
-    r_varint64(ss);
-    break;
-  case WIRE_64BIT:
-    ss_skip(ss, sizeof(int64_t));
-    break;
-  case WIRE_LENGTH_DELIMITED:
-    len = r_varint32(ss);
-    ss_skip(ss, len);
-    break;
-  case WIRE_32BIT:
-    ss_skip(ss, sizeof(int32_t));
-    break;
-  }
-}
-
-VALUE read_obj(Msg& msg, ss_t& ss) {
+VALUE read_obj(ss_t& ss, Msg& msg) {
   VALUE obj = rb_funcall(msg.target, ID_CTOR, 0);
   
   for (Fld& fld : msg.flds_to_enumerate)
@@ -120,16 +106,16 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
     if (fld.label != LABEL_REPEATED) {
       if (fld.label == LABEL_REQUIRED)
         num_required_fields_read++;
-      set_value(msg, fld, obj, INFLATE(fld.read(ss, fld)));
+      set_value(msg, fld, obj, INFLATE(fld.read(ss, msg, fld)));
     } else {
       VALUE rb_arr = get_value(msg, fld, obj);
       if (fld.is_packed) {
         uint32_t byte_len = r_varint32(ss);
         ss_t tmp_ss = ss_substream(ss, byte_len);
         while (ss_more(tmp_ss))
-          rb_ary_push(rb_arr, INFLATE(fld.read(tmp_ss, fld)));
+          rb_ary_push(rb_arr, INFLATE(fld.read(tmp_ss, msg, fld)));
       } else {
-        VALUE val = fld.read(ss, fld);
+        VALUE val = fld.read(ss, msg, fld);
         rb_ary_push(rb_arr, INFLATE(val));
       }
     }
@@ -142,4 +128,28 @@ VALUE read_obj(Msg& msg, ss_t& ss) {
 
   return obj;
 }
+
+void ss_skip(ss_t& ss, int32_t n) {
+  ss.pos += n;
+}
+
+void skip(ss_t& ss, wire_t wire_type) {
+  uint32_t len;
+  switch (wire_type) {
+  case WIRE_VARINT: 
+    r_varint64(ss);
+    break;
+  case WIRE_64BIT:
+    ss_skip(ss, sizeof(int64_t));
+    break;
+  case WIRE_LENGTH_DELIMITED:
+    len = r_varint32(ss);
+    ss_skip(ss, len);
+    break;
+  case WIRE_32BIT:
+    ss_skip(ss, sizeof(int32_t));
+    break;
+  }
+}
+
  

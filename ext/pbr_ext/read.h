@@ -5,8 +5,6 @@
 #include "model.h"
 
 read_val_func get_val_reader(wire_t wire_type, fld_t fld_type);
-
-VALUE read_obj(Msg& msg, ss_t& ss);
-uint32_t r_varint32(ss_t& ss);
+VALUE read_obj(ss_t& ss, Msg& msg);
 
 #endif
