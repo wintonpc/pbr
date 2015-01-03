@@ -11,8 +11,6 @@ to inflect field names (or hash keys).
 # Notes
 
 - TODO
-  - test descriptors with same name but in different namespaces
-
   - more realistic performance tests with wrapped, real messages
 
 - documentation
@@ -143,7 +141,10 @@ managing strings efficiently. Pbr supports this case in pure C++, to avoid alloc
 
 - Unknown fields are discarded upon deserialization. Consequently, Pbr should not be used
   when passthrough behavior is required.
-- default values for optional fields are not currently supported
+- unsupported
+  - default values for optional fields
+  - extensions
+  - 'oneof'
 - A Float in an integer-typed field is truncated when serializing, as with Float::to_i
 - The test for missing required fields when reading a message may exhibit false negatives
   when required fields are duplicated in the protobuf. Duplicate fields are unlikely.
@@ -163,7 +164,7 @@ When reading a message, each field is preceded by a header that contains the fie
 The metafield must be looked up to know how to deserialize the field. To make this lookup
 efficient, message types with reasonably low field numbers store their metafields in a sparse
 vector. This allows the metafield to be looked up by directly indexing into the vector. For
-other message types, metafields are stored in a dense vector and lookup is done by scanning.
+messages with large field numbers, metafields are stored in a dense vector and lookup is done by scanning.
 
 ### Function pointers
 

@@ -169,7 +169,7 @@ vector<VALUE> arr2vec(VALUE array) {
 }
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
-  cerr << "writing" << endl;
+  cerr << "writing..." << endl;
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
   buf_t buf;
