@@ -17,7 +17,7 @@ class Pbr
     def self.compile(req)
       file = req.proto_file.map do |file|
         g = new(StringIO.new)
-        ns = file.package.split('.').map(&:classify)
+        ns = file.package.split('.').map(&:camelize)
         g.compile(ns, file)
 
         g.c.rewind
@@ -102,14 +102,12 @@ class Pbr
       # Turn the label into Ruby
       label = name_for(L, f.label)
 
-      STDERR.puts("!! #{f.type_name}")
-
       # Turn the name into a Ruby
       name = ":#{f.name}"
 
       # Determine the type-name and convert to Ruby
       type = if f.type_name
-        f.type_name.split('.').map(&:classify).join('::')
+        f.type_name.split('.').map(&:camelize).join('::')
       else
         ":#{name_for(T, f.type)}"
       end
