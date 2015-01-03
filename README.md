@@ -11,7 +11,6 @@ to inflect field names (or hash keys).
 # Notes
 
 - TODO
-
   - test descriptors with same name but in different namespaces
 
   - more realistic performance tests with wrapped, real messages
