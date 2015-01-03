@@ -129,7 +129,8 @@ void write_obj(buf_t& buf, Msg& msg, VALUE obj) {
       if (val == Qnil)
         continue;
       else if (TYPE(val) != T_ARRAY)
-        rb_raise(VALIDATION_ERROR, "Expected array but got: %s", pp(val));
+        rb_raise(VALIDATION_ERROR, "%s.%s: Expected array but got: %s",
+                 msg.name.c_str(), fld.name.c_str(), pp(val));
       else if (fld.is_packed)
         write_packed(buf, msg, fld, obj, val);
       else
