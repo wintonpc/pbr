@@ -106,6 +106,7 @@ class FileDescriptorProto
 
   optional :name, :string, 1       # file name, relative to root of source tree
   optional :package, :string, 2    # e.g. "foo", "foo.bar", etc.
+  repeated :dependencies, :string, 3
 
   repeated :message_type, DescriptorProto,     4
   repeated :enum_type,    EnumDescriptorProto, 5

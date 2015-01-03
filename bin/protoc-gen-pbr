@@ -6,12 +6,10 @@ require 'pp'
 
 # borrowed from beefcake
 
-ns = (ENV['PBR_NAMESPACE'] || '').split('::')
-
 pbr      = Pbr.new(PbrMapping.vanilla)
 input    = STDIN.read
 request  = pbr.read(input, CodeGeneratorRequest)
-response = Pbr::Generator.compile(ns, request)
+response = Pbr::Generator.compile(request)
 output   = pbr.write(response, CodeGeneratorResponse)
 
 STDOUT.print(output)

@@ -14,14 +14,15 @@ class Pbr
     T = FieldDescriptorProto::Type
 
 
-    def self.compile(ns, req)
+    def self.compile(req)
       file = req.proto_file.map do |file|
         g = new(StringIO.new)
+        ns = file.package.split('.').map(&:classify)
         g.compile(ns, file)
 
         g.c.rewind
         CodeGeneratorResponse::File.new(
-          :name => File.basename(file.name, '.proto') + '.pb.rb',
+          :name => File.join(file.package.gsub('.', '/'),File.basename(file.name, '.proto') + '.pb.rb'),
           :content => g.c.read
         )
       end
@@ -101,20 +102,14 @@ class Pbr
       # Turn the label into Ruby
       label = name_for(L, f.label)
 
+      STDERR.puts("!! #{f.type_name}")
+
       # Turn the name into a Ruby
       name = ":#{f.name}"
 
       # Determine the type-name and convert to Ruby
       type = if f.type_name
-        # We have a type_name so we will use it after converting to a
-        # Ruby friendly version
-        t = f.type_name
-        if pkg
-          t = t.gsub(pkg, '') # Remove the leading package name
-        end
-        t = t.gsub(/^\.*/, '')       # Remove leading `.`s
-
-        t.gsub('.', '::')  # Convert to Ruby namespacing syntax
+        f.type_name.split('.').map(&:classify).join('::')
       else
         ":#{name_for(T, f.type)}"
       end
@@ -144,12 +139,14 @@ class Pbr
     end
 
     def name_for(mod, val)
-      mod.name_for(val).to_s.gsub(/.*_/, '').downcase
+      mod.name_for(val).to_s.downcase
     end
 
     def compile(ns, file)
       puts "## Generated from #{file.name} for #{file.package}"
       puts "require 'pbr'"
+      file.dependencies.each{|d| puts "require_relative '#{File.join(file.package.split('.').size.times.map{'..'}.join('/'),
+                                                                     d.sub(/\.proto/, '.pb'))}'"}
       puts
 
       ns!(ns) do
