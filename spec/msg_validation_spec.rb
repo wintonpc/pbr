@@ -55,4 +55,5 @@ describe 'Message validation' do
   it_validates_read('bad enums', {req: '', an_enum: 4})
   it_validates_write('bad bytes (object)', {req: '', some_bytes: {a: :z}})
   it_validates_write('bad embedded msg (integer)', {req: '', some_msg: 42})
+  it_validates_write('bad repeated (integer)', {req: '', rep: 42})
 end
