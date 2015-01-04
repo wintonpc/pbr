@@ -105,7 +105,7 @@ VALUE read_obj(ss_t& ss, Msg& msg) {
     Fld *fld_ptr = msg.find_fld(msg, fld_num);
 
     if (fld_ptr == NULL) {
-      cerr << "skipping unrecognized field " << msg.name << "." << fld_num << endl;
+      //cerr << "skipping unrecognized field " << msg.name << "." << fld_num << endl;
       wire_t wire_type = h & 7;
       skip(ss, wire_type);
       continue;

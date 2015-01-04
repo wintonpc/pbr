@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Pbr::VERSION
   spec.authors       = ['Peter Winton']
   spec.email         = ['pwinton@indigobio.com']
-  spec.summary       = %q{Fast ProtoBuf}
-  spec.description   = %q{Fast ProtoBuf}
+  spec.summary       = %q{Fast Ruby ProtoBuf}
+  spec.description   = %q{A fast C++ implementation of ProtoBuf for ruby}
   spec.homepage      = ''
   spec.license       = 'MIT'
 

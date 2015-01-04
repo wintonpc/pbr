@@ -85,6 +85,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
   for (VALUE type : new_types)
     register_fields(model, get_msg_for_type(model, type), type, mapping);
 
+  /*
   // print debugging info
   cerr << endl;
   cerr << "REGISTERED:" << endl;
@@ -107,6 +108,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
     }
   }
   cerr << "---------------" << endl;
+  */
   
   return Qnil;
 }
@@ -177,7 +179,6 @@ vector<VALUE> arr2vec(VALUE array) {
 }
 
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
-  cerr << "writing" << endl;
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
   buf_t buf;
@@ -187,7 +188,6 @@ VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
 }
 
 VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
-  cerr << "reading" << endl;
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
   ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
