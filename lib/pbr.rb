@@ -27,7 +27,8 @@ class Pbr
     @opts = opts.dup
     default_opt(:validate_on_write, true)
     default_opt(:validate_on_read, true)
-    @handle = Ext::create_handle(opts)
+    @keep_alive = []
+    @handle = Ext::create_handle(opts, @keep_alive)
     @mapping = mapping
     @registered_types = Set.new
 

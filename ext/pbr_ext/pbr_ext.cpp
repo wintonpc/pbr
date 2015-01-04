@@ -41,10 +41,11 @@ VALUE VALIDATION_ERROR;
 #define MODEL_PTR(handle) (Model*)NUM2LONG(handle)
 #define MODEL(handle) *(MODEL_PTR(handle))
 
-VALUE create_handle(VALUE self, VALUE opts) {
+VALUE create_handle(VALUE self, VALUE opts, VALUE keep_alive_array) {
   Model *m = new Model();
   m->validate_on_write = rb_hash_get_sym(opts, "validate_on_write");
   m->validate_on_read = rb_hash_get_sym(opts, "validate_on_read");
+  m->keep_alive_array = keep_alive_array;
   return LONG2NUM((long int)(m));
 }
 
@@ -70,6 +71,7 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
     Msg msg = make_msg(type_name(type), max_field_num(rb_get(type, "fields")));
     msg.model = &model;
     msg.target = rb_call1(rb_get(mapping, "get_target_type"), type);
+    keep_alive(model, msg.target);
     msg.target_is_hash = RTEST(rb_funcall(msg.target, rb_intern("<="), 1, rb_cHash));
     msg.write = write_obj; // was necessary for indirection at one point. leave as is for
     msg.read = read_obj;   // future flexibility. no noticeable performance hit.
@@ -130,15 +132,21 @@ void register_fields(Model& model, Msg& msg, VALUE type, VALUE mapping) {
       msg.num_required_fields++;
     fld.is_packed = RTEST(rb_get(rb_fld, "packed"));
     fld.deflate = rb_hash_aref(deflators, fld_name);
+    keep_alive(model, fld.deflate);
     fld.inflate = rb_hash_aref(inflators, fld_name);
+    keep_alive(model, fld.inflate);
     fld.get_lazy_type = rb_get(rb_fld, "get_lazy_type");
+    keep_alive(model, fld.get_lazy_type);
     if (fld_type == FLD_ENUM) {
       fld.enum_module = rb_get(rb_fld, "msg_class");
+      keep_alive(model, fld.enum_module);
       fld.enum_values = arr2vec(rb_get(fld.enum_module, "values"));
+      // (we don't need to keep_alive() Fixnums)
     }
 
     if (msg.target_is_hash) {
       fld.target_key = rb_call1(rb_get(mapping, "get_target_key"), rb_fld);
+      keep_alive(model, fld.target_key);
     } else {
       VALUE tf = rb_call1(rb_get(mapping, "get_target_field"), rb_fld);
       string target_field_name = TYPE(tf) == T_STRING ? RSTRING_PTR(tf) : rb_sym_to_cstr(tf);
@@ -237,7 +245,7 @@ extern "C" void Init_pbr_ext() {
 
   VALIDATION_ERROR = rb_const_get(pbr, rb_intern("ValidationError"));
 
-  rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 1);
+  rb_define_singleton_method(ext, "create_handle", (VALUE(*)(ANYARGS))create_handle, 2);
   rb_define_singleton_method(ext, "destroy_handle", (VALUE(*)(ANYARGS))destroy_handle, 1);
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);

@@ -63,3 +63,7 @@ Msg make_msg(std::string name, fld_num_t max_fld_num) {
   
   return msg;
 }
+
+void keep_alive(Model& model, VALUE obj) {
+  rb_ary_push(model.keep_alive_array, obj);
+}

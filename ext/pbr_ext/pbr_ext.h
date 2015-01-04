@@ -10,7 +10,7 @@
 #include "model.h"
 
 
-VALUE create_handle(VALUE self, VALUE opts);
+VALUE create_handle(VALUE self, VALUE opts, VALUE keep_alive_array);
 VALUE destroy_handle(VALUE self, VALUE handle);
 VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping);
 VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type);

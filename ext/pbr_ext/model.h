@@ -26,6 +26,7 @@ struct Model {
   bool validate_on_write;
   bool validate_on_read;
   std::vector<Msg> msgs;
+  VALUE keep_alive_array;
 };
 
 struct Msg {
@@ -72,6 +73,7 @@ struct LazyField {
 Msg make_msg(std::string name, fld_num_t max_fld_num);
 Msg *find_msg_by_name(Model& model, std::string name);
 Msg *find_msg_for_type(Model& model, VALUE type);
+void keep_alive(Model& model, VALUE obj);
 
 
 #endif
