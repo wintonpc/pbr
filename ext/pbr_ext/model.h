@@ -70,8 +70,8 @@ struct LazyField {
   Fld *fld;
 };
 
-Msg make_msg(std::string name, fld_num_t max_fld_num);
-Msg *find_msg_by_name(Model& model, std::string name);
+Msg make_msg(const std::string& name, fld_num_t max_fld_num);
+Msg *find_msg_by_name(Model& model, const std::string& name);
 Msg *find_msg_for_type(Model& model, VALUE type);
 void keep_alive(Model& model, VALUE obj);
 

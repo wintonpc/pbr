@@ -33,13 +33,10 @@ Fld *find_scanning_fld(Msg& msg, fld_num_t fld_num) {
   return NULL;
 }
 
-Msg *find_msg_by_name(Model& model, std::string name) {
-  int len = model.msgs.size();
-  for (int i=0; i<len; i++) {
-    Msg& msg = model.msgs[i];
+Msg *find_msg_by_name(Model& model, const std::string& name) {
+  for (Msg& msg : model.msgs)
     if (msg.name == name)
       return &msg;
-  }
   return NULL;
 }
 
@@ -47,7 +44,7 @@ Msg *find_msg_for_type(Model& model, VALUE type) {
   return find_msg_by_name(model, type_name(type));
 }
 
-Msg make_msg(std::string name, fld_num_t max_fld_num) {
+Msg make_msg(const std::string& name, fld_num_t max_fld_num) {
   Msg msg;
   msg.name = name;
   
