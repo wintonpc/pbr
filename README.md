@@ -34,7 +34,7 @@ class MyMessage
 end
 ```
 
-use
+Use it:
 
 ```ruby
 pbr = Pbr.new
@@ -139,7 +139,7 @@ You must preregister all possible polymorphic types ahead of time with `Pbr#regi
 
 ### Quirks
 
-- Unknown fields are discarded upon deserialization. Consequently, Pbr should not be used
+- Unrecognized fields are discarded upon deserialization. Consequently, Pbr should not be used
   when passthrough behavior is required.
 - unsupported
   - default values for optional fields

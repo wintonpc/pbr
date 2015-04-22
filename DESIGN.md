@@ -1,12 +1,24 @@
+## Protobuf Specs
+
+[Encoding](https://developers.google.com/protocol-buffers/docs/encoding)
+
+[Protobuf compiler plugin API](https://developers.google.com/protocol-buffers/docs/reference/other).
+Documentation on the meta-protos sent between the compiler and a plugin are harder to come by.
+[Here](https://github.com/google/protobuf/blob/v2.6.1/src/google/protobuf/compiler/plugin.proto)
+and
+[here](https://github.com/google/protobuf/blob/v2.6.1/src/google/protobuf/descriptor.proto)
+are good starting points.
+
+
 ## Optimizations
 
-Generally, as much work is done up front during type registration, in
-order to decrease the amount of work required to de/serialize. An
-effort is made to make validation as lightweight as possible; however,
-once validation for a message starts to fail, less emphasis is placed
-on optimizing the reporting of errors. In most well-designed
-applications, such errors would be rare and occur mostly during
-development.
+Generally, as much work as possible is done up front during type
+registration, in order to decrease the amount of work required to
+de/serialize. An effort is made to make validation as lightweight as
+possible; however, once validation for a message starts to fail, less
+emphasis is placed on optimizing the reporting of errors. In most
+well-designed applications, such errors would be rare and occur mostly
+during development.
 
 ### Field lookup
 
@@ -30,7 +42,7 @@ not.)
 
 ### Embedded messages
 
-An embedded message is prefixed with a varint encoded length of the
+An embedded message is prefixed with the varint encoded length of the
 message. To know how many bytes the varint will take, you need to know
 the encoded message length; to know the length, you must do the
 encoding. The obvious approach is to write the embedded message to a
@@ -83,8 +95,9 @@ not collected until the C++ code no longer needs them.
   - java process verifies it sees the right data
   - ruby side verifies it sees the right data echoed from java
 - Monitor performance throughout development
-  - use a big messages with a large variety of field types
+  - encode big messages with a large variety of field types
   - use large, real-life messages
+- Manually test for memory leaks
 - Test descriptor validation
 - Test message validation
 
