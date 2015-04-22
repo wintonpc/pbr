@@ -65,9 +65,7 @@ DEF_RV(BYTES) {
   if (fld.get_lazy_type == Qnil) {
     return rb_str_new(ss_read_chars(ss, len), len);
   } else {
-    LazyField lf;
-    lf.ss = ss_substream(ss, len);
-    lf.fld = &fld;
+    LazyField lf(ss_substream(ss, len), fld);
     lazy_fields->push_back(lf);
     return Qnil;
   }
@@ -137,7 +135,7 @@ VALUE read_obj(ss_t& ss, Msg& msg) {
   }
 
   for (LazyField& lf : lazy_fields) {
-    Fld& fld = *lf.fld;
+    Fld& fld = lf.fld;
     Msg& lazy_msg = get_lazy_msg_type(msg, fld, obj);
     VALUE val = lazy_msg.read(lf.ss, lazy_msg);
     set_value(msg, fld, obj, val);

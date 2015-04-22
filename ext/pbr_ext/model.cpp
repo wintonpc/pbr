@@ -64,3 +64,5 @@ Msg make_msg(const std::string& name, fld_num_t max_fld_num) {
 void keep_alive(Model& model, VALUE obj) {
   rb_ary_push(model.keep_alive_array, obj);
 }
+
+LazyField::LazyField(ss_t ss, Fld& fld) : ss(ss), fld(fld) {}

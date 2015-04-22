@@ -4,6 +4,8 @@
 #include "common.h"
 #include "model.h"
 
+#include <algorithm>
+
 // https://anteru.net/2007/12/18/200/
 #define REINTERPRET(type, value)  *reinterpret_cast<type*>(&value)
 
@@ -41,13 +43,9 @@ inline void set_value(Msg& msg, Fld& fld, VALUE obj, VALUE val) {
 }
 
 inline void validate_enum(Msg& msg, Fld& fld, VALUE val) {
-  bool is_valid = false;
-  for (VALUE m : fld.enum_values) {
-    if (m == val) {
-      is_valid = true;
-      break;
-    }
-  }
+  std::vector<VALUE> valid_values = fld.enum_values;
+  bool is_valid = std::any_of(valid_values.begin(), valid_values.end(),
+                              [=](VALUE m) { return m == val; });
   
   if (!is_valid)
     rb_raise(VALIDATION_ERROR, "%s.%s is %s, which is not a member of %s",

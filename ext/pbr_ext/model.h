@@ -67,7 +67,9 @@ struct Fld {
 
 struct LazyField {
   ss_t ss;
-  Fld *fld;
+  Fld& fld;
+
+  LazyField(ss_t ss, Fld& fld);
 };
 
 Msg make_msg(const std::string& name, fld_num_t max_fld_num);
