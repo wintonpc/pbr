@@ -12,6 +12,7 @@ typedef unsigned int zz32_t;
 typedef long unsigned int zz64_t;
 typedef std::vector<unsigned char> buf_t;
 
+// these come from the encoding spec: https://developers.google.com/protocol-buffers/docs/encoding
 const wire_t WIRE_VARINT = 0;
 const wire_t WIRE_64BIT = 1;
 const wire_t WIRE_LENGTH_DELIMITED = 2;
@@ -19,6 +20,8 @@ const wire_t WIRE_LENGTH_DELIMITED = 2;
 //const wire_t WIRE_END_GROUP = 4;
 const wire_t WIRE_32BIT = 5;
 
+// these come from the protoc plugin API:
+// https://github.com/google/protobuf/blob/v2.6.1/src/google/protobuf/descriptor.proto#L105-L133
 const fld_t FLD_DOUBLE = 1;
 const fld_t FLD_FLOAT = 2;
 const fld_t FLD_INT64 = 3;

@@ -111,9 +111,7 @@ void write_obj(buf_t& buf, Msg& msg, VALUE obj) {
     rb_raise(VALIDATION_ERROR, "Expected %s but got: %s", pp(msg.target), pp(obj));
 
   int32_t initial_offset = buf.size();
-  int num_flds = msg.flds_to_enumerate.size();
-  for (int i=0; i<num_flds; i++) {
-    Fld& fld = msg.flds_to_enumerate[i];
+  for (Fld& fld : msg.flds_to_enumerate) {
     VALUE val = get_value(msg, fld, obj);
     if (fld.label != LABEL_REPEATED) {
       if (val == Qnil) {
