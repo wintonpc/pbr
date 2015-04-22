@@ -101,3 +101,20 @@ not collected until the C++ code no longer needs them.
 - Test descriptor validation
 - Test message validation
 
+
+# Code Tour
+
+Usage of the gem revolves around the `Pbr` class in `lib/pbr.rb`. This
+class calls into methods on `Pbr::Ext` which are C++ methods,
+installed by `Init_pbr_ext` in `ext/pbr_ext/pbr_ext.cpp`.
+
+The C++ extension can be built manually with `rake clean && rake
+compile`, according to configuration in `ext/pbr_ext/extconf.rb`,
+thanks to the `rake-compiler` gem.
+
+When the pbr gem is installed, `bin/protoc-gen-pbr` is made available
+on the PATH. The `protoc` compiler knows to look for a
+"protoc-gen-pbr" plugin on the PATH when it is instructed to emit code
+for "pbr". The meat of the generator is in `lib/pbr/generator.rb`,
+which emits classes that include `Pbr::Message`.
+
