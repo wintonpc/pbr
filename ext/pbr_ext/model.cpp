@@ -34,9 +34,9 @@ Fld *find_scanning_fld(Msg& msg, fld_num_t fld_num) {
 }
 
 Msg *find_msg_by_name(Model& model, const std::string& name) {
-  for (Msg& msg : model.msgs)
-    if (msg.name == name)
-      return &msg;
+  for (auto& msg_ptr : model.msgs)
+    if (msg_ptr->name == name)
+      return msg_ptr.get();
   return NULL;
 }
 

@@ -43,6 +43,7 @@ VALUE VALIDATION_ERROR;
 
 VALUE create_handle(VALUE self, VALUE opts, VALUE keep_alive_array) {
   Model *m = new Model();
+  m->msgs.reserve(1);
   m->validate_on_write = rb_hash_get_sym(opts, "validate_on_write");
   m->validate_on_read = rb_hash_get_sym(opts, "validate_on_read");
   m->keep_alive_array = keep_alive_array;
@@ -78,7 +79,10 @@ VALUE register_types(VALUE self, VALUE handle, VALUE types, VALUE mapping) {
     msg.index = model.msgs.size();
     msg.num_required_fields = 0;
     msg.last_varint_size = 1;
-    model.msgs.push_back(msg);
+
+    auto msg_ptr = std::make_shared<Msg>();
+    *msg_ptr = msg;
+    model.msgs.push_back(msg_ptr);
   }
 
   // fill in fields

@@ -4,6 +4,7 @@
 #include <ruby.h>
 #include <vector>
 #include <string>
+#include <memory>
 #include "common.h"
 #include "types.h"
 #include "ss.h"
@@ -25,7 +26,7 @@ typedef VALUE (*read_val_func)(ss_t& ss, Msg& msg, Fld& fld, std::vector<LazyFie
 struct Model {
   bool validate_on_write;
   bool validate_on_read;
-  std::vector<Msg> msgs;
+  std::vector<std::shared_ptr<Msg>> msgs;
   VALUE keep_alive_array;
 };
 
