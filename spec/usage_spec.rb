@@ -123,13 +123,6 @@ describe Pbr do
     expect(v2.msg.bar).to eql 'goodbye'
   end
 
-  # it 'regression' do
-  #   pbr = Pbr.new
-  #   pbr.write(make_valid_test_msg)
-  #   pbr.write(TinyMsg.new(foo: '', bar: ''))
-  #   pbr.write(make_valid_test_msg)
-  # end
-
   def make_valid_test_msg
     TestMsg.new(foo:      'hello',
                 words:    ['ping', 'pong'],

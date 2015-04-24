@@ -43,7 +43,6 @@ VALUE VALIDATION_ERROR;
 
 VALUE create_handle(VALUE self, VALUE opts, VALUE keep_alive_array) {
   Model *m = new Model();
-  m->msgs.reserve(1);
   m->validate_on_write = rb_hash_get_sym(opts, "validate_on_write");
   m->validate_on_read = rb_hash_get_sym(opts, "validate_on_read");
   m->keep_alive_array = keep_alive_array;
