@@ -1,4 +1,5 @@
 # pbr
+[![Build Status](https://travis-ci.org/wintonpc/pbr.svg)](https://travis-ci.org/wintonpc/pbr)
 
 PBR (or ProtoBuf for Ruby) is a pragmatic Ruby interface to Google's ProtocolBuffers.
 The majority of the code is implemented as a C++ Ruby extension.
