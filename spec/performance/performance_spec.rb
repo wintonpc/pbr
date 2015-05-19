@@ -3,6 +3,7 @@ require 'pbr'
 require 'oj'
 require 'securerandom'
 require_relative 'bigmsg.pb'
+require 'pp'
 
 describe 'Performance' do
 
@@ -37,11 +38,12 @@ describe 'Performance' do
       pbr.read(pb_encoded, BigMsg)
     end
 
-    oj_msg = Pbr.new(PbrMapping.always(OpenStruct)).read(pb_encoded, BigMsg).to_h
+    oj_msg = Pbr.new(PbrMapping.hash_with_symbol_keys).read(pb_encoded, BigMsg)
 
     oj_encoded = nil
     oj_time = time_it(:oj_roundtrip) do
       oj_encoded = Oj.dump(oj_msg)
+      oj_encoded.force_encoding(Encoding::ASCII_8BIT)
       Oj.load(oj_encoded)
     end
 
