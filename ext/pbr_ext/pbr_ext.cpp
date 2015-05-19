@@ -181,20 +181,35 @@ vector<VALUE> arr2vec(VALUE array) {
   return v;
 }
 
-VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
+void write_internal(VALUE self, VALUE handle, VALUE obj, VALUE type, buf_t& buf) {
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
-  buf_t buf;
   buf.reserve(MSG_INITIAL_CAPACITY);
   msg.write(buf, msg, obj);
+}
+
+VALUE write(VALUE self, VALUE handle, VALUE obj, VALUE type) {
+  buf_t buf;
+  write_internal(self, handle, obj, type, buf);
   return rb_str_new((const char*)buf.data(), buf.size());
 }
 
-VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
+VALUE read_internal(VALUE self, VALUE handle, ss_t& ss, VALUE type) {
   Model& model = MODEL(handle);
   Msg& msg = get_msg_for_type(model, type);
-  ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
   return msg.read(ss, msg);
+}
+
+VALUE read(VALUE self, VALUE handle, VALUE sbuf, VALUE type) {
+  ss_t ss = ss_make(RSTRING_PTR(sbuf), RSTRING_LEN(sbuf));
+  return read_internal(self, handle, ss, type);
+}
+
+VALUE transmute(VALUE self, VALUE in_handle, VALUE out_handle, VALUE obj, VALUE type) {
+  buf_t buf;
+  write_internal(self, in_handle, obj, type, buf);
+  ss_t ss = ss_make((char*)buf.data(), buf.size());
+  return read_internal(self, out_handle, ss, type);
 }
 
 wire_t wire_type_for_fld_type(fld_t fld_type) {
@@ -253,6 +268,7 @@ extern "C" void Init_pbr_ext() {
   rb_define_singleton_method(ext, "register_types", (VALUE(*)(ANYARGS))register_types, 3);
   rb_define_singleton_method(ext, "write", (VALUE(*)(ANYARGS))write, 3);
   rb_define_singleton_method(ext, "read", (VALUE(*)(ANYARGS))read, 3);
+  rb_define_singleton_method(ext, "transmute", (VALUE(*)(ANYARGS))transmute, 4);
 
   rb_require("pp");
 }

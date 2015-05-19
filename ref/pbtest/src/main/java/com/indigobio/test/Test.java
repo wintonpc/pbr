@@ -8,10 +8,10 @@ public final class Test {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface SomethingOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface SomethingOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.indigobio.test.Something)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required string a = 1;
     /**
      * <code>required string a = 1;</code>
      */
@@ -30,8 +30,9 @@ public final class Test {
    * Protobuf type {@code com.indigobio.test.Something}
    */
   public static final class Something extends
-      com.google.protobuf.GeneratedMessage
-      implements SomethingOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.indigobio.test.Something)
+      SomethingOrBuilder {
     // Use Something.newBuilder() to construct.
     private Something(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -78,8 +79,9 @@ public final class Test {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              a_ = input.readBytes();
+              a_ = bs;
               break;
             }
           }
@@ -122,7 +124,6 @@ public final class Test {
     }
 
     private int bitField0_;
-    // required string a = 1;
     public static final int A_FIELD_NUMBER = 1;
     private java.lang.Object a_;
     /**
@@ -171,7 +172,8 @@ public final class Test {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasA()) {
         memoizedIsInitialized = 0;
@@ -282,8 +284,9 @@ public final class Test {
      * Protobuf type {@code com.indigobio.test.Something}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.indigobio.test.Test.SomethingOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.indigobio.test.Something)
+        com.indigobio.test.Test.SomethingOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.indigobio.test.Test.internal_static_com_indigobio_test_Something_descriptor;
@@ -402,7 +405,6 @@ public final class Test {
       }
       private int bitField0_;
 
-      // required string a = 1;
       private java.lang.Object a_ = "";
       /**
        * <code>required string a = 1;</code>
@@ -416,9 +418,12 @@ public final class Test {
       public java.lang.String getA() {
         java.lang.Object ref = a_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          a_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            a_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -487,10 +492,10 @@ public final class Test {
     // @@protoc_insertion_point(class_scope:com.indigobio.test.Something)
   }
 
-  public interface EverythingOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface EverythingOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.indigobio.test.Everything)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int32 f_int32 = 1;
     /**
      * <code>required int32 f_int32 = 1;</code>
      */
@@ -500,7 +505,6 @@ public final class Test {
      */
     int getFInt32();
 
-    // required int64 f_int64 = 2;
     /**
      * <code>required int64 f_int64 = 2;</code>
      */
@@ -510,7 +514,6 @@ public final class Test {
      */
     long getFInt64();
 
-    // required uint32 f_uint32 = 3;
     /**
      * <code>required uint32 f_uint32 = 3;</code>
      */
@@ -520,7 +523,6 @@ public final class Test {
      */
     int getFUint32();
 
-    // required uint64 f_uint64 = 4;
     /**
      * <code>required uint64 f_uint64 = 4;</code>
      */
@@ -530,7 +532,6 @@ public final class Test {
      */
     long getFUint64();
 
-    // required sint32 f_sint32 = 5;
     /**
      * <code>required sint32 f_sint32 = 5;</code>
      */
@@ -540,7 +541,6 @@ public final class Test {
      */
     int getFSint32();
 
-    // required sint64 f_sint64 = 6;
     /**
      * <code>required sint64 f_sint64 = 6;</code>
      */
@@ -550,7 +550,6 @@ public final class Test {
      */
     long getFSint64();
 
-    // required bool f_bool = 7;
     /**
      * <code>required bool f_bool = 7;</code>
      */
@@ -560,7 +559,6 @@ public final class Test {
      */
     boolean getFBool();
 
-    // required .com.indigobio.test.Everything.State f_enum = 8;
     /**
      * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
      */
@@ -570,7 +568,6 @@ public final class Test {
      */
     com.indigobio.test.Test.Everything.State getFEnum();
 
-    // required fixed64 f_fixed64 = 9;
     /**
      * <code>required fixed64 f_fixed64 = 9;</code>
      */
@@ -580,7 +577,6 @@ public final class Test {
      */
     long getFFixed64();
 
-    // required sfixed64 f_sfixed64 = 10;
     /**
      * <code>required sfixed64 f_sfixed64 = 10;</code>
      */
@@ -590,7 +586,6 @@ public final class Test {
      */
     long getFSfixed64();
 
-    // required double f_double = 11;
     /**
      * <code>required double f_double = 11;</code>
      */
@@ -600,7 +595,6 @@ public final class Test {
      */
     double getFDouble();
 
-    // required string f_string = 12;
     /**
      * <code>required string f_string = 12;</code>
      */
@@ -615,7 +609,6 @@ public final class Test {
     com.google.protobuf.ByteString
         getFStringBytes();
 
-    // required bytes f_bytes = 13;
     /**
      * <code>required bytes f_bytes = 13;</code>
      */
@@ -625,7 +618,6 @@ public final class Test {
      */
     com.google.protobuf.ByteString getFBytes();
 
-    // required .com.indigobio.test.Something f_embedded = 14;
     /**
      * <code>required .com.indigobio.test.Something f_embedded = 14;</code>
      */
@@ -639,7 +631,6 @@ public final class Test {
      */
     com.indigobio.test.Test.SomethingOrBuilder getFEmbeddedOrBuilder();
 
-    // repeated int32 f_packed = 15 [packed = true];
     /**
      * <code>repeated int32 f_packed = 15 [packed = true];</code>
      */
@@ -653,7 +644,6 @@ public final class Test {
      */
     int getFPacked(int index);
 
-    // required fixed32 f_fixed32 = 16;
     /**
      * <code>required fixed32 f_fixed32 = 16;</code>
      */
@@ -663,7 +653,6 @@ public final class Test {
      */
     int getFFixed32();
 
-    // required sfixed32 f_sfixed32 = 17;
     /**
      * <code>required sfixed32 f_sfixed32 = 17;</code>
      */
@@ -673,7 +662,6 @@ public final class Test {
      */
     int getFSfixed32();
 
-    // required float f_float = 18;
     /**
      * <code>required float f_float = 18;</code>
      */
@@ -683,7 +671,6 @@ public final class Test {
      */
     float getFFloat();
 
-    // repeated .com.indigobio.test.Something f_things = 19;
     /**
      * <code>repeated .com.indigobio.test.Something f_things = 19;</code>
      */
@@ -708,7 +695,6 @@ public final class Test {
     com.indigobio.test.Test.SomethingOrBuilder getFThingsOrBuilder(
         int index);
 
-    // required int32 f_another_int32 = 20;
     /**
      * <code>required int32 f_another_int32 = 20;</code>
      */
@@ -722,8 +708,9 @@ public final class Test {
    * Protobuf type {@code com.indigobio.test.Everything}
    */
   public static final class Everything extends
-      com.google.protobuf.GeneratedMessage
-      implements EverythingOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.indigobio.test.Everything)
+      EverythingOrBuilder {
     // Use Everything.newBuilder() to construct.
     private Everything(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -831,8 +818,9 @@ public final class Test {
               break;
             }
             case 98: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000800;
-              fString_ = input.readBytes();
+              fString_ = bs;
               break;
             }
             case 106: {
@@ -1030,7 +1018,6 @@ public final class Test {
     }
 
     private int bitField0_;
-    // required int32 f_int32 = 1;
     public static final int F_INT32_FIELD_NUMBER = 1;
     private int fInt32_;
     /**
@@ -1046,7 +1033,6 @@ public final class Test {
       return fInt32_;
     }
 
-    // required int64 f_int64 = 2;
     public static final int F_INT64_FIELD_NUMBER = 2;
     private long fInt64_;
     /**
@@ -1062,7 +1048,6 @@ public final class Test {
       return fInt64_;
     }
 
-    // required uint32 f_uint32 = 3;
     public static final int F_UINT32_FIELD_NUMBER = 3;
     private int fUint32_;
     /**
@@ -1078,7 +1063,6 @@ public final class Test {
       return fUint32_;
     }
 
-    // required uint64 f_uint64 = 4;
     public static final int F_UINT64_FIELD_NUMBER = 4;
     private long fUint64_;
     /**
@@ -1094,7 +1078,6 @@ public final class Test {
       return fUint64_;
     }
 
-    // required sint32 f_sint32 = 5;
     public static final int F_SINT32_FIELD_NUMBER = 5;
     private int fSint32_;
     /**
@@ -1110,7 +1093,6 @@ public final class Test {
       return fSint32_;
     }
 
-    // required sint64 f_sint64 = 6;
     public static final int F_SINT64_FIELD_NUMBER = 6;
     private long fSint64_;
     /**
@@ -1126,7 +1108,6 @@ public final class Test {
       return fSint64_;
     }
 
-    // required bool f_bool = 7;
     public static final int F_BOOL_FIELD_NUMBER = 7;
     private boolean fBool_;
     /**
@@ -1142,7 +1123,6 @@ public final class Test {
       return fBool_;
     }
 
-    // required .com.indigobio.test.Everything.State f_enum = 8;
     public static final int F_ENUM_FIELD_NUMBER = 8;
     private com.indigobio.test.Test.Everything.State fEnum_;
     /**
@@ -1158,7 +1138,6 @@ public final class Test {
       return fEnum_;
     }
 
-    // required fixed64 f_fixed64 = 9;
     public static final int F_FIXED64_FIELD_NUMBER = 9;
     private long fFixed64_;
     /**
@@ -1174,7 +1153,6 @@ public final class Test {
       return fFixed64_;
     }
 
-    // required sfixed64 f_sfixed64 = 10;
     public static final int F_SFIXED64_FIELD_NUMBER = 10;
     private long fSfixed64_;
     /**
@@ -1190,7 +1168,6 @@ public final class Test {
       return fSfixed64_;
     }
 
-    // required double f_double = 11;
     public static final int F_DOUBLE_FIELD_NUMBER = 11;
     private double fDouble_;
     /**
@@ -1206,7 +1183,6 @@ public final class Test {
       return fDouble_;
     }
 
-    // required string f_string = 12;
     public static final int F_STRING_FIELD_NUMBER = 12;
     private java.lang.Object fString_;
     /**
@@ -1249,7 +1225,6 @@ public final class Test {
       }
     }
 
-    // required bytes f_bytes = 13;
     public static final int F_BYTES_FIELD_NUMBER = 13;
     private com.google.protobuf.ByteString fBytes_;
     /**
@@ -1265,7 +1240,6 @@ public final class Test {
       return fBytes_;
     }
 
-    // required .com.indigobio.test.Something f_embedded = 14;
     public static final int F_EMBEDDED_FIELD_NUMBER = 14;
     private com.indigobio.test.Test.Something fEmbedded_;
     /**
@@ -1287,7 +1261,6 @@ public final class Test {
       return fEmbedded_;
     }
 
-    // repeated int32 f_packed = 15 [packed = true];
     public static final int F_PACKED_FIELD_NUMBER = 15;
     private java.util.List<java.lang.Integer> fPacked_;
     /**
@@ -1311,7 +1284,6 @@ public final class Test {
     }
     private int fPackedMemoizedSerializedSize = -1;
 
-    // required fixed32 f_fixed32 = 16;
     public static final int F_FIXED32_FIELD_NUMBER = 16;
     private int fFixed32_;
     /**
@@ -1327,7 +1299,6 @@ public final class Test {
       return fFixed32_;
     }
 
-    // required sfixed32 f_sfixed32 = 17;
     public static final int F_SFIXED32_FIELD_NUMBER = 17;
     private int fSfixed32_;
     /**
@@ -1343,7 +1314,6 @@ public final class Test {
       return fSfixed32_;
     }
 
-    // required float f_float = 18;
     public static final int F_FLOAT_FIELD_NUMBER = 18;
     private float fFloat_;
     /**
@@ -1359,7 +1329,6 @@ public final class Test {
       return fFloat_;
     }
 
-    // repeated .com.indigobio.test.Something f_things = 19;
     public static final int F_THINGS_FIELD_NUMBER = 19;
     private java.util.List<com.indigobio.test.Test.Something> fThings_;
     /**
@@ -1395,7 +1364,6 @@ public final class Test {
       return fThings_.get(index);
     }
 
-    // required int32 f_another_int32 = 20;
     public static final int F_ANOTHER_INT32_FIELD_NUMBER = 20;
     private int fAnotherInt32_;
     /**
@@ -1436,7 +1404,8 @@ public final class Test {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasFInt32()) {
         memoizedIsInitialized = 0;
@@ -1772,8 +1741,9 @@ public final class Test {
      * Protobuf type {@code com.indigobio.test.Everything}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.indigobio.test.Test.EverythingOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.indigobio.test.Everything)
+        com.indigobio.test.Test.EverythingOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.indigobio.test.Test.internal_static_com_indigobio_test_Everything_descriptor;
@@ -2191,7 +2161,6 @@ public final class Test {
       }
       private int bitField0_;
 
-      // required int32 f_int32 = 1;
       private int fInt32_ ;
       /**
        * <code>required int32 f_int32 = 1;</code>
@@ -2224,7 +2193,6 @@ public final class Test {
         return this;
       }
 
-      // required int64 f_int64 = 2;
       private long fInt64_ ;
       /**
        * <code>required int64 f_int64 = 2;</code>
@@ -2257,7 +2225,6 @@ public final class Test {
         return this;
       }
 
-      // required uint32 f_uint32 = 3;
       private int fUint32_ ;
       /**
        * <code>required uint32 f_uint32 = 3;</code>
@@ -2290,7 +2257,6 @@ public final class Test {
         return this;
       }
 
-      // required uint64 f_uint64 = 4;
       private long fUint64_ ;
       /**
        * <code>required uint64 f_uint64 = 4;</code>
@@ -2323,7 +2289,6 @@ public final class Test {
         return this;
       }
 
-      // required sint32 f_sint32 = 5;
       private int fSint32_ ;
       /**
        * <code>required sint32 f_sint32 = 5;</code>
@@ -2356,7 +2321,6 @@ public final class Test {
         return this;
       }
 
-      // required sint64 f_sint64 = 6;
       private long fSint64_ ;
       /**
        * <code>required sint64 f_sint64 = 6;</code>
@@ -2389,7 +2353,6 @@ public final class Test {
         return this;
       }
 
-      // required bool f_bool = 7;
       private boolean fBool_ ;
       /**
        * <code>required bool f_bool = 7;</code>
@@ -2422,7 +2385,6 @@ public final class Test {
         return this;
       }
 
-      // required .com.indigobio.test.Everything.State f_enum = 8;
       private com.indigobio.test.Test.Everything.State fEnum_ = com.indigobio.test.Test.Everything.State.ACTIVE;
       /**
        * <code>required .com.indigobio.test.Everything.State f_enum = 8;</code>
@@ -2458,7 +2420,6 @@ public final class Test {
         return this;
       }
 
-      // required fixed64 f_fixed64 = 9;
       private long fFixed64_ ;
       /**
        * <code>required fixed64 f_fixed64 = 9;</code>
@@ -2491,7 +2452,6 @@ public final class Test {
         return this;
       }
 
-      // required sfixed64 f_sfixed64 = 10;
       private long fSfixed64_ ;
       /**
        * <code>required sfixed64 f_sfixed64 = 10;</code>
@@ -2524,7 +2484,6 @@ public final class Test {
         return this;
       }
 
-      // required double f_double = 11;
       private double fDouble_ ;
       /**
        * <code>required double f_double = 11;</code>
@@ -2557,7 +2516,6 @@ public final class Test {
         return this;
       }
 
-      // required string f_string = 12;
       private java.lang.Object fString_ = "";
       /**
        * <code>required string f_string = 12;</code>
@@ -2571,9 +2529,12 @@ public final class Test {
       public java.lang.String getFString() {
         java.lang.Object ref = fString_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          fString_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            fString_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -2631,7 +2592,6 @@ public final class Test {
         return this;
       }
 
-      // required bytes f_bytes = 13;
       private com.google.protobuf.ByteString fBytes_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes f_bytes = 13;</code>
@@ -2667,7 +2627,6 @@ public final class Test {
         return this;
       }
 
-      // required .com.indigobio.test.Something f_embedded = 14;
       private com.indigobio.test.Test.Something fEmbedded_ = com.indigobio.test.Test.Something.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder> fEmbeddedBuilder_;
@@ -2776,7 +2735,7 @@ public final class Test {
         if (fEmbeddedBuilder_ == null) {
           fEmbeddedBuilder_ = new com.google.protobuf.SingleFieldBuilder<
               com.indigobio.test.Test.Something, com.indigobio.test.Test.Something.Builder, com.indigobio.test.Test.SomethingOrBuilder>(
-                  fEmbedded_,
+                  getFEmbedded(),
                   getParentForChildren(),
                   isClean());
           fEmbedded_ = null;
@@ -2784,7 +2743,6 @@ public final class Test {
         return fEmbeddedBuilder_;
       }
 
-      // repeated int32 f_packed = 15 [packed = true];
       private java.util.List<java.lang.Integer> fPacked_ = java.util.Collections.emptyList();
       private void ensureFPackedIsMutable() {
         if (!((bitField0_ & 0x00004000) == 0x00004000)) {
@@ -2836,7 +2794,8 @@ public final class Test {
       public Builder addAllFPacked(
           java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureFPackedIsMutable();
-        super.addAll(values, fPacked_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, fPacked_);
         onChanged();
         return this;
       }
@@ -2850,7 +2809,6 @@ public final class Test {
         return this;
       }
 
-      // required fixed32 f_fixed32 = 16;
       private int fFixed32_ ;
       /**
        * <code>required fixed32 f_fixed32 = 16;</code>
@@ -2883,7 +2841,6 @@ public final class Test {
         return this;
       }
 
-      // required sfixed32 f_sfixed32 = 17;
       private int fSfixed32_ ;
       /**
        * <code>required sfixed32 f_sfixed32 = 17;</code>
@@ -2916,7 +2873,6 @@ public final class Test {
         return this;
       }
 
-      // required float f_float = 18;
       private float fFloat_ ;
       /**
        * <code>required float f_float = 18;</code>
@@ -2949,7 +2905,6 @@ public final class Test {
         return this;
       }
 
-      // repeated .com.indigobio.test.Something f_things = 19;
       private java.util.List<com.indigobio.test.Test.Something> fThings_ =
         java.util.Collections.emptyList();
       private void ensureFThingsIsMutable() {
@@ -3091,7 +3046,8 @@ public final class Test {
           java.lang.Iterable<? extends com.indigobio.test.Test.Something> values) {
         if (fThingsBuilder_ == null) {
           ensureFThingsIsMutable();
-          super.addAll(values, fThings_);
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, fThings_);
           onChanged();
         } else {
           fThingsBuilder_.addAllMessages(values);
@@ -3189,7 +3145,6 @@ public final class Test {
         return fThingsBuilder_;
       }
 
-      // required int32 f_another_int32 = 20;
       private int fAnotherInt32_ ;
       /**
        * <code>required int32 f_another_int32 = 20;</code>
@@ -3233,12 +3188,12 @@ public final class Test {
     // @@protoc_insertion_point(class_scope:com.indigobio.test.Everything)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_indigobio_test_Something_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_indigobio_test_Something_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_indigobio_test_Everything_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3269,29 +3224,29 @@ public final class Test {
       "E\020\001\022\014\n\010INACTIVE\020\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_com_indigobio_test_Something_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_com_indigobio_test_Something_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_indigobio_test_Something_descriptor,
-              new java.lang.String[] { "A", });
-          internal_static_com_indigobio_test_Everything_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_indigobio_test_Everything_descriptor,
-              new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", "FFixed32", "FSfixed32", "FFloat", "FThings", "FAnotherInt32", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_com_indigobio_test_Something_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_com_indigobio_test_Something_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_indigobio_test_Something_descriptor,
+        new java.lang.String[] { "A", });
+    internal_static_com_indigobio_test_Everything_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_com_indigobio_test_Everything_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_indigobio_test_Everything_descriptor,
+        new java.lang.String[] { "FInt32", "FInt64", "FUint32", "FUint64", "FSint32", "FSint64", "FBool", "FEnum", "FFixed64", "FSfixed64", "FDouble", "FString", "FBytes", "FEmbedded", "FPacked", "FFixed32", "FSfixed32", "FFloat", "FThings", "FAnotherInt32", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

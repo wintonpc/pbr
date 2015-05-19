@@ -13,6 +13,7 @@ require_relative 'pbr/enum'
 require_relative 'pbr/descriptors.pb'
 require_relative 'pbr/plugin.pb'
 require_relative 'pbr/generator'
+require_relative 'pbr/transmuter'
 
 begin
   require 'pbr_ext'
@@ -69,6 +70,10 @@ class Pbr
 
   def register(type)
     ensure_type_registered(type)
+  end
+
+  def handle
+    Pbr.handles[@cookie]
   end
 
   private
