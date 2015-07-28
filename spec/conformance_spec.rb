@@ -10,7 +10,10 @@ describe 'Conformance' do
       system('mvn clean package') or abort 'maven failed'
     end
 
-    require_relative '../ref/test.pb'
+    require_relative '../ref/com/indigobio/test/test.pb'
+
+    Everything = Com::Indigobio::Test::Everything
+    Something = Com::Indigobio::Test::Something
 
     msg = Everything.new(
         f_int32: 2**31 - 1,

@@ -58,7 +58,11 @@ class Pbr
         f_type = pb_type(type)
         f_opts = {msg_class: msg_class(type)}.merge(opts)
         fields_by_name[name] = Field.new(f_label, f_type, name, num, f_opts)
-        attr_accessor name
+        attr_accessor name unless struct?(self)
+      end
+
+      def struct?(x)
+        x.respond_to?(:members) && x.respond_to?(:hash)
       end
 
       def type_name(*args)

@@ -49,6 +49,7 @@ class Pbr
 
     def define!(mt)
       puts
+      puts "#{mt.name} = Struct.new(#{mt.field.map{|f| ":#{f.name}"}.join(', ')})"
       puts "class #{mt.name}"
 
       indent do
