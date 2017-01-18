@@ -72,14 +72,14 @@ You can create custom `PbrMapping` objects to express arbitrary mappings.
 ```ruby
 # a possible implementation of PbrMapping.vanilla
 PbrMapping.new do |m|
-  m.get_target_type = proc {|source_type| source_type}
-  m.get_target_field = proc {|field| field.name}
+  m.get_target_type = proc { |source_type| source_type }
+  m.get_target_field = proc { |field| field.name }
 end
 
 # a possible implementation of PbrMapping.hash_with_string_keys
 PbrMapping.new do |m|
-  m.get_target_type = proc {|source_type| Hash}
-  m.get_target_key = proc {|field| field.name.to_s}
+  m.get_target_type = proc { |source_type| Hash }
+  m.get_target_key = proc { |field| field.name.to_s }
 end
 ```
 
@@ -96,8 +96,8 @@ class TestMsg
   include Pbr::Message
   required :stamp, :string, 1  # this field contains a `Time` in Ruby, but is serialized as a string
 
-  deflate(:stamp) {|time| time.utc.iso8601(3)}
-  inflate(:stamp) {|iso_str| Time.parse(iso_str).localtime}
+  deflate(:stamp) { |time| time.utc.iso8601(3) }
+  inflate(:stamp) { |iso_str| Time.parse(iso_str).localtime }
 end
 ```
 
@@ -132,7 +132,7 @@ class WrappedMsg
   required :type, :string, 1
   required :msg, :bytes, 2   # the serialized message
 
-  type_of(:msg) {|wrapped| wrapped.type.constantize }  # constantize from activesupport
+  type_of(:msg) { |wrapped| wrapped.type.constantize }  # constantize from activesupport
 end
 ```
 
