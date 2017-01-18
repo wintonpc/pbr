@@ -14,3 +14,6 @@
 mkmf.log
 .idea
 \#*\#
+ext/pbr_ext/TAGS
+ref/pbtest/target
+ref/test.pb.rb

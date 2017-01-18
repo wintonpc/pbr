@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Pbr::VERSION
   spec.authors       = ['Peter Winton']
   spec.email         = ['pwinton@indigobio.com']
-  spec.summary       = %q{Fast ProtoBuf}
-  spec.description   = %q{Fast ProtoBuf}
+  spec.summary       = %q{Fast Ruby ProtoBuf}
+  spec.description   = %q{A fast C++ implementation of ProtoBuf for ruby}
   spec.homepage      = ''
   spec.license       = 'MIT'
 
@@ -18,9 +18,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
+  spec.extensions << 'ext/pbr_ext/extconf.rb'
+
   spec.add_development_dependency 'bundler', '~> 1.7'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rake-compiler'
+  spec.add_development_dependency 'oj'
+  spec.add_runtime_dependency 'activesupport'
 
 end
